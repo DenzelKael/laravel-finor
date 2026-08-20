@@ -58,3 +58,11 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 # laravel-finor
 # Creado por Ing. ZED
+
+# <h1>composer install</h1>
+# <h1>npm install</h1>
+# <h1>cp .env.example .env</h1>
+# <h1>php artisan</h1>
+# <h1>php artisan key:generate</h1>
+# <h1>php artisan migrate</h1>
+# <h1>composer run dev</h1>
