@@ -1,16 +1,2 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('adminlte::page')
 
-    <title>Hello World</title>
-</head>
-<body>
-
-    <h1>Hello World!</h1>
-
-    <p>Esta es mi primera vista Blade con Laravel.</p>
-
-</body>
-</html>
