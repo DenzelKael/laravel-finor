@@ -236,11 +236,13 @@ return [
         [
             'text' => 'Dashboard',
             'icon' => 'bi bi-speedometer',
-            'submenu' => [
-                ['text' => 'Dashboard v1', 'url' => '/', 'icon' => 'bi bi-circle'],
-                ['text' => 'Dashboard v2', 'url' => 'demo/dashboard-v2', 'icon' => 'bi bi-circle'],
-                ['text' => 'Dashboard v3', 'url' => 'demo/dashboard-v3', 'icon' => 'bi bi-circle'],
-            ],
+
+            ], ['header' => 'GESTIÓN'],
+        [
+            'text' => 'Clients',
+            'url' => 'clients',
+            'icon' => 'bi bi-people',
+            'active' => ['clientes*'],
         ],
         [
             'text' => 'Theme Generate',
