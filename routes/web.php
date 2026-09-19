@@ -38,3 +38,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 });
+Route::resource(
+    'payments',
+    \App\Http\Controllers\PaymentController::class
+);
+
+Route::get(
+    'payments/{payment}/receipt',
+    [\App\Http\Controllers\PaymentController::class, 'receipt']
+)->name('payments.receipt');
