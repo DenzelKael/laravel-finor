@@ -236,6 +236,13 @@ return [
         [
             'text' => 'Dashboard',
             'icon' => 'bi bi-speedometer',
+
+            ], ['header' => 'GESTIÓN'],
+        [
+            'text' => 'Clients',
+            'url' => 'clients',
+            'icon' => 'bi bi-people',
+            'active' => ['clientes*'],
             'submenu' => [
                 ['text' => 'Dashboard v1', 'url' => '/', 'icon' => 'bi bi-circle'],
                 ['text' => 'Planes de Suscripción','url' => 'plans','icon' => 'bi bi-list-check',],
