@@ -238,7 +238,7 @@ return [
             'icon' => 'bi bi-speedometer',
             'submenu' => [
                 ['text' => 'Dashboard v1', 'url' => '/', 'icon' => 'bi bi-circle'],
-                ['text' => 'Dashboard v2', 'url' => 'demo/dashboard-v2', 'icon' => 'bi bi-circle'],
+                ['text' => 'Planes de Suscripción','url' => 'plans','icon' => 'bi bi-list-check',],
                 ['text' => 'Dashboard v3', 'url' => 'demo/dashboard-v3', 'icon' => 'bi bi-circle'],
             ],
         ],
