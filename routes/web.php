@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -38,4 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-});
+
+    Route::get('/', [DashboardController::class, 'index']);
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+ });
