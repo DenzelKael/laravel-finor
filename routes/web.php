@@ -23,6 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
     return view('welcome');
     });
+    Route::resource('clients', \App\Http\Controllers\ClientController::class)->except('show');
+    Route::resource('plans', \App\Http\Controllers\PlanController::class);
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
