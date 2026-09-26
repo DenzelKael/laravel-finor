@@ -1,7 +1,7 @@
 <?php
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ClientController;
 
 
 // AdminLTE authentication routes
@@ -23,7 +23,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
     return view('welcome');
     });
-    Route::resource('clients', \App\Http\Controllers\ClientController::class)->except('show');
+ Route::controller(ClientController::class)
+    ->name('clients.')
+    ->group(function () {
+        Route::get('clients', 'index')->name('index');
+        Route::get('clients/create', 'create')->name('create');
+        Route::post('clients', 'store')->name('store');
+        Route::get('clients/{client}/edit', 'edit')->name('edit');
+        Route::put('clients/{client}', 'update')->name('update');
+        Route::delete('clients/{client}', 'destroy')->name('destroy');
+    });
     Route::resource('plans', \App\Http\Controllers\PlanController::class);
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
