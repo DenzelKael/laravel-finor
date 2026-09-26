@@ -6,13 +6,17 @@
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h1 class="mb-0">Gestión de pagos</h1>
+
             <small class="text-muted">
-                Registro y administración de pagos asociados a suscripciones
+                Registro y consulta de pagos asociados a suscripciones
             </small>
         </div>
 
-        <a href="{{ route('payments.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
+        <a
+            href="{{ route('payments.create') }}"
+            class="btn btn-primary"
+        >
+            <i class="fas fa-plus mr-1"></i>
             Registrar pago
         </a>
     </div>
@@ -20,35 +24,7 @@
 
 @section('content')
 
-    {{-- Success message --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="fas fa-check-circle mr-2"></i>
-            {{ session('success') }}
-
-            <button type="button"
-                    class="close"
-                    data-dismiss="alert"
-                    aria-label="Cerrar">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    {{-- Error message --}}
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="fas fa-exclamation-triangle mr-2"></i>
-            {{ session('error') }}
-
-            <button type="button"
-                    class="close"
-                    data-dismiss="alert"
-                    aria-label="Cerrar">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
+    @include('payments.partials.alerts')
 
     <div class="card">
 
@@ -66,13 +42,15 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Suscripción</th>
                         <th>Cliente</th>
+                        <th>Plan</th>
                         <th>Monto</th>
-                        <th>Método de pago</th>
+                        <th>Método</th>
                         <th>Fecha</th>
                         <th>Estado</th>
-                        <th class="text-center">Acciones</th>
+                        <th class="text-center">
+                            Acciones
+                        </th>
                     </tr>
                 </thead>
 
@@ -80,62 +58,29 @@
 
                     @forelse ($payments as $payment)
 
-                        @php
-                            $subscription = $subscriptions[$payment->subscription_id] ?? null;
-
-                            $paymentMethodLabels = [
-                                'CASH' => 'Efectivo',
-                                'CARD' => 'Tarjeta',
-                                'TRANSFER' => 'Transferencia bancaria',
-                                'QR' => 'QR',
-                            ];
-
-                            $statusLabels = [
-                                'REGISTERED' => 'Registrado',
-                                'PENDING' => 'Pendiente',
-                                'CANCELLED' => 'Anulado',
-                            ];
-
-                            $statusClasses = [
-                                'REGISTERED' => 'success',
-                                'PENDING' => 'warning',
-                                'CANCELLED' => 'danger',
-                            ];
-
-                            $statusLabel = $statusLabels[$payment->status] ?? $payment->status;
-                            $statusClass = $statusClasses[$payment->status] ?? 'secondary';
-                        @endphp
-
                         <tr>
 
                             <td>
-                                {{ $payment->id }}
+                                #{{ $payment->id }}
                             </td>
 
                             <td>
-                                #{{ $payment->subscription_id }}
-
-                                @if ($subscription)
-                                    <br>
-                                    <small class="text-muted">
-                                        {{ $subscription['plan_name'] }}
-                                    </small>
-                                @endif
+                                {{ $payment->subscription?->customer_name ?? 'No disponible' }}
                             </td>
 
                             <td>
-                                {{ $subscription['customer_name'] ?? 'No disponible' }}
+                                {{ $payment->subscription?->plan_name ?? 'No disponible' }}
                             </td>
 
                             <td>
                                 <strong>
-                                    Bs. {{ number_format((float) $payment->amount, 2, ',', '.') }}
+                                    Bs.
+                                    {{ number_format((float) $payment->amount, 2, ',', '.') }}
                                 </strong>
                             </td>
 
                             <td>
-                                {{ $paymentMethodLabels[$payment->payment_method]
-                                    ?? $payment->payment_method }}
+                                {{ $payment->payment_method_label }}
                             </td>
 
                             <td>
@@ -143,45 +88,45 @@
                             </td>
 
                             <td>
-                                <span class="badge badge-{{ $statusClass }}">
-                                    {{ $statusLabel }}
+                                <span class="badge badge-{{ $payment->status_badge }}">
+                                    {{ $payment->status_label }}
                                 </span>
                             </td>
 
                             <td class="text-center">
 
-                                <a href="{{ route('payments.show', $payment) }}"
-                                   class="btn btn-info btn-sm"
-                                   title="Ver">
+                                <a
+                                    href="{{ route('payments.show', $payment) }}"
+                                    class="btn btn-info btn-sm"
+                                    title="Ver detalle"
+                                >
                                     <i class="fas fa-eye"></i>
                                 </a>
 
-                                <a href="{{ route('payments.receipt', $payment) }}"
-                                   class="btn btn-secondary btn-sm"
-                                   title="Recibo">
+                                <a
+                                    href="{{ route('payments.receipt', $payment) }}"
+                                    class="btn btn-secondary btn-sm"
+                                    title="Ver recibo"
+                                >
                                     <i class="fas fa-receipt"></i>
                                 </a>
 
-                                <a href="{{ route('payments.edit', $payment) }}"
-                                   class="btn btn-warning btn-sm"
-                                   title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-
-                                <form action="{{ route('payments.destroy', $payment) }}"
-                                      method="POST"
-                                      class="d-inline"
-                                      onsubmit="return confirm('¿Está seguro de eliminar este pago?');">
-
+                                <form
+                                    action="{{ route('payments.destroy', $payment) }}"
+                                    method="POST"
+                                    class="d-inline"
+                                    onsubmit="return confirm('¿Está seguro de eliminar este pago?');"
+                                >
                                     @csrf
                                     @method('DELETE')
 
-                                    <button type="submit"
-                                            class="btn btn-danger btn-sm"
-                                            title="Eliminar">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        title="Eliminar pago"
+                                    >
                                         <i class="fas fa-trash"></i>
                                     </button>
-
                                 </form>
 
                             </td>
@@ -191,12 +136,13 @@
                     @empty
 
                         <tr>
-                            <td colspan="8"
-                                class="text-center text-muted py-4">
-
+                            <td
+                                colspan="8"
+                                class="text-center text-muted py-4"
+                            >
                                 <i class="fas fa-info-circle mr-1"></i>
-                                No existen pagos registrados.
 
+                                No existen pagos registrados.
                             </td>
                         </tr>
 

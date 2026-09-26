@@ -5,7 +5,9 @@
 @section('content_header')
 
     <div>
-        <h1 class="mb-0">Registrar pago</h1>
+        <h1 class="mb-0">
+            Registrar pago
+        </h1>
 
         <small class="text-muted">
             Registre un pago asociado a una suscripción
@@ -16,68 +18,25 @@
 
 @section('content')
 
-    {{-- Exception message --}}
-    @if (session('error'))
-
-        <div class="alert alert-danger">
-
-            <i class="fas fa-exclamation-triangle mr-2"></i>
-
-            {{ session('error') }}
-
-        </div>
-
-    @endif
-
-
-    {{-- Validation errors --}}
-    @if ($errors->any())
-
-        <div class="alert alert-danger">
-
-            <strong>
-                <i class="fas fa-exclamation-circle"></i>
-                Revise la información ingresada.
-            </strong>
-
-            <ul class="mb-0 mt-2">
-
-                @foreach ($errors->all() as $error)
-
-                    <li>{{ $error }}</li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    @endif
-
+    @include('payments.partials.alerts')
 
     <div class="card card-primary">
 
         <div class="card-header">
-
             <h3 class="card-title">
-
                 <i class="fas fa-money-bill-wave mr-1"></i>
-
                 Información del pago
-
             </h3>
-
         </div>
 
-
-        <form action="{{ route('payments.store') }}"
-              method="POST">
+        <form
+            action="{{ route('payments.store') }}"
+            method="POST"
+        >
 
             @csrf
 
-
             <div class="card-body">
-
 
                 {{-- Subscription --}}
                 <div class="form-group">
@@ -100,22 +59,20 @@
                         @foreach ($subscriptions as $subscription)
 
                             <option
-                                value="{{ $subscription['id'] }}"
-                                {{ old('subscription_id') == $subscription['id'] ? 'selected' : '' }}
+                                value="{{ $subscription->id }}"
+                                {{ old('subscription_id') == $subscription->id ? 'selected' : '' }}
                             >
-
-                                #{{ $subscription['id'] }}
+                                #{{ $subscription->id }}
                                 -
-                                {{ $subscription['customer_name'] }}
+                                {{ $subscription->customer_name }}
                                 -
-                                {{ $subscription['plan_name'] }}
+                                {{ $subscription->plan_name }}
 
-                                @if ($subscription['status'] === 'EXPIRED')
+                                @if ($subscription->isExpired())
                                     - VENCIDA
                                 @else
                                     - ACTIVA
                                 @endif
-
                             </option>
 
                         @endforeach
@@ -123,11 +80,9 @@
                     </select>
 
                     @error('subscription_id')
-
                         <span class="invalid-feedback">
                             {{ $message }}
                         </span>
-
                     @enderror
 
                     <small class="form-text text-muted">
@@ -135,7 +90,6 @@
                     </small>
 
                 </div>
-
 
                 {{-- Amount --}}
                 <div class="form-group">
@@ -165,17 +119,14 @@
                         >
 
                         @error('amount')
-
                             <span class="invalid-feedback">
                                 {{ $message }}
                             </span>
-
                         @enderror
 
                     </div>
 
                 </div>
-
 
                 {{-- Payment method --}}
                 <div class="form-group">
@@ -226,15 +177,12 @@
                     </select>
 
                     @error('payment_method')
-
                         <span class="invalid-feedback">
                             {{ $message }}
                         </span>
-
                     @enderror
 
                 </div>
-
 
                 {{-- Payment date --}}
                 <div class="form-group">
@@ -253,59 +201,14 @@
                     >
 
                     @error('payment_date')
-
                         <span class="invalid-feedback">
                             {{ $message }}
                         </span>
-
                     @enderror
 
                 </div>
-
-
-                {{-- Status --}}
-                <div class="form-group">
-
-                    <label for="status">
-                        Estado
-                    </label>
-
-                    <select
-                        name="status"
-                        id="status"
-                        class="form-control @error('status') is-invalid @enderror"
-                        required
-                    >
-
-                        <option
-                            value="REGISTERED"
-                            {{ old('status', 'REGISTERED') === 'REGISTERED' ? 'selected' : '' }}
-                        >
-                            Registrado
-                        </option>
-
-                        <option
-                            value="PENDING"
-                            {{ old('status') === 'PENDING' ? 'selected' : '' }}
-                        >
-                            Pendiente
-                        </option>
-
-                    </select>
-
-                    @error('status')
-
-                        <span class="invalid-feedback">
-                            {{ $message }}
-                        </span>
-
-                    @enderror
-
-                </div>
-
 
             </div>
-
 
             <div class="card-footer">
 
@@ -313,21 +216,16 @@
                     type="submit"
                     class="btn btn-primary"
                 >
-
                     <i class="fas fa-save mr-1"></i>
                     Registrar pago
-
                 </button>
-
 
                 <a
                     href="{{ route('payments.index') }}"
                     class="btn btn-secondary"
                 >
-
                     <i class="fas fa-arrow-left mr-1"></i>
                     Cancelar
-
                 </a>
 
             </div>
