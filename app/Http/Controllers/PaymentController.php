@@ -4,16 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ExpiredSubscriptionException;
 use App\Models\Payment;
+use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
     /**
-     * Temporary subscriptions until the Subscription module is integrated.
+     * Subscriptions from DB or fallback mock until migrations/seeders are run.
      */
     private function getMockSubscriptions(): array
     {
+        try {
+            $dbSubscriptions = Subscription::all()->keyBy('id')->map(function ($sub) {
+                return [
+                    'id' => $sub->id,
+                    'customer_name' => $sub->customer_name,
+                    'plan_name' => $sub->plan_name,
+                    'start_date' => $sub->start_date ? $sub->start_date->format('Y-m-d') : null,
+                    'expiration_date' => $sub->expiration_date ? $sub->expiration_date->format('Y-m-d') : null,
+                    'status' => $sub->status,
+                ];
+            })->toArray();
+
+            if (!empty($dbSubscriptions)) {
+                return $dbSubscriptions;
+            }
+        } catch (\Throwable $e) {
+            // DB table might not exist yet before migration
+        }
+
         return [
             1 => [
                 'id' => 1,
