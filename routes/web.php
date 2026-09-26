@@ -1,8 +1,8 @@
 <?php
+
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
-
-
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -20,11 +20,28 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-    return view('welcome');
-    });
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+
     Route::resource('clients', \App\Http\Controllers\ClientController::class)->except('show');
     Route::resource('plans', \App\Http\Controllers\PlanController::class);
+
+    Route::resource(
+        'payments',
+        PaymentController::class
+    )->only([
+        'index',
+        'create',
+        'store',
+        'show',
+        'destroy',
+    ]);
+
+    Route::get(
+        'payments/{payment}/receipt',
+        [PaymentController::class, 'receipt']
+    )->name('payments.receipt');
+
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
@@ -38,7 +55,4 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-
-    Route::get('/', [DashboardController::class, 'index']);
-    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
- });
+});
