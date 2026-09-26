@@ -6,19 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
 
-            // Temporary reference until the Subscription module is integrated.
-            $table->unsignedBigInteger('subscription_id')->index();
+            $table->foreignId('subscription_id')
+                ->constrained('subscriptions')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
 
             $table->decimal('amount', 10, 2);
-            $table->string('payment_method', 50);
+            $table->string('payment_method', 30);
             $table->date('payment_date');
             $table->string('status', 30)->default('REGISTERED');
 
@@ -26,9 +25,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('payments');
