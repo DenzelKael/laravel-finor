@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\RoleController;
 
 
 // AdminLTE authentication routes
@@ -21,8 +21,26 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
-    return view('welcome');
+        return view('welcome');
     });
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/users', function () {
+            return view('settings.users.index');
+            ;
+        })->name('users.index');
+
+
+        Route::get('/roles', [RoleController::class, 'index'])
+            ->name('roles.index');
+
+        Route::get('/permissions', function () {
+            return view('settings.permissions.index');
+            ;
+        })->name('permissions.index');
+    });
+
+
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
@@ -38,19 +56,3 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 });
 
-Route::prefix('admin')->group(function () {
-    Route::get('/users', function () {
-        return view('settings.users.index');
-        ;
-    })->name('users.index');
-
-    Route::get('/roles', function () {
-        return view('settings.roles.index');
-        ;
-    })->name('roles.index');
-
-    Route::get('/permissions', function () {
-        return view('settings.permissions.index');
-        ;
-    })->name('permissions.index');
-});
