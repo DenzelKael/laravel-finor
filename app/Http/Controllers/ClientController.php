@@ -42,10 +42,9 @@ class ClientController extends Controller
         $client = Client::create($data);
 
          return response()->json([
-            'success' => true,
-            'message' => 'Cliente creado exitosamente.',
-            'client'  => $client,
-        ]);
+            'data'  => $client,
+            'message' => 'Cliente Creado Exitosamente.',
+        ], 201);
     }
 
     /**
@@ -82,9 +81,8 @@ class ClientController extends Controller
 
 
         return response()->json([
-            'success' => true,
-            'message' => 'Cliente Editado.',
-            'client'  => $client,
+        'data' => $client,
+        'message' => 'Cliente Editado Exitosamente.',
         ]);
     }
 
@@ -96,8 +94,7 @@ class ClientController extends Controller
         //
          $client->delete();
        return response()->json([
-            'success' => true,
-            'message' => 'Cliente eliminado.',
+            'message' => 'Cliente Eliminado Exitosamente.',
         ]);
     }
 }

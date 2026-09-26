@@ -1,7 +1,7 @@
 <?php
-
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ClientController;
 
 
 // AdminLTE authentication routes
@@ -23,12 +23,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
     return view('welcome');
     });
-   Route::get('clients', [\App\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
-    Route::get('clients/create', [\App\Http\Controllers\ClientController::class, 'create'])->name('clients.create');
-    Route::post('clients', [\App\Http\Controllers\ClientController::class, 'store'])->name('clients.store');
-    Route::get('clients/{client}/edit', [\App\Http\Controllers\ClientController::class, 'edit'])->name('clients.edit');
-    Route::put('clients/{client}', [\App\Http\Controllers\ClientController::class, 'update'])->name('clients.update');
-    Route::delete('clients/{client}', [\App\Http\Controllers\ClientController::class, 'destroy'])->name('clients.destroy');
+ Route::controller(ClientController::class)
+    ->name('clients.')
+    ->group(function () {
+        Route::get('clients', 'index')->name('index');
+        Route::get('clients/create', 'create')->name('create');
+        Route::post('clients', 'store')->name('store');
+        Route::get('clients/{client}/edit', 'edit')->name('edit');
+        Route::put('clients/{client}', 'update')->name('update');
+        Route::delete('clients/{client}', 'destroy')->name('destroy');
+    });
     Route::resource('plans', \App\Http\Controllers\PlanController::class);
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
@@ -43,4 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-});
+
+    Route::get('/', [DashboardController::class, 'index']);
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+ });

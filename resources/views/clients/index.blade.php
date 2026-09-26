@@ -3,14 +3,14 @@
 @section('title', 'Clients')
 
 @section('content_header')
-    <h1>Clients</h1>
+    <h1>Clientes</h1>
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">
         <a href="{{ route('clients.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> New Client
+            <i class="fas fa-plus"></i> Nuevo Cliente
         </a>
     </div>
 
@@ -21,11 +21,11 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Name</th>
+                    <th>Nombre</th>
                     <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th style="width: 200px">Actions</th>
+                    <th>Telefono</th>
+                    <th>Direccion</th>
+                    <th style="width: 200px">Accion</th>
                 </tr>
             </thead>
             <tbody id="clients-table-body">
@@ -38,10 +38,11 @@
                         <td>{{ $client->address ?? '-' }}</td>
                         <td>
                             <a href="{{ route('clients.edit', $client) }}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
+                                <i class="fas fa-edit"></i> Editar
                             </a>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $client->id }})">
-                                <i class="fas fa-trash"></i> Delete
+                            <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="confirmDelete({{ $client->id }}, '{{ route('clients.destroy', $client) }}')">
+                                <i class="fas fa-trash"></i> Eliminar
                             </button>
                         </td>
                     </tr>
@@ -61,38 +62,6 @@
 @endsection
 
 @section('js')
-@vite(['resources/js/app.js'])
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function showAlert(message, type = 'success') {
-        document.getElementById('alert-container').innerHTML =
-            `<div class="alert alert-${type} m-3">${message}</div>`;
-        setTimeout(() => document.getElementById('alert-container').innerHTML = '', 3000);
-    }
-
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Estas seguro',
-            text: "Este cliente sera eliminado permanentemente.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelarButtonColor: '#6c757d',
-            confirmButtonText: 'Si, eliminar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                deleteClient(id);
-            }
-        });
-    }
-
-    async function deleteClient(id) {
-        const { data } = await window.api.delete(`/clients/${id}`);
-
-        if (data.success) {
-            document.getElementById(`client-row-${id}`).remove();
-            showAlert(data.message);
-        }
-    }
-</script>
+@vite(['resources/js/clients/index.js'])
 @endsection

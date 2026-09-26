@@ -1,5 +1,5 @@
 <div class="form-group">
-    <label>Name</label>
+    <label>Nombre</label>
     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
            value="{{ old('name', $client->name ?? '') }}">
     @error('name')
@@ -17,7 +17,7 @@
 </div>
 
 <div class="form-group">
-    <label>Phone</label>
+    <label>Telefono</label>
     <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
            value="{{ old('phone', $client->phone ?? '') }}">
     @error('phone')
@@ -26,7 +26,7 @@
 </div>
 
 <div class="form-group">
-    <label>Address</label>
+    <label>Direccion</label>
     <input type="text" name="address" class="form-control @error('address') is-invalid @enderror"
            value="{{ old('address', $client->address ?? '') }}">
     @error('address')
