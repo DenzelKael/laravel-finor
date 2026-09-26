@@ -3,74 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ExpiredSubscriptionException;
+use App\Http\Requests\StorePaymentRequest;
 use App\Models\Payment;
 use App\Models\Subscription;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+use App\Services\PaymentService;
 
 class PaymentController extends Controller
 {
-    /**
-     * Subscriptions from DB or fallback mock until migrations/seeders are run.
-     */
-    private function getMockSubscriptions(): array
-    {
-        try {
-            $dbSubscriptions = Subscription::all()->keyBy('id')->map(function ($sub) {
-                return [
-                    'id' => $sub->id,
-                    'customer_name' => $sub->customer_name,
-                    'plan_name' => $sub->plan_name,
-                    'start_date' => $sub->start_date ? $sub->start_date->format('Y-m-d') : null,
-                    'expiration_date' => $sub->expiration_date ? $sub->expiration_date->format('Y-m-d') : null,
-                    'status' => $sub->status,
-                ];
-            })->toArray();
-
-            if (!empty($dbSubscriptions)) {
-                return $dbSubscriptions;
-            }
-        } catch (\Throwable $e) {
-            // DB table might not exist yet before migration
-        }
-
-        return [
-            1 => [
-                'id' => 1,
-                'customer_name' => 'Juan Pérez',
-                'plan_name' => 'Plan Básico',
-                'start_date' => '2026-09-01',
-                'expiration_date' => '2026-12-31',
-                'status' => 'ACTIVE',
-            ],
-
-            2 => [
-                'id' => 2,
-                'customer_name' => 'María López',
-                'plan_name' => 'Plan Premium',
-                'start_date' => '2026-01-01',
-                'expiration_date' => '2026-08-31',
-                'status' => 'EXPIRED',
-            ],
-
-            3 => [
-                'id' => 3,
-                'customer_name' => 'Carlos Mendoza',
-                'plan_name' => 'Plan Estándar',
-                'start_date' => '2026-09-10',
-                'expiration_date' => '2027-03-10',
-                'status' => 'ACTIVE',
-            ],
-        ];
-    }
-
     /**
      * Display a listing of payments.
      */
     public function index()
     {
-        $payments = Payment::latest()->get();
-        $subscriptions = $this->getMockSubscriptions();
+        $payments = Payment::with('subscription')->latest()->get();
+        $subscriptions = Subscription::all()->keyBy('id');
 
         return view('payments.index', compact('payments', 'subscriptions'));
     }
@@ -80,66 +26,18 @@ class PaymentController extends Controller
      */
     public function create()
     {
-        $subscriptions = $this->getMockSubscriptions();
+        $subscriptions = Subscription::all();
 
         return view('payments.create', compact('subscriptions'));
     }
 
     /**
-     * Store a newly created payment.
+     * Store a newly created payment in storage.
      */
-    public function store(Request $request)
+    public function store(StorePaymentRequest $request, PaymentService $paymentService)
     {
-        $validated = $request->validate(
-            [
-                'subscription_id' => 'required|integer',
-                'amount' => 'required|numeric|min:0.01',
-                'payment_method' => 'required|string|max:50',
-                'payment_date' => 'required|date',
-                'status' => 'required|string|max:30',
-            ],
-            [
-                'subscription_id.required' => 'Debe seleccionar una suscripción.',
-                'subscription_id.integer' => 'La suscripción seleccionada no es válida.',
-
-                'amount.required' => 'El monto es obligatorio.',
-                'amount.numeric' => 'El monto debe ser un valor numérico.',
-                'amount.min' => 'El monto debe ser mayor a cero.',
-
-                'payment_method.required' => 'Debe seleccionar un método de pago.',
-
-                'payment_date.required' => 'La fecha de pago es obligatoria.',
-                'payment_date.date' => 'La fecha de pago no es válida.',
-
-                'status.required' => 'El estado es obligatorio.',
-            ]
-        );
-
         try {
-            $subscriptions = $this->getMockSubscriptions();
-
-            if (!isset($subscriptions[$validated['subscription_id']])) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'subscription_id' => 'La suscripción seleccionada no existe.',
-                    ]);
-            }
-
-            $subscription = $subscriptions[$validated['subscription_id']];
-
-            $expirationDate = Carbon::parse(
-                $subscription['expiration_date']
-            );
-
-            if (
-                $subscription['status'] === 'EXPIRED' ||
-                $expirationDate->isPast()
-            ) {
-                throw new ExpiredSubscriptionException();
-            }
-
-            $payment = Payment::create($validated);
+            $payment = $paymentService->registerPayment($request->validated());
 
             return redirect()
                 ->route('payments.receipt', $payment)
@@ -157,93 +55,14 @@ class PaymentController extends Controller
      */
     public function show(Payment $payment)
     {
-        $subscriptions = $this->getMockSubscriptions();
+        $payment->load('subscription');
+        $subscription = $payment->subscription;
 
-        $subscription =
-            $subscriptions[$payment->subscription_id] ?? null;
-
-        return view(
-            'payments.show',
-            compact('payment', 'subscription')
-        );
+        return view('payments.show', compact('payment', 'subscription'));
     }
 
     /**
-     * Show the form for editing the specified payment.
-     */
-    public function edit(Payment $payment)
-    {
-        $subscriptions = $this->getMockSubscriptions();
-
-        return view(
-            'payments.edit',
-            compact('payment', 'subscriptions')
-        );
-    }
-
-    /**
-     * Update the specified payment.
-     */
-    public function update(Request $request, Payment $payment)
-    {
-        $validated = $request->validate(
-            [
-                'subscription_id' => 'required|integer',
-                'amount' => 'required|numeric|min:0.01',
-                'payment_method' => 'required|string|max:50',
-                'payment_date' => 'required|date',
-                'status' => 'required|string|max:30',
-            ],
-            [
-                'subscription_id.required' => 'Debe seleccionar una suscripción.',
-                'amount.required' => 'El monto es obligatorio.',
-                'amount.numeric' => 'El monto debe ser un valor numérico.',
-                'amount.min' => 'El monto debe ser mayor a cero.',
-                'payment_method.required' => 'Debe seleccionar un método de pago.',
-                'payment_date.required' => 'La fecha de pago es obligatoria.',
-                'status.required' => 'El estado es obligatorio.',
-            ]
-        );
-
-        try {
-            $subscriptions = $this->getMockSubscriptions();
-
-            if (!isset($subscriptions[$validated['subscription_id']])) {
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'subscription_id' => 'La suscripción seleccionada no existe.',
-                    ]);
-            }
-
-            $subscription = $subscriptions[$validated['subscription_id']];
-
-            $expirationDate = Carbon::parse(
-                $subscription['expiration_date']
-            );
-
-            if (
-                $subscription['status'] === 'EXPIRED' ||
-                $expirationDate->isPast()
-            ) {
-                throw new ExpiredSubscriptionException();
-            }
-
-            $payment->update($validated);
-
-            return redirect()
-                ->route('payments.index')
-                ->with('success', 'Pago actualizado correctamente.');
-
-        } catch (ExpiredSubscriptionException $exception) {
-            return back()
-                ->withInput()
-                ->with('error', $exception->getMessage());
-        }
-    }
-
-    /**
-     * Remove the specified payment.
+     * Remove the specified payment from storage.
      */
     public function destroy(Payment $payment)
     {
@@ -259,14 +78,9 @@ class PaymentController extends Controller
      */
     public function receipt(Payment $payment)
     {
-        $subscriptions = $this->getMockSubscriptions();
+        $payment->load('subscription');
+        $subscription = $payment->subscription;
 
-        $subscription =
-            $subscriptions[$payment->subscription_id] ?? null;
-
-        return view(
-            'payments.receipt',
-            compact('payment', 'subscription')
-        );
+        return view('payments.receipt', compact('payment', 'subscription'));
     }
 }
