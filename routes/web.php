@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 
 
 // AdminLTE authentication routes
@@ -25,11 +26,9 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('admin')->group(function () {
-        Route::get('/users', function () {
-            return view('settings.users.index');
-            ;
-        })->name('users.index');
 
+        Route::get('/users', [UserController::class, 'index'])
+            ->name('users.index');
 
         Route::get('/roles', [RoleController::class, 'index'])
             ->name('roles.index');
