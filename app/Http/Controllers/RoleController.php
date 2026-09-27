@@ -9,7 +9,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::with('permissions', 'users')->get();
         return view('settings.roles.index', compact('roles'));
     }
 }
