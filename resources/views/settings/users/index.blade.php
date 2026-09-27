@@ -22,9 +22,9 @@
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->getRoleNames()->implode(', ') }}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm">
+                        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm">
                             Edit
-                        </button>
+                        </a>
                     </td>
                 </tr>
             @endforeach
