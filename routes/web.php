@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PermissionController;
 
 
 // AdminLTE authentication routes
@@ -33,10 +34,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/roles', [RoleController::class, 'index'])
             ->name('roles.index');
 
-        Route::get('/permissions', function () {
-            return view('settings.permissions.index');
-            ;
-        })->name('permissions.index');
+        Route::get('/permissions', [PermissionController::class, 'index'])
+            ->name('permissions.index');
     });
 
 
