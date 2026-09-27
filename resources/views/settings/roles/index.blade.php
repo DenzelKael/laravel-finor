@@ -3,7 +3,7 @@
 @section('title', 'Roles')
 
 @section('content')
-    <h3>Roles</h3>
+    <h4>Roles</h4>
 
     <table class="table table-bordered">
         <thead>
@@ -22,9 +22,7 @@
                     <td>{{ $role->users->count() }}</td>
                     <td>{{ $role->permissions->count() }}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm">
-                            Edit
-                        </button>
+                        <a href="{{ route('roles.edit', $role) }}">Edit</a>
                     </td>
                 </tr>
             @endforeach
