@@ -21,4 +21,19 @@ class RoleController extends Controller
 
         return view('settings.roles.edit', compact('role', 'permissions'));
     }
+
+    public function update(Request $request, Role $role)
+    {
+        $validated = $request->validate([
+            'permissions' => ['array'],
+            'permissions.*' => ['string', 'exists:permissions,name'],
+        ]);
+
+        $role->syncPermissions(
+            $validated['permissions'] ?? []
+        );
+
+        return redirect()
+            ->route('roles.edit', $role);
+    }
 }
