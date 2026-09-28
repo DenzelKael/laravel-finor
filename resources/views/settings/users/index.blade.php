@@ -22,9 +22,11 @@
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->getRoleNames()->implode(', ') }}</td>
                     <td>
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm">
-                            Edit
-                        </a>
+                        @can('users.update')
+                            <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm">
+                                Edit
+                            </a>
+                        @endcan
                     </td>
                 </tr>
             @endforeach

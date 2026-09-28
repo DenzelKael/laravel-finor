@@ -27,6 +27,20 @@ class UserController extends Controller
         $validated = $request->validate([
             'role' => ['required', 'exists:roles,name'],
         ]);
+        $isLastAdmin =
+            $user->hasRole('Admin')
+            && User::role('Admin')->count() === 1;
+
+        if (
+            $isLastAdmin
+            && $validated['role'] !== 'Admin'
+        ) {
+            return back()
+                ->withErrors([
+                    'role' => 'Debe existir al menos un administrador.'
+                ]);
+        }
+
         $user->syncRoles($validated['role']);
         return redirect()
             ->route('users.edit', $user)

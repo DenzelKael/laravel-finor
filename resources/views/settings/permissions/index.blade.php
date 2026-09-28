@@ -3,9 +3,11 @@
 @section('content')
     <h3>Permissions</h3>
     <div class="mb-3">
-        <a href="{{ route('permissions.create') }}" class="btn btn-success">
-            New Permission
-        </a>
+        @can('permissions.create')
+            <a href="{{ route('permissions.create') }}" class="btn btn-success">
+                New Permission
+            </a>
+        @endcan
     </div>
     <table class="table table-bordered">
         <thead>
@@ -31,23 +33,21 @@
                         </td>
                     @endforeach
                     <td class="text-center">
-                        <a href="{{ route('permissions.edit', $permission) }}" class="btn btn-sm btn-secondary">
-                            Edit
-                        </a>
-                    </td>
-                    <td class="text-center">
-                        <a href="{{ route('permissions.edit', $permission) }}" class="btn btn-sm btn-secondary">
-                            Edit
-                        </a>
+                        @can('permissions.update')
+                            <a href="{{ route('permissions.edit', $permission) }}" class="btn btn-sm btn-secondary">
+                                Edit
+                            </a>
+                        @endcan
                         <form action="{{ route('permissions.destroy', $permission) }}" method="POST" style="display:inline;">
 
                             @csrf
                             @method('DELETE')
-
-                            <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('¿Eliminar este permiso?')">
-                                Delete
-                            </button>
+                            @can('permissions.delete')
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('¿Eliminar este permiso?')">
+                                    Delete
+                                </button>
+                            @endcan
                         </form>
                     </td>
                 </tr>

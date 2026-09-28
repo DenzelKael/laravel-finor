@@ -22,7 +22,11 @@
                     <td>{{ $role->users->count() }}</td>
                     <td>{{ $role->permissions->count() }}</td>
                     <td>
-                        <a href="{{ route('roles.edit', $role) }}">Edit</a>
+                        @can('roles.update')
+                            <a href="{{ route('roles.edit', $role) }}" class="btn btn-primary btn-sm">
+                                Edit
+                            </a>
+                        @endcan
                     </td>
                 </tr>
             @endforeach

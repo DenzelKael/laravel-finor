@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
-
+use Spatie\Permission\Models\HasRoles;
 class AppServiceProvider extends ServiceProvider
 {
     /**

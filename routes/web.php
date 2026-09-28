@@ -27,44 +27,55 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('admin')->group(function () {
-
+        //users
         Route::get('/users', [UserController::class, 'index'])
+            ->middleware('permission:users.view')
             ->name('users.index');
 
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])
+            ->middleware('permission:users.update')
             ->name('users.edit');
 
         Route::put('/users/{user}', [UserController::class, 'update'])
+            ->middleware('permission:users.update')
             ->name('users.update');
 
+        //roles
         Route::get('/roles', [RoleController::class, 'index'])
+            ->middleware('permission:roles.view')
             ->name('roles.index');
 
         Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])
+            ->middleware('permission:roles.update')
             ->name('roles.edit');
 
         Route::put('/roles/{role}', [RoleController::class, 'update'])
+            ->middleware('permission:roles.update')
             ->name('roles.update');
 
+        //permissions
         Route::get('/permissions', [PermissionController::class, 'index'])
+            ->middleware('permission:permissions.view')
             ->name('permissions.index');
 
-        Route::get('/permissions', [PermissionController::class, 'index'])
-            ->name('permissions.index');
-
-        route::get('/permissions/create', [PermissionController::class, 'create'])
+        Route::get('/permissions/create', [PermissionController::class, 'create'])
+            ->middleware('permission:permissions.create')
             ->name('permissions.create');
 
         route::post('/permissions', [PermissionController::class, 'store'])
+            ->middleware('permission:permissions.create')
             ->name('permissions.store');
 
         Route::get('/permissions/{permission}/edit', [PermissionController::class, 'edit'])
+            ->middleware('permission:permissions.update')
             ->name('permissions.edit');
 
         Route::put('/permissions/{permission}', [PermissionController::class, 'update'])
+            ->middleware('permission:permissions.update')
             ->name('permissions.update');
 
         Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])
+            ->middleware('permission:permissions.delete')
             ->name('permissions.destroy');
     });
 

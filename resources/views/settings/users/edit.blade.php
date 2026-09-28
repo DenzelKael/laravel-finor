@@ -20,8 +20,12 @@
                     {{ $role->name }}
                 </label>
             </div>
-
         @endforeach
+        @error('role')
+            <div class="alert alert-danger mt-3">
+                {{ $message }}
+            </div>
+        @enderror
 
         <button type="submit" class="btn btn-success mt-3">
             Save Changes
