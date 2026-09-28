@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\SubscriptionStatus;
+use App\Models\Client;
+use App\Models\Plan;
 use App\Models\Subscription;
 use Illuminate\Database\Seeder;
 
@@ -9,36 +12,99 @@ class SubscriptionSeeder extends Seeder
 {
     public function run(): void
     {
-        Subscription::updateOrCreate(
-            ['id' => 1],
+        $client1 = Client::firstOrCreate(
+            ['email' => 'juan.perez@example.com'],
             [
-                'customer_name' => 'Juan Pérez',
-                'plan_name' => 'Plan Básico',
-                'start_date' => '2026-09-01',
-                'expiration_date' => '2026-12-31',
-                'status' => 'ACTIVE',
+                'name' => 'Juan Pérez',
+                'phone' => '71234567',
+                'address' => 'Av. San Martín #123',
             ]
         );
 
-        Subscription::updateOrCreate(
-            ['id' => 2],
+        $client2 = Client::firstOrCreate(
+            ['email' => 'maria.lopez@example.com'],
             [
-                'customer_name' => 'María López',
-                'plan_name' => 'Plan Premium',
-                'start_date' => '2026-01-01',
-                'expiration_date' => '2026-08-31',
-                'status' => 'EXPIRED',
+                'name' => 'María López',
+                'phone' => '79876543',
+                'address' => 'Calle Bolívar #456',
             ]
         );
 
-        Subscription::updateOrCreate(
-            ['id' => 3],
+        $client3 = Client::firstOrCreate(
+            ['email' => 'carlos.mendoza@example.com'],
             [
-                'customer_name' => 'Carlos Mendoza',
-                'plan_name' => 'Plan Estándar',
-                'start_date' => '2026-09-10',
-                'expiration_date' => '2027-03-10',
-                'status' => 'ACTIVE',
+                'name' => 'Carlos Mendoza',
+                'phone' => '70123456',
+                'address' => 'Av. Cristo Redentor #789',
+            ]
+        );
+
+        $planBasic = Plan::firstOrCreate(
+            ['nombre' => 'Plan Básico'],
+            [
+                'descripcion' => 'Acceso esencial al servicio',
+                'precio' => 100.00,
+                'duracion_dias' => 30,
+                'activo' => true,
+            ]
+        );
+
+        $planPremium = Plan::firstOrCreate(
+            ['nombre' => 'Plan Premium'],
+            [
+                'descripcion' => 'Acceso total y soporte prioritario',
+                'precio' => 250.00,
+                'duracion_dias' => 30,
+                'activo' => true,
+            ]
+        );
+
+        $planStandard = Plan::firstOrCreate(
+            ['nombre' => 'Plan Estándar'],
+            [
+                'descripcion' => 'Acceso estándar recomendado',
+                'precio' => 150.00,
+                'duracion_dias' => 30,
+                'activo' => true,
+            ]
+        );
+
+        // Suscripción activa (Juan Pérez - Plan Básico)
+        Subscription::firstOrCreate(
+            [
+                'client_id' => $client1->id,
+                'plan_id' => $planBasic->id,
+            ],
+            [
+                'start_date' => now()->startOfMonth()->toDateString(),
+                'expiration_date' => now()->addMonths(3)->endOfDay()->toDateString(),
+                'status' => SubscriptionStatus::Active->value,
+            ]
+        );
+
+        // Suscripción vencida (María López - Plan Premium)
+        Subscription::firstOrCreate(
+            [
+                'client_id' => $client2->id,
+                'plan_id' => $planPremium->id,
+            ],
+            [
+                'start_date' => now()->subMonths(4)->startOfMonth()->toDateString(),
+                'expiration_date' => now()->subDays(5)->endOfDay()->toDateString(),
+                'status' => SubscriptionStatus::Expired->value,
+            ]
+        );
+
+        // Suscripción activa (Carlos Mendoza - Plan Estándar)
+        Subscription::firstOrCreate(
+            [
+                'client_id' => $client3->id,
+                'plan_id' => $planStandard->id,
+            ],
+            [
+                'start_date' => now()->subDays(10)->toDateString(),
+                'expiration_date' => now()->addMonths(6)->endOfDay()->toDateString(),
+                'status' => SubscriptionStatus::Active->value,
             ]
         );
     }

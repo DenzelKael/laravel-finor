@@ -10,12 +10,14 @@ return new class extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->string('customer_name');
-            $table->string('plan_name');
+            $table->foreignId('client_id')->constrained('clients')->restrictOnDelete();
+            $table->foreignId('plan_id')->constrained('plans')->restrictOnDelete();
             $table->date('start_date');
             $table->date('expiration_date');
             $table->string('status')->default('ACTIVE');
             $table->timestamps();
+
+            $table->index(['status', 'expiration_date']);
         });
     }
 
