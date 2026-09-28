@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PlanController;
 use Illuminate\Support\Facades\Route;
 
 // AdminLTE authentication routes
@@ -23,7 +25,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
 
-    Route::resource('clients', \App\Http\Controllers\ClientController::class)->except('show');
+    Route::controller(ClientController::class)
+        ->name('clients.')
+        ->group(function () {
+            Route::get('clients', 'index')->name('index');
+            Route::get('clients/create', 'create')->name('create');
+            Route::post('clients', 'store')->name('store');
+            Route::get('clients/{client}/edit', 'edit')->name('edit');
+            Route::put('clients/{client}', 'update')->name('update');
+            Route::delete('clients/{client}', 'destroy')->name('destroy');
+        });
     Route::resource('plans', \App\Http\Controllers\PlanController::class);
 
     Route::resource(

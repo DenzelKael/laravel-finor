@@ -39,9 +39,12 @@ class ClientController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        Client::create($data);
+        $client = Client::create($data);
 
-        return redirect()->route('clients.index')->with('success', 'Client created successfully.');
+         return response()->json([
+            'data'  => $client,
+            'message' => 'Cliente Creado Exitosamente.',
+        ], 201);
     }
 
     /**
@@ -76,16 +79,22 @@ class ClientController extends Controller
 
         $client->update($data);
 
-        return redirect()->route('clients.index')->with('success', 'Client updated.');
+
+        return response()->json([
+        'data' => $client,
+        'message' => 'Cliente Editado Exitosamente.',
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+
      */
     public function destroy(Client $client)
     {
         //
-        $client->delete();
-        return redirect()->route('clients.index')->with('success', 'Client deleted.');
+         $client->delete();
+       return response()->json([
+            'message' => 'Cliente Eliminado Exitosamente.',
+        ]);
     }
 }

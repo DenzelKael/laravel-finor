@@ -237,10 +237,10 @@ return [
             'text' => 'Dashboard',
             'icon' => 'bi bi-speedometer',
 
-        ], 
+        ],
         ['header' => 'GESTIÓN'],
         [
-            'text' => 'Clients',
+            'text' => 'Clientes',
             'url' => 'clients',
             'icon' => 'bi bi-people',
             'active' => ['clientes*'],
