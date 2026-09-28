@@ -21,6 +21,19 @@
                 </label>
             </div>
         @endforeach
+
+        <hr>
+        <h4>Direct Permissions</h4>
+        @foreach ($permissions as $permission)
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="permissions[]" value="{{ $permission->name }}"
+                    @checked($user->hasDirectPermission($permission->name))>
+                <label>
+                    {{ $permission->name }}
+                </label>
+            </div>
+        @endforeach
+
         @error('role')
             <div class="alert alert-danger mt-3">
                 {{ $message }}

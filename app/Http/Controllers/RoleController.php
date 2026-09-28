@@ -33,9 +33,6 @@ class RoleController extends Controller
             $validated['permissions'] ?? []
         );
 
-        app()[PermissionRegistrar::class]
-            ->forgetCachedPermissions();
-
         return redirect()
             ->route('roles.edit', $role);
     }
