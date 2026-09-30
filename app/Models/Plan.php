@@ -21,4 +21,9 @@ class Plan extends Model
         'activo' => 'boolean',
         'precio' => 'decimal:2',
     ];
+
+    public function suscriptions()
+    {
+        return $this->hasMany(Suscription::class);
+    }
 }
