@@ -8,10 +8,10 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Role</th>
-                <th>Users</th>
-                <th>Permissions</th>
-                <th>Actions</th>
+                <th>Rol</th>
+                <th>Usuarios</th>
+                <th>Permisos</th>
+                <th>Acciones</th>
             </tr>
         </thead>
 

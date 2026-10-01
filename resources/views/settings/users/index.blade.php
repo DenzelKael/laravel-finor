@@ -3,15 +3,15 @@
 @section('title', 'Users')
 
 @section('content')
-    <h3>Users</h3>
+    <h3>Usuarios</h3>
 
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Nombre</th>
                 <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
+                <th>Rol</th>
+                <th>Acciones</th>
             </tr>
         </thead>
 

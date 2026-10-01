@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <h3>Edit User: {{ $user->name }}</h3>
+    <h3>Editar Usuario: {{ $user->name }}</h3>
 
     <p>Email: {{ $user->email }}</p>
 
@@ -23,7 +23,7 @@
         @endforeach
 
         <hr>
-        <h4>Direct Permissions</h4>
+        <h4>Permisos Directos</h4>
         @foreach ($permissions as $permission)
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="permissions[]" value="{{ $permission->name }}"
@@ -41,10 +41,10 @@
         @enderror
 
         <button type="submit" class="btn btn-success mt-3">
-            Save Changes
+            Guardar Cambios
         </button>
         <a href="{{ route('users.index') }}" class="btn btn-secondary mt-3">
-            Back
+            volver
         </a>
     </form>
 

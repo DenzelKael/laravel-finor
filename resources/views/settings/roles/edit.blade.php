@@ -8,7 +8,7 @@
 
 @section('content')
 
-    <h3>Edit Role: {{ $role->name }}</h3>
+    <h3>Editar Rol: {{ $role->name }}</h3>
     <form id="edit-form" data-update-url="{{ route('roles.update', $role) }}" data-index-url="{{ route('roles.index') }}">
         @csrf
         @method('PUT')
@@ -35,10 +35,10 @@
         </div>
 
         <button type="submit" class="btn btn-success mt-3">
-            Save Changes
+            Guardar Cambios
         </button>
         <a href="{{ route('roles.index') }}" class="btn btn-secondary mt-3">
-            Back
+            Volver
         </a>
     </form>
 

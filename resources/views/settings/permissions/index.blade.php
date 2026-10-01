@@ -1,22 +1,22 @@
 @extends('adminlte::page')
 @section('title', 'Permissions')
 @section('content')
-    <h3>Permissions</h3>
+    <h3>Permisos</h3>
     <div class="mb-3">
         @can('permissions.create')
             <a href="{{ route('permissions.create') }}" class="btn btn-success">
-                New Permission
+                Nuevo permiso
             </a>
         @endcan
     </div>
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Permission</th>
+                <th>Permisos</th>
                 @foreach ($roles as $role)
                     <th>{{ $role->name }}</th>
                 @endforeach
-                <th>Actions</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>

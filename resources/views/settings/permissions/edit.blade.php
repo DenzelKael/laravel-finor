@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <h3>Edit Permission</h3>
+    <h3>Editar Permiso</h3>
 
     <form id="edit-form" data-update-url="{{ route('permissions.update', $permission) }}"
         data-index-url="{{ route('permissions.index') }}">
@@ -13,7 +13,7 @@
         @method('PUT')
 
         <div class="mb-3">
-            <label class="form-label">Permission Name</label>
+            <label class="form-label">Nombre del Permiso</label>
             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                 value="{{ old('name', $permission->name) }}">
             @error('name')
@@ -22,11 +22,11 @@
         </div>
 
         <button type="submit" class="btn btn-success">
-            Save Changes
+            Guardar Cambios
         </button>
 
         <a href="{{ route('permissions.index') }}" class="btn btn-secondary">
-            Back
+            Volver
         </a>
 
     </form>
