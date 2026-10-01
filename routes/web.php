@@ -1,8 +1,10 @@
 <?php
-use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ClientController;
 
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PlanController;
+use Illuminate\Support\Facades\Route;
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -20,20 +22,33 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-    return view('welcome');
-    });
- Route::controller(ClientController::class)
-    ->name('clients.')
-    ->group(function () {
-        Route::get('clients', 'index')->name('index');
-        Route::get('clients/create', 'create')->name('create');
-        Route::post('clients', 'store')->name('store');
-        Route::get('clients/{client}/edit', 'edit')->name('edit');
-        Route::put('clients/{client}', 'update')->name('update');
-        Route::delete('clients/{client}', 'destroy')->name('destroy');
-    });
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+
+    Route::controller(ClientController::class)
+        ->name('clients.')
+        ->group(function () {
+            Route::get('clients', 'index')->name('index');
+            Route::get('clients/create', 'create')->name('create');
+            Route::post('clients', 'store')->name('store');
+            Route::get('clients/{client}/edit', 'edit')->name('edit');
+            Route::put('clients/{client}', 'update')->name('update');
+            Route::delete('clients/{client}', 'destroy')->name('destroy');
+        });
     Route::resource('plans', \App\Http\Controllers\PlanController::class);
+
+    Route::controller(PaymentController::class)
+        ->prefix('payments')
+        ->name('payments.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{payment}', 'show')->name('show');
+            Route::get('/{payment}/receipt', 'receipt')->name('receipt');
+            Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
+        });
+
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
@@ -47,7 +62,4 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-
-    Route::get('/', [DashboardController::class, 'index']);
-    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
- });
+});
