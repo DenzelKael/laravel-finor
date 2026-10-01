@@ -1,9 +1,12 @@
 <?php
-
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ClientController;
+
 
 
 // AdminLTE authentication routes
@@ -22,10 +25,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('welcome');
-    });
-
     Route::prefix('admin')->group(function () {
         //users
         Route::get('/users', [UserController::class, 'index'])
@@ -62,7 +61,7 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:permissions.create')
             ->name('permissions.create');
 
-        route::post('/permissions', [PermissionController::class, 'store'])
+        Route::post('/permissions', [PermissionController::class, 'store'])
             ->middleware('permission:permissions.create')
             ->name('permissions.store');
 
@@ -79,6 +78,18 @@ Route::middleware('auth')->group(function () {
             ->name('permissions.destroy');
     });
 
+    Route::controller(ClientController::class)
+        ->name('clients.')
+        ->group(function () {
+            Route::get('clients', 'index')->name('index');
+            Route::get('clients/create', 'create')->name('create');
+            Route::post('clients', 'store')->name('store');
+            Route::get('clients/{client}/edit', 'edit')->name('edit');
+            Route::put('clients/{client}', 'update')->name('update');
+            Route::delete('clients/{client}', 'destroy')->name('destroy');
+        });
+    Route::resource('plans', \App\Http\Controllers\PlanController::class);
+
 
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
@@ -92,6 +103,10 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
-    Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-});
+    Route::get('/', [DashboardController::class, 'index']);
 
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+
+    Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
+        ->name('logout');
+});

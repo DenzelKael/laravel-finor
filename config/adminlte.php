@@ -221,6 +221,25 @@ return [
             'icon' => 'bi bi-speedometer',
         ],
 
+        ['header' => 'GESTIÓN'],
+        [
+            'text' => 'Clientes',
+            'url' => 'clients',
+            'icon' => 'bi bi-people',
+            'active' => ['clientes*'],
+        ],
+        [
+            'text' => 'Subscription Plans',
+            'url' => 'plans',
+            'icon' => 'bi bi-list-check',
+        ],
+
+        ['header' => 'REPORTS'],
+        [
+            'text' => 'Dashboard v1',
+            'url' => '/',
+            'icon' => 'bi bi-bar-chart-fill',
+        ],
         ['header' => 'CONFIGURACIÓN'],
         [
             'text' => 'Configuración',
@@ -246,6 +265,7 @@ return [
                 ],
             ],
         ],
+
     ],
 
     /*
