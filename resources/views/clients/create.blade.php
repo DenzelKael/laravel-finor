@@ -7,21 +7,20 @@
 @endsection
 
 @section('content')
-<div class="card">
-    <div class="card-body">
-        <form id="create-form"
-              data-store-url="{{ route('clients.store') }}"
-              data-index-url="{{ route('clients.index') }}">
-            @csrf
-            @include('clients.form')
+    <div class="card">
+        <div class="card-body">
+            <form id="create-form" data-store-url="{{ route('clients.store') }}"
+                data-index-url="{{ route('clients.index') }}">
+                @csrf
+                @include('clients.form')
 
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="{{ route('clients.index') }}" class="btn btn-secondary">Cancelar</a>
-        </form>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="{{ route('clients.index') }}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
     </div>
-</div>
 @endsection
 
 @section('js')
-@vite(['resources/js/clients/create.js'])
+    @vite(['resources/js/clients/create.js'])
 @endsection
