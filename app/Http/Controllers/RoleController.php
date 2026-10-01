@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Http\Requests\UpdateRolePermissionsRequest;
 
 class RoleController extends Controller
 {
@@ -22,12 +23,9 @@ class RoleController extends Controller
         return view('settings.roles.edit', compact('role', 'permissions'));
     }
 
-    public function update(Request $request, Role $role)
+    public function update(UpdateRolePermissionsRequest $request, Role $role)
     {
-        $validated = $request->validate([
-            'permissions' => ['array'],
-            'permissions.*' => ['string', 'exists:permissions,name'],
-        ]);
+        $validated = $request->validated();
 
         $role->syncPermissions(
             $validated['permissions'] ?? []

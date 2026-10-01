@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Http\Requests\UpdateUserRoleRequest;
 
 
 class UserController extends Controller
@@ -30,13 +31,9 @@ class UserController extends Controller
             )
         );
     }
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRoleRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'role' => ['required', 'exists:roles,name'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['exists:permissions,name'],
-        ]);
+        $validated = $request->validated();
         $isLastAdmin =
             $user->hasRole('Admin')
             && User::role('Admin')->count() === 1;

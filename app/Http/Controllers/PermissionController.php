@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\PermissionRequest;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 class PermissionController extends Controller
@@ -20,18 +21,12 @@ class PermissionController extends Controller
     {
         return view('settings.permissions.create');
     }
-    public function store(Request $request)
+    public function store(PermissionRequest $request)
     {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'regex:/^[a-z_]+\.[a-z_]+$/',
-                'unique:permissions,name',
-            ],
-        ]);
-        Permission::create([
-            'name' => $validated['name'],
-        ]);
+        $validated = $request->validated();
+
+        Permission::create($validated);
+
         return redirect()
             ->route('permissions.index');
     }
@@ -42,19 +37,11 @@ class PermissionController extends Controller
             compact('permission')
         );
     }
-
-    public function update(Request $request, Permission $permission)
+    public function update(PermissionRequest $request, Permission $permission)
     {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'regex:/^[a-z_]+\.[a-z_]+$/',
-                'unique:permissions,name,' . $permission->id,
-            ],
-        ]);
-        $permission->update([
-            'name' => $validated['name'],
-        ]);
+        $permission->update(
+            $request->validated()
+        );
         return redirect()
             ->route('permissions.index');
     }
@@ -69,5 +56,4 @@ class PermissionController extends Controller
         return redirect()
             ->route('permissions.index');
     }
-
 }
