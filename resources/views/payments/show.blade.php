@@ -1,225 +1,62 @@
 @extends('adminlte::page')
 
-@section('title', 'Detalle del pago')
+@section('title', 'Detalle de Pago #' . $payment->id)
 
 @section('content_header')
-
     <div class="d-flex justify-content-between align-items-center">
-
+        <h1>Detalle de Pago #{{ $payment->id }}</h1>
         <div>
-            <h1 class="mb-0">
-                Detalle del pago
-            </h1>
-
-            <small class="text-muted">
-                Información del pago #{{ $payment->id }}
-            </small>
+            <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-success btn-sm mr-1">
+                <i class="fas fa-receipt mr-1"></i> Ver Recibo
+            </a>
+            <a href="{{ route('payments.index') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left mr-1"></i> Volver al Listado
+            </a>
         </div>
-
-        <a
-            href="{{ route('payments.receipt', $payment) }}"
-            class="btn btn-secondary"
-        >
-            <i class="fas fa-receipt mr-1"></i>
-            Ver recibo
-        </a>
-
     </div>
-
-@stop
+@endsection
 
 @section('content')
-
-    @include('payments.partials.alerts')
-
-    <div class="row">
-
-        {{-- Payment information --}}
-        <div class="col-md-6">
-
-            <div class="card card-primary">
-
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-money-bill-wave mr-1"></i>
-                        Información del pago
-                    </h3>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card card-outline card-info">
+            <div class="card-header">
+                <h3 class="card-title">Información del Comprobante</h3>
+                <div class="card-tools">
+                    <x-payment-status-badge :status="$payment->status" />
                 </div>
-
-                <div class="card-body">
-
-                    <dl class="row">
-
-                        <dt class="col-sm-5">
-                            Número de pago
-                        </dt>
-
-                        <dd class="col-sm-7">
-                            #{{ $payment->id }}
-                        </dd>
-
-                        <dt class="col-sm-5">
-                            Monto
-                        </dt>
-
-                        <dd class="col-sm-7">
-                            <strong>
-                                Bs.
-                                {{ number_format((float) $payment->amount, 2, ',', '.') }}
-                            </strong>
-                        </dd>
-
-                        <dt class="col-sm-5">
-                            Método de pago
-                        </dt>
-
-                        <dd class="col-sm-7">
-                            {{ $payment->payment_method_label }}
-                        </dd>
-
-                        <dt class="col-sm-5">
-                            Fecha de pago
-                        </dt>
-
-                        <dd class="col-sm-7">
-                            {{ $payment->payment_date->format('d/m/Y') }}
-                        </dd>
-
-                        <dt class="col-sm-5">
-                            Estado
-                        </dt>
-
-                        <dd class="col-sm-7">
-                            <span class="badge badge-{{ $payment->status_badge }}">
-                                {{ $payment->status_label }}
-                            </span>
-                        </dd>
-
-                    </dl>
-
-                </div>
-
             </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Comprobante ID:</dt>
+                    <dd class="col-sm-8">#{{ $payment->id }}</dd>
 
-        </div>
+                    <dt class="col-sm-4">Cliente:</dt>
+                    <dd class="col-sm-8">{{ $payment->subscription->client->name ?? 'N/A' }}</dd>
 
-        {{-- Subscription information --}}
-        <div class="col-md-6">
+                    <dt class="col-sm-4">Plan Suscrito:</dt>
+                    <dd class="col-sm-8">{{ $payment->subscription->plan->nombre ?? 'N/A' }}</dd>
 
-            <div class="card card-info">
+                    <dt class="col-sm-4">Fecha de Pago:</dt>
+                    <dd class="col-sm-8">{{ $payment->payment_date->format('d/m/Y') }}</dd>
 
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-file-contract mr-1"></i>
-                        Información de la suscripción
-                    </h3>
-                </div>
+                    <dt class="col-sm-4">Método de Pago:</dt>
+                    <dd class="col-sm-8">{{ $payment->payment_method->label() }}</dd>
 
-                <div class="card-body">
+                    <dt class="col-sm-4">Monto Pagado:</dt>
+                    <dd class="col-sm-8"><span class="text-success h5 font-weight-bold">{{ $payment->formatted_amount }}</span></dd>
 
-                    @if ($payment->subscription)
-
-                        <dl class="row">
-
-                            <dt class="col-sm-5">
-                                Suscripción
-                            </dt>
-
-                            <dd class="col-sm-7">
-                                #{{ $payment->subscription->id }}
-                            </dd>
-
-                            <dt class="col-sm-5">
-                                Cliente
-                            </dt>
-
-                            <dd class="col-sm-7">
-                                {{ $payment->subscription->customer_name }}
-                            </dd>
-
-                            <dt class="col-sm-5">
-                                Plan
-                            </dt>
-
-                            <dd class="col-sm-7">
-                                {{ $payment->subscription->plan_name }}
-                            </dd>
-
-                            <dt class="col-sm-5">
-                                Fecha de inicio
-                            </dt>
-
-                            <dd class="col-sm-7">
-                                {{ $payment->subscription->start_date->format('d/m/Y') }}
-                            </dd>
-
-                            <dt class="col-sm-5">
-                                Fecha de vencimiento
-                            </dt>
-
-                            <dd class="col-sm-7">
-                                {{ $payment->subscription->expiration_date->format('d/m/Y') }}
-                            </dd>
-
-                            <dt class="col-sm-5">
-                                Estado
-                            </dt>
-
-                            <dd class="col-sm-7">
-
-                                @if ($payment->subscription->isExpired())
-
-                                    <span class="badge badge-danger">
-                                        Vencida
-                                    </span>
-
-                                @else
-
-                                    <span class="badge badge-success">
-                                        Activa
-                                    </span>
-
-                                @endif
-
-                            </dd>
-
-                        </dl>
-
-                    @else
-
-                        <div class="alert alert-warning mb-0">
-                            <i class="fas fa-exclamation-triangle mr-1"></i>
-                            No se encontró información de la suscripción.
-                        </div>
-
-                    @endif
-
-                </div>
-
+                    <dt class="col-sm-4">Fecha de Registro:</dt>
+                    <dd class="col-sm-8">{{ $payment->created_at->format('d/m/Y H:i') }}</dd>
+                </dl>
             </div>
-
+            <div class="card-footer d-flex justify-content-end">
+                <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-primary mr-2">
+                    <i class="fas fa-print mr-1"></i> Imprimir Recibo
+                </a>
+                <a href="{{ route('payments.index') }}" class="btn btn-secondary">Volver</a>
+            </div>
         </div>
-
     </div>
-
-    <div class="mb-3">
-
-        <a
-            href="{{ route('payments.index') }}"
-            class="btn btn-secondary"
-        >
-            <i class="fas fa-arrow-left mr-1"></i>
-            Volver
-        </a>
-
-        <a
-            href="{{ route('payments.receipt', $payment) }}"
-            class="btn btn-info"
-        >
-            <i class="fas fa-receipt mr-1"></i>
-            Ver recibo
-        </a>
-
-    </div>
-
-@stop
+</div>
+@endsection

@@ -37,21 +37,17 @@ Route::middleware('auth')->group(function () {
         });
     Route::resource('plans', \App\Http\Controllers\PlanController::class);
 
-    Route::resource(
-        'payments',
-        PaymentController::class
-    )->only([
-        'index',
-        'create',
-        'store',
-        'show',
-        'destroy',
-    ]);
-
-    Route::get(
-        'payments/{payment}/receipt',
-        [PaymentController::class, 'receipt']
-    )->name('payments.receipt');
+    Route::controller(PaymentController::class)
+        ->prefix('payments')
+        ->name('payments.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{payment}', 'show')->name('show');
+            Route::get('/{payment}/receipt', 'receipt')->name('receipt');
+            Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
+        });
 
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).

@@ -2,85 +2,95 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ExpiredSubscriptionException;
+use App\Enums\PaymentStatus;
 use App\Http\Requests\StorePaymentRequest;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Services\PaymentService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
     /**
-     * Display a listing of payments.
+     * Muestra el listado paginado de pagos con sus relaciones.
      */
-    public function index()
+    public function index(): View
     {
-        $payments = Payment::with('subscription')->latest()->get();
-        $subscriptions = Subscription::all()->keyBy('id');
+        $payments = Payment::with(['subscription.client', 'subscription.plan'])
+            ->latest('payment_date')
+            ->latest('id')
+            ->paginate(15);
 
-        return view('payments.index', compact('payments', 'subscriptions'));
+        return view('payments.index', compact('payments'));
     }
 
     /**
-     * Show the form for creating a new payment.
+     * Muestra el formulario para registrar un nuevo pago.
      */
-    public function create()
+    public function create(): View
     {
-        $subscriptions = Subscription::all();
+        $subscriptions = Subscription::active()
+            ->with(['client', 'plan'])
+            ->get();
 
         return view('payments.create', compact('subscriptions'));
     }
 
     /**
-     * Store a newly created payment in storage.
+     * Registra un pago y responde en JSON para el ApiClient.
      */
-    public function store(StorePaymentRequest $request, PaymentService $paymentService)
-    {
-        try {
-            $payment = $paymentService->registerPayment($request->validated());
+    public function store(
+        StorePaymentRequest $request,
+        PaymentService $paymentService
+    ): JsonResponse {
+        $subscription = Subscription::findOrFail($request->validated('subscription_id'));
 
-            return redirect()
-                ->route('payments.receipt', $payment)
-                ->with('success', 'Pago registrado correctamente.');
+        $payment = $paymentService->registerPayment(
+            $subscription,
+            $request->toDto()
+        );
 
-        } catch (ExpiredSubscriptionException $exception) {
-            return back()
-                ->withInput()
-                ->with('error', $exception->getMessage());
-        }
+        return response()->json([
+            'data' => $payment,
+            'message' => 'Pago registrado correctamente.',
+            'redirect' => route('payments.receipt', $payment),
+        ], 201);
     }
 
     /**
-     * Display the specified payment.
+     * Muestra el detalle del pago.
      */
-    public function show(Payment $payment)
+    public function show(Payment $payment): View
     {
-        $payment->load('subscription');
-        $subscription = $payment->subscription;
+        $payment->load(['subscription.client', 'subscription.plan']);
 
-        return view('payments.show', compact('payment', 'subscription'));
+        return view('payments.show', compact('payment'));
     }
 
     /**
-     * Remove the specified payment from storage.
+     * Muestra el recibo del pago.
      */
-    public function destroy(Payment $payment)
+    public function receipt(Payment $payment): View
     {
-        $payment->delete();
+        $payment->load(['subscription.client', 'subscription.plan']);
 
-        return redirect()
-            ->route('payments.index')
-            ->with('success', 'Pago eliminado correctamente.');
+        return view('payments.receipt', compact('payment'));
     }
 
     /**
-     * Display the payment receipt.
+     * Anula un pago sin eliminar el registro físico (Trazabilidad contable).
      */
-    public function receipt(Payment $payment)
+    public function cancel(Payment $payment): JsonResponse
     {
-        $payment->load('subscription');
-        $subscription = $payment->subscription;
+        $this->authorize('cancel', $payment);
 
-        return view('payments.receipt', compact('payment', 'subscription'));
+        $payment->update([
+            'status' => PaymentStatus::Cancelled,
+        ]);
+
+        return response()->json([
+            'message' => 'Pago anulado correctamente.',
+        ]);
     }
 }
