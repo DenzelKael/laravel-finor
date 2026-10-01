@@ -8,7 +8,7 @@
 
     <p>Email: {{ $user->email }}</p>
 
-    <form action="{{ route('users.update', $user) }}" method="POST">
+    <form id="edit-form" data-update-url="{{ route('users.update', $user) }}" data-index-url="{{ route('users.index') }}">
         @csrf
         @method('PUT')
 
@@ -48,4 +48,8 @@
         </a>
     </form>
 
+@endsection
+
+@section('js')
+    @vite(['resources/js/users/edit.js'])
 @endsection

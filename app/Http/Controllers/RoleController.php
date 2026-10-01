@@ -32,7 +32,8 @@ class RoleController extends Controller
             $validated['permissions'] ?? []
         );
 
-        return redirect()
-            ->route('roles.edit', $role);
+        return response()->json([
+            'message' => 'Rol actualizado correctamente.',
+        ]);
     }
 }

@@ -23,12 +23,14 @@ class PermissionController extends Controller
     }
     public function store(PermissionRequest $request)
     {
-        $validated = $request->validated();
+        $permission = Permission::create(
+            $request->validated()
+        );
 
-        Permission::create($validated);
-
-        return redirect()
-            ->route('permissions.index');
+        return response()->json([
+            'message' => 'Permiso creado correctamente.',
+            'data' => $permission,
+        ]);
     }
     public function edit(Permission $permission)
     {
@@ -42,8 +44,9 @@ class PermissionController extends Controller
         $permission->update(
             $request->validated()
         );
-        return redirect()
-            ->route('permissions.index');
+        return response()->json([
+            'message' => 'Permiso actualizado correctamente.',
+        ]);
     }
     public function destroy(Permission $permission)
     {

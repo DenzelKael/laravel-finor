@@ -53,10 +53,8 @@ class UserController extends Controller
         $user->syncPermissions(
             $validated['permissions'] ?? []
         );
-        return redirect()
-            ->route('users.edit', $user)
-            ->with('success', 'Role updated successfully.');
-
-
+        return response()->json([
+            'message' => 'Usuario actualizado correctamente.',
+        ]);
     }
 }

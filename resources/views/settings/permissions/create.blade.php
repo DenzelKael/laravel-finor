@@ -6,17 +6,16 @@
 
     <h3>Create Permission</h3>
 
-    <form action="{{ route('permissions.store') }}" method="POST">
+    <form id="create-form" data-store-url="{{ route('permissions.store') }}"
+        data-index-url="{{ route('permissions.index') }}">
 
         @csrf
 
         <div class="mb-3">
             <label class="form-label">Permission Name</label>
-            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                placeholder="clients.view" value="{{ old('name') }}">
-            @error('name')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <input type="text" name="name" class="form-control" placeholder="clients.view">
+
+            <div class="invalid-feedback"></div>
         </div>
 
         <button type="submit" class="btn btn-success">
@@ -29,4 +28,8 @@
 
     </form>
 
+@endsection
+
+@section('js')
+    @vite(['resources/js/permissions/create.js'])
 @endsection

@@ -6,7 +6,8 @@
 
     <h3>Edit Permission</h3>
 
-    <form action="{{ route('permissions.update', $permission) }}" method="POST">
+    <form id="edit-form" data-update-url="{{ route('permissions.update', $permission) }}"
+        data-index-url="{{ route('permissions.index') }}">
 
         @csrf
         @method('PUT')
@@ -30,4 +31,8 @@
 
     </form>
 
+@endsection
+
+@section('js')
+    @vite(['resources/js/permissions/edit.js'])
 @endsection

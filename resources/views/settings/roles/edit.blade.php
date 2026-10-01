@@ -9,7 +9,7 @@
 @section('content')
 
     <h3>Edit Role: {{ $role->name }}</h3>
-    <form action="{{ route('roles.update', $role) }}" method="POST">
+    <form id="edit-form" data-update-url="{{ route('roles.update', $role) }}" data-index-url="{{ route('roles.index') }}">
         @csrf
         @method('PUT')
 
@@ -42,4 +42,8 @@
         </a>
     </form>
 
+@endsection
+
+@section('js')
+    @vite(['resources/js/roles/edit.js'])
 @endsection
