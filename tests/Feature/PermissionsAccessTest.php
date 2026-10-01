@@ -63,7 +63,10 @@ class PermissionsAccessTest extends TestCase
                 'role' => 'Admin',
                 'permissions' => [],
             ])
-            ->assertRedirect();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Usuario actualizado correctamente.',
+            ]);
 
         $this->assertTrue($user->fresh()->hasRole('Admin'));
     }
