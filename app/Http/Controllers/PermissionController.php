@@ -10,7 +10,7 @@ class PermissionController extends Controller
 {
     public function index()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::paginate(10);
         $roles = Role::all();
         return view(
             'settings.permissions.index',
