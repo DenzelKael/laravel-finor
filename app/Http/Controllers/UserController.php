@@ -7,6 +7,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\UpdateUserRoleRequest;
+use App\Enums\RoleName;
 
 
 class UserController extends Controller
@@ -35,8 +36,8 @@ class UserController extends Controller
     {
         $validated = $request->validated();
         $isLastAdmin =
-            $user->hasRole('Admin')
-            && User::role('Admin')->count() === 1;
+            $user->hasRole(RoleName::Admin->value)
+            && User::role(RoleName::Admin->value)->count() === 1;
 
         if (
             $isLastAdmin

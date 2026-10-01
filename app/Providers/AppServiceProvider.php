@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use Spatie\Permission\Models\HasRoles;
 use Illuminate\Pagination\Paginator;
+use App\Enums\RoleName;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         Gate::before(function (User $user) {
-            return $user->hasRole('Admin')
+            $user->hasRole(RoleName::Admin->value)
                 ? true
                 : null;
         });
