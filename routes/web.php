@@ -2,6 +2,7 @@
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\SuscripcionController;
 
 
 // AdminLTE authentication routes
@@ -50,4 +51,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+    
+    Route::controller(SuscripcionController::class)
+    ->name('suscriptions.')
+    ->group(function () {
+        Route::get('suscripciones', 'index')->name('index');
+        Route::get('suscripciones/create', 'create')->name('create');
+        Route::post('suscripciones', 'store')->name('store');
+        Route::get('suscripciones/{suscripcion}/edit', 'edit')->name('edit');
+        Route::put('suscripciones/{suscripcion}', 'update')->name('update');
+        Route::delete('suscripciones/{suscripcion}', 'destroy')->name('destroy');
+    });
  });
