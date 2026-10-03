@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
         Route::put('clients/{client}', 'update')->name('update');
         Route::delete('clients/{client}', 'destroy')->name('destroy');
     });
-    Route::resource('plans', \App\Http\Controllers\PlanController::class);
+    Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
