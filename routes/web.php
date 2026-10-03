@@ -50,4 +50,5 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData'])->name('dashboard.chart');
  });
