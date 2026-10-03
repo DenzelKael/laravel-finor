@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/js/clients/create.js',
                 'resources/js/clients/edit.js',
                 'resources/js/clients/index.js',
+                'resources/js/dashboard/main.js',
             ],
             refresh: true,
             fonts: [
