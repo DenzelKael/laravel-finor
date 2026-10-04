@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\PaymentStatus;
 use App\Http\Requests\StorePaymentRequest;
+use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Services\PaymentService;
@@ -17,6 +18,8 @@ class PaymentController extends Controller
      */
     public function index(): View
     {
+        $this->authorize('viewAny', Payment::class);
+
         $payments = Payment::with(['subscription.client', 'subscription.plan'])
             ->latest('payment_date')
             ->latest('id')
@@ -30,6 +33,8 @@ class PaymentController extends Controller
      */
     public function create(): View
     {
+        $this->authorize('create', Payment::class);
+
         $subscriptions = Subscription::active()
             ->with(['client', 'plan'])
             ->get();
@@ -52,9 +57,8 @@ class PaymentController extends Controller
         );
 
         return response()->json([
-            'data' => $payment,
+            'data' => new PaymentResource($payment),
             'message' => 'Pago registrado correctamente.',
-            'redirect' => route('payments.receipt', $payment),
         ], 201);
     }
 
@@ -63,6 +67,8 @@ class PaymentController extends Controller
      */
     public function show(Payment $payment): View
     {
+        $this->authorize('view', $payment);
+
         $payment->load(['subscription.client', 'subscription.plan']);
 
         return view('payments.show', compact('payment'));
@@ -73,6 +79,8 @@ class PaymentController extends Controller
      */
     public function receipt(Payment $payment): View
     {
+        $this->authorize('view', $payment);
+
         $payment->load(['subscription.client', 'subscription.plan']);
 
         return view('payments.receipt', compact('payment'));

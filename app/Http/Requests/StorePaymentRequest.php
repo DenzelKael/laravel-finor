@@ -13,7 +13,7 @@ class StorePaymentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('create', Payment::class) ?? true;
+        return $this->user()?->can('create', Payment::class) ?? false;
     }
 
     public function rules(): array
@@ -22,7 +22,6 @@ class StorePaymentRequest extends FormRequest
             'subscription_id' => [
                 'required',
                 'integer',
-                'exists:subscriptions,id',
                 new ActiveSubscription(),
             ],
 
@@ -54,9 +53,6 @@ class StorePaymentRequest extends FormRequest
 
             'subscription_id.integer' =>
                 'La suscripción seleccionada no es válida.',
-
-            'subscription_id.exists' =>
-                'La suscripción seleccionada no existe en el sistema.',
 
             'amount.required' =>
                 'El monto es obligatorio.',
