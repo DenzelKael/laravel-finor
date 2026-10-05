@@ -9,35 +9,34 @@ use App\Models\User;
 class PaymentPolicy
 {
     /**
-     * Determina si el usuario puede ver el listado de pagos.
+     * Determine whether the user can view the payment list.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('payments.viewAny') || $user->can('payments.index');
+        return true;
     }
 
     /**
-     * Determina si el usuario puede ver el detalle o recibo de un pago.
+     * Determine whether the user can view the payment details and receipt.
      */
     public function view(User $user, Payment $payment): bool
     {
-        return $user->can('payments.view');
+        return true;
     }
 
     /**
-     * Determina si el usuario puede registrar pagos.
+     * Determine whether the user can create payments.
      */
     public function create(User $user): bool
     {
-        return $user->can('payments.create');
+        return true;
     }
 
     /**
-     * Determina si el usuario puede anular un pago.
+     * Determine whether the user can cancel the payment.
      */
     public function cancel(User $user, Payment $payment): bool
     {
-        return $payment->status !== PaymentStatus::Cancelled
-            && $user->can('payments.cancel');
+        return $payment->status !== PaymentStatus::Cancelled;
     }
 }

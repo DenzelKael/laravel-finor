@@ -22,6 +22,7 @@ class StorePaymentRequest extends FormRequest
             'subscription_id' => [
                 'required',
                 'integer',
+                'exists:subscriptions,id',
                 new ActiveSubscription(),
             ],
 
@@ -53,6 +54,9 @@ class StorePaymentRequest extends FormRequest
 
             'subscription_id.integer' =>
                 'La suscripción seleccionada no es válida.',
+
+            'subscription_id.exists' =>
+                'La suscripción seleccionada no existe en el sistema.',
 
             'amount.required' =>
                 'El monto es obligatorio.',
