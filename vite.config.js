@@ -11,6 +11,8 @@ export default defineConfig({
                 'resources/js/clients/create.js',
                 'resources/js/clients/edit.js',
                 'resources/js/clients/index.js',
+                'resources/js/payments/create.js',
+                'resources/js/payments/index.js',
             ],
             refresh: true,
           
