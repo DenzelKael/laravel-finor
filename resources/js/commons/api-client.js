@@ -57,6 +57,10 @@ class ApiClient {
         return http.put(url, body, config);
     }
 
+    patch(url, body = null, config = {}) {
+        return http.patch(url, body, config);
+    }
+
     delete(url, config = {}) {
         return http.delete(url, config);
     }
