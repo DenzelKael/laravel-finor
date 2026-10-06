@@ -133,17 +133,17 @@ return [
     // Documentation URL used by the navbar "Documentation" link and the sidebar
     // "View documentation" CTA (false to hide the CTA). Defaults to the in-app
     // docs viewer served at /docs (see the `docs` keys below).
-    'sidebar_docs_url' => '/docs',
+    'sidebar_docs_url' => false,
 
     // Bundled demo/showcase pages (Dashboard v2/v3, Widgets, UI, Forms, Tables,
     // Layout Options, Theme Generate, auth variants, error pages). Set false to
     // skip registering their routes in production.
-    'demo' => true,
+    'demo' => false,
     'demo_middleware' => ['web', 'auth'],
 
     // In-app documentation viewer: renders this package's docs/*.md files at
     // /docs and /docs/{page}. Set 'docs' => false to disable the route.
-    'docs' => true,
+    'docs' => false,
     'docs_middleware' => ['web'],
 
     'sidebar_breakpoint' => 'lg',     // sidebar-expand-{breakpoint}
@@ -226,20 +226,14 @@ return [
             'text' => 'Clientes',
             'url' => 'clients',
             'icon' => 'bi bi-people',
-            'active' => ['clientes*'],
+            'active' => ['clients*'],
         ],
         [
-            'text' => 'Subscription Plans',
+            'text' => 'Planes de suscripción',
             'url' => 'plans',
             'icon' => 'bi bi-list-check',
         ],
 
-        ['header' => 'REPORTS'],
-        [
-            'text' => 'Dashboard v1',
-            'url' => '/',
-            'icon' => 'bi bi-bar-chart-fill',
-        ],
         ['header' => 'CONFIGURACIÓN'],
         [
             'text' => 'Configuración',
