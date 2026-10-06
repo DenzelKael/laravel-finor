@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         Gate::before(function (User $user) {
-            $user->hasRole(RoleName::Admin->value)
+            return $user->hasRole(RoleName::Admin->value)
                 ? true
                 : null;
         });
