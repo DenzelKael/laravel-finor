@@ -41,7 +41,9 @@
                                 <i class="fas fa-edit"></i> Editar
                             </a>
                             <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="confirmDelete({{ $client->id }}, '{{ route('clients.destroy', $client) }}')">
+                                    data-action="delete-client"
+                                    data-id="{{ $client->id }}"
+                                    data-url="{{ route('clients.destroy', $client) }}">
                                 <i class="fas fa-trash"></i> Eliminar
                             </button>
                         </td>

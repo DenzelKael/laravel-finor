@@ -1,4 +1,3 @@
-// resources/js/commons/base-form.js
 import api, { ApiError } from './api-client.js';
 
 export default class BaseForm {
@@ -11,31 +10,42 @@ export default class BaseForm {
         return new FormData(this.form);
     }
 
-    showData(data) {
-        //
-    }
-
     clearErrors() {
-        this.form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        this.form.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        this.form.querySelectorAll('.is-invalid').forEach((el) => el.classList.remove('is-invalid'));
+        this.form.querySelectorAll('.invalid-feedback').forEach((el) => (el.textContent = ''));
     }
 
     showValidationErrors(errors) {
         for (const field in errors) {
             const input = this.form.querySelector(`[name="${field}"]`);
-            if (input) {
-                input.classList.add('is-invalid');
-                input.nextElementSibling.textContent = errors[field][0];
+            if (!input) continue;
+
+            input.classList.add('is-invalid');
+
+            const group = input.closest('.form-group');
+            let feedback = group?.querySelector('.invalid-feedback');
+
+            if (!feedback) {
+                feedback = document.createElement('span');
+                feedback.className = 'invalid-feedback';
+                group?.appendChild(feedback);
             }
+
+            feedback.textContent = errors[field][0];
         }
     }
 
-    async createResource(data) {
+    createResource(data) {
         return api.post(this.form.dataset.storeUrl, data);
     }
 
-    async updateResource(data) {
+    updateResource(data) {
         return api.put(this.form.dataset.updateUrl, data);
+    }
+
+    onSuccess(response) {
+        sessionStorage.setItem('flash_message', response.message);
+        window.location.href = this.form.dataset.indexUrl;
     }
 
     async handleSubmit(e) {
@@ -50,8 +60,7 @@ export default class BaseForm {
                 ? await this.updateResource(data)
                 : await this.createResource(data);
 
-            sessionStorage.setItem('flash_message', response.message);
-            window.location.href = this.form.dataset.indexUrl;
+            this.onSuccess(response);
         } catch (error) {
             if (!(error instanceof ApiError)) throw error;
 
@@ -65,10 +74,6 @@ export default class BaseForm {
                 case 'not_found':
                     alert('Este registro ya no existe.');
                     window.location.href = this.form.dataset.indexUrl;
-                    break;
-                case 'server':
-                case 'network':
-                    alert('No se pudo guardar el registro. Intenta de nuevo.');
                     break;
                 default:
                     alert(error.message);
