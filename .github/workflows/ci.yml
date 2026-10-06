@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Verificar nombres de archivo PSR-4
+        run: composer dump-autoload --optimize --strict-psr
+
+      - name: Instalar dependencias JS
+        run: npm ci
+
+      - name: Compilar assets (detecta entradas faltantes en vite.config.js)
+        run: npm run build
+
+      - name: Preparar entorno
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+
+      - name: Migraciones y seeders desde cero
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Tests
+        run: php artisan test
