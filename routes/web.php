@@ -1,10 +1,14 @@
 <?php
-
-use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PlanController;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\PaymentController;
+
+
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -22,8 +26,58 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+    Route::prefix('admin')->group(function () {
+        //users
+        Route::get('/users', [UserController::class, 'index'])
+            ->middleware('permission:users.view')
+            ->name('users.index');
+
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])
+            ->middleware('permission:users.update')
+            ->name('users.edit');
+
+        Route::put('/users/{user}', [UserController::class, 'update'])
+            ->middleware('permission:users.update')
+            ->name('users.update');
+
+        //roles
+        Route::get('/roles', [RoleController::class, 'index'])
+            ->middleware('permission:roles.view')
+            ->name('roles.index');
+
+        Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])
+            ->middleware('permission:roles.update')
+            ->name('roles.edit');
+
+        Route::put('/roles/{role}', [RoleController::class, 'update'])
+            ->middleware('permission:roles.update')
+            ->name('roles.update');
+
+        //permissions
+        Route::get('/permissions', [PermissionController::class, 'index'])
+            ->middleware('permission:permissions.view')
+            ->name('permissions.index');
+
+        Route::get('/permissions/create', [PermissionController::class, 'create'])
+            ->middleware('permission:permissions.create')
+            ->name('permissions.create');
+
+        Route::post('/permissions', [PermissionController::class, 'store'])
+            ->middleware('permission:permissions.create')
+            ->name('permissions.store');
+
+        Route::get('/permissions/{permission}/edit', [PermissionController::class, 'edit'])
+            ->middleware('permission:permissions.update')
+            ->name('permissions.edit');
+
+        Route::put('/permissions/{permission}', [PermissionController::class, 'update'])
+            ->middleware('permission:permissions.update')
+            ->name('permissions.update');
+
+        Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])
+            ->middleware('permission:permissions.delete')
+            ->name('permissions.destroy');
+    });
 
     Route::controller(ClientController::class)
         ->name('clients.')
@@ -49,6 +103,7 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
         });
 
+
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
@@ -61,5 +116,10 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
-    Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
+
+    Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
+        ->name('logout');
 });

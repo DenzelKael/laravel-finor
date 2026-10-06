@@ -124,7 +124,7 @@ return [
     |
     */
 
-    'footer_left' => 'Copyright &copy; 2014-'.date('Y').' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
+    'footer_left' => 'Copyright &copy; 2014-' . date('Y') . ' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
     'footer_right' => 'Anything you want',
     'preloader' => false,
     'control_sidebar' => false,
@@ -212,32 +212,15 @@ return [
     |--------------------------------------------------------------------------
     | Menu
     |--------------------------------------------------------------------------
-    |
-    | The sidebar (and optional top-nav) menu. Each item is an array. Supported
-    | keys:
-    |
-    |   'header'      => 'SECTION LABEL'            // a section header
-    |   'text'        => 'Dashboard'               // link label (required for links)
-    |   'route'       => 'dashboard'               // named route  -> url
-    |   'url'         => 'admin/users'             // raw url (relative or absolute)
-    |   'icon'        => 'bi bi-speedometer'       // Bootstrap Icons class
-    |   'icon_color'  => 'primary'                 // optional text-{color}
-    |   'label'       => 5                         // badge value
-    |   'label_color' => 'primary'                 // badge color
-    |   'active'      => ['admin/users*']          // url patterns that mark active
-    |   'target'      => '_blank'                  // anchor target
-    |   'can'         => 'view-users'              // gate/permission to show item
-    |   'submenu'     => [ ...child items... ]     // nested items (treeview)
-    |
     */
 
     'menu' => [
-        // ---- Sidebar: mirrors the AdminLTE 4 demo sidebar ----
         [
             'text' => 'Dashboard',
+            'url' => '/',
             'icon' => 'bi bi-speedometer',
-
         ],
+
         ['header' => 'GESTIÓN'],
         [
             'text' => 'Clientes',
@@ -256,12 +239,39 @@ return [
             'icon'    => 'bi bi-cash-stack',
             'active'  => ['payments*'],
         ],
-    ['header' => 'REPORTS'],
-    [
-        'text'    => 'Dashboard v1',
-        'url'     => '/',
-        'icon'    => 'bi bi-bar-chart-fill',
-    ],
+
+        ['header' => 'REPORTS'],
+        [
+            'text' => 'Dashboard v1',
+            'url' => '/',
+            'icon' => 'bi bi-bar-chart-fill',
+        ],
+        ['header' => 'CONFIGURACIÓN'],
+        [
+            'text' => 'Configuración',
+            'icon' => 'bi bi-gear-fill',
+            'submenu' => [
+                [
+                    'text' => 'Usuarios',
+                    'url' => 'admin/users',
+                    'icon' => 'bi bi-people',
+                    'can' => 'users.view',
+                ],
+                [
+                    'text' => 'Roles',
+                    'url' => 'admin/roles',
+                    'icon' => 'bi bi-shield-lock',
+                    'can' => 'roles.view',
+                ],
+                [
+                    'text' => 'Permisos',
+                    'url' => 'admin/permissions',
+                    'icon' => 'bi bi-key-fill',
+                    'can' => 'permissions.view',
+                ],
+            ],
+        ],
+
     ],
 
     /*

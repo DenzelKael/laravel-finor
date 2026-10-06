@@ -17,11 +17,6 @@ class Client extends Model
         'address',
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);

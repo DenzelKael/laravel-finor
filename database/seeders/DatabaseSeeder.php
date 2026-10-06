@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -16,10 +17,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            SubscriptionSeeder::class,
+            RolesAndPermissionsSeeder::class,
         ]);
 
-        User::updateOrCreate(
+        $user = User::updateOrCreate(
             [
                 'email' => 'test@example.com',
             ],
@@ -28,5 +29,11 @@ class DatabaseSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
+
+        $user->assignRole('Admin');
+
+        $this->call([
+            SubscriptionSeeder::class,
+        ]);
     }
 }
