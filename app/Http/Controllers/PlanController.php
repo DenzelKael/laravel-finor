@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
+use App\Http\Resources\PlanResource;
 use App\Models\Plan;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 
 class PlanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $plans = Plan::latest()->paginate(10);
 
@@ -20,62 +23,56 @@ class PlanController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
         $plan = new Plan();
 
-        return view('plans.form', compact('plan'));
+        return view('plans.create', compact('plan'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PlanRequest $request)
+    public function store(PlanRequest $request): JsonResponse
     {
-        Plan::create($request->validated());
+        $plan = Plan::create($request->validated());
 
-        return redirect()
-            ->route('plans.index')
-            ->with('success', 'Plan creado correctamente.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Plan $plan)
-    {
-        return view('plans.show', compact('plan'));
+        return response()->json([
+            'message' => 'Plan creado correctamente.',
+            'data' => new PlanResource($plan),
+        ], 201);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Plan $plan)
+    public function edit(Plan $plan): View
     {
-        return view('plans.form', compact('plan'));
+        return view('plans.edit', compact('plan'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PlanRequest $request, Plan $plan)
+    public function update(PlanRequest $request, Plan $plan): JsonResponse
     {
         $plan->update($request->validated());
 
-        return redirect()
-            ->route('plans.index')
-            ->with('success', 'Plan actualizado correctamente.');
+        return response()->json([
+            'message' => 'Plan actualizado correctamente.',
+            'data' => new PlanResource($plan),
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Plan $plan)
+    public function destroy(Plan $plan): JsonResponse
     {
         $plan->delete();
 
-        return redirect()
-            ->route('plans.index')
-            ->with('success', 'Plan eliminado correctamente.');
+        return response()->json([
+            'message' => 'Plan eliminado correctamente.',
+        ]);
     }
 }

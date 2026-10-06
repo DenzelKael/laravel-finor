@@ -229,7 +229,7 @@ return [
             'active' => ['clientes*'],
         ],
         [
-            'text'    => 'Subscription Plans',
+            'text'    => 'Planes',
             'url'     => 'plans',
             'icon'    => 'bi bi-list-check',
         ],

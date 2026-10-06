@@ -89,7 +89,7 @@ Route::middleware('auth')->group(function () {
             Route::put('clients/{client}', 'update')->name('update');
             Route::delete('clients/{client}', 'destroy')->name('destroy');
         });
-    Route::resource('plans', \App\Http\Controllers\PlanController::class);
+    Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
 
     Route::controller(PaymentController::class)
         ->prefix('payments')
