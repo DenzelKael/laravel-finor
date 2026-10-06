@@ -7,6 +7,8 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Enums\RoleName;
+use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Permission;
 
 class PermissionsAccessTest extends TestCase
 {
@@ -77,7 +79,6 @@ class PermissionsAccessTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole(RoleName::Admin->value);
 
-        // Único admin intenta quitarse su propio rol
         $this->actingAs($admin)
             ->from("/admin/users/{$admin->id}/edit")
             ->put("/admin/users/{$admin->id}", [
@@ -96,5 +97,22 @@ class PermissionsAccessTest extends TestCase
         $admin->assignRole(RoleName::Admin->value);
 
         $this->actingAs($admin)->get('/admin/roles')->assertOk();
+    }
+
+    public function test_admin_bypasses_permissions_not_assigned_to_role(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        Permission::firstOrCreate(['name' => 'reports.view']);
+
+        Route::middleware(['web', 'auth', 'can:reports.view'])
+            ->get('/_test/gate', fn() => 'ok');
+
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleName::Admin->value);
+
+        $this->assertFalse($admin->getAllPermissions()->contains('name', 'reports.view'));
+
+        $this->actingAs($admin)->get('/_test/gate')->assertOk();
     }
 }
