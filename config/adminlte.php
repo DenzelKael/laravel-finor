@@ -229,9 +229,17 @@ return [
             'active' => ['clients*'],
         ],
         [
-            'text' => 'Planes de suscripción',
+
+            'text' => 'Planes',
             'url' => 'plans',
             'icon' => 'bi bi-list-check',
+        ],
+        [
+            'text' => 'Payments',
+            'url' => 'payments',
+            'icon' => 'bi bi-cash-stack',
+            'active' => ['payments*'],
+
         ],
 
         ['header' => 'CONFIGURACIÓN'],

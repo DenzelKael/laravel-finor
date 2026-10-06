@@ -6,6 +6,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\PaymentController;
 
 
 
@@ -88,7 +89,19 @@ Route::middleware('auth')->group(function () {
             Route::put('clients/{client}', 'update')->name('update');
             Route::delete('clients/{client}', 'destroy')->name('destroy');
         });
-    Route::resource('plans', \App\Http\Controllers\PlanController::class);
+    Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
+
+    Route::controller(PaymentController::class)
+        ->prefix('payments')
+        ->name('payments.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{payment}', 'show')->name('show');
+            Route::get('/{payment}/receipt', 'receipt')->name('receipt');
+            Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
+        });
 
 
     // Email verification — protect app routes with the `verified` middleware once
@@ -103,7 +116,7 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
-    Route::get('/', [DashboardController::class, 'index']);
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
 
