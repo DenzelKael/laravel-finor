@@ -40,6 +40,28 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'permissions.update']);
         Permission::firstOrCreate(['name' => 'permissions.delete']);
 
+        // Clients
+        Permission::firstOrCreate(['name' => 'clients.view']);
+        Permission::firstOrCreate(['name' => 'clients.create']);
+        Permission::firstOrCreate(['name' => 'clients.update']);
+        Permission::firstOrCreate(['name' => 'clients.delete']);
+
+        // Plans
+        Permission::firstOrCreate(['name' => 'plans.view']);
+        Permission::firstOrCreate(['name' => 'plans.create']);
+        Permission::firstOrCreate(['name' => 'plans.update']);
+        Permission::firstOrCreate(['name' => 'plans.delete']);
+
+        // Payments
+        Permission::firstOrCreate(['name' => 'payments.view']);
+        Permission::firstOrCreate(['name' => 'payments.create']);
+        Permission::firstOrCreate(['name' => 'payments.cancel']);
+
+        // Subscriptions
+        Permission::firstOrCreate(['name' => 'subscriptions.view']);
+        Permission::firstOrCreate(['name' => 'subscriptions.create']);
+        Permission::firstOrCreate(['name' => 'subscriptions.update']);
+        Permission::firstOrCreate(['name' => 'subscriptions.cancel']);
 
         $admin->syncPermissions([
             'users.view',
