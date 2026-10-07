@@ -9,8 +9,8 @@ use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Spatie\Permission\Models\Permission;
+use Tests\TestCase;
 
 class PaymentRegistrationTest extends TestCase
 {
@@ -27,10 +27,13 @@ class PaymentRegistrationTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        
-        $permission = Permission::findOrCreate('payments.create', 'web');
 
-$this->user->givePermissionTo($permission);
+        $createPermission = Permission::findOrCreate(
+            'payments.create',
+            'web'
+        );
+
+        $this->user->givePermissionTo($createPermission);
 
         $client = Client::create([
             'name' => 'Cliente de Prueba',
@@ -128,5 +131,44 @@ $this->user->givePermissionTo($permission);
             ->assertJsonValidationErrors([
                 'subscription_id',
             ]);
+    }
+
+    /**
+     * Test 4: An authorized user can cancel a registered payment.
+     */
+    public function test_authorized_user_can_cancel_registered_payment(): void
+    {
+        $cancelPermission = Permission::findOrCreate(
+            'payments.cancel',
+            'web'
+        );
+
+        $this->user->givePermissionTo($cancelPermission);
+
+        $payment = $this->activeSubscription
+            ->payments()
+            ->create([
+                'amount' => 150.00,
+                'payment_method' => PaymentMethod::Cash,
+                'payment_date' => now()->toDateString(),
+                'status' => PaymentStatus::Registered,
+            ]);
+
+        $response = $this->actingAs($this->user)
+            ->patchJson(
+                route('payments.cancel', $payment)
+            );
+
+        $response->assertOk()
+            ->assertJsonPath(
+                'message',
+                'Pago anulado correctamente.'
+            );
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->id,
+            'subscription_id' => $this->activeSubscription->id,
+            'status' => PaymentStatus::Cancelled->value,
+        ]);
     }
 }
