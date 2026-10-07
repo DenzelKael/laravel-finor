@@ -86,4 +86,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-window.confirmCancelPayment = confirmCancelPayment;
+
