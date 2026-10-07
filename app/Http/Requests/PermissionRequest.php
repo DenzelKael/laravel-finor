@@ -13,7 +13,15 @@ class PermissionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        return $this->route('permission')
+            ? $user->can('permissions.update')
+            : $user->can('permissions.create');
     }
 
     /**
