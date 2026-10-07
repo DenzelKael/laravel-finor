@@ -38,21 +38,22 @@
                                 Edit
                             </a>
                         @endcan
-                        <form action="{{ route('permissions.destroy', $permission) }}" method="POST" style="display:inline;">
 
-                            @csrf
-                            @method('DELETE')
-                            @can('permissions.delete')
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('¿Eliminar este permiso?')">
-                                    Delete
-                                </button>
-                            @endcan
-                        </form>
+                        @can('permissions.delete')
+                            <button type="button" class="btn btn-danger btn-sm js-delete-permission"
+                                data-url="{{ route('permissions.destroy', $permission) }}">
+                                Delete
+                            </button>
+                        @endcan
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
     {{ $permissions->links() }}
+@endsection
+
+
+@section('js')
+    @vite(['resources/js/permissions/index.js'])
 @endsection

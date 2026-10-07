@@ -99,20 +99,34 @@ class PermissionsAccessTest extends TestCase
         $this->actingAs($admin)->get('/admin/roles')->assertOk();
     }
 
-    public function test_admin_bypasses_permissions_not_assigned_to_role(): void
+    public function test_admin_can_delete_unassigned_permission_via_json(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
-
-        Permission::firstOrCreate(['name' => 'reports.view']);
-
-        Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate', fn() => 'ok');
 
         $admin = User::factory()->create();
         $admin->assignRole(RoleName::Admin->value);
 
-        $this->assertFalse($admin->getAllPermissions()->contains('name', 'reports.view'));
+        $permission = Permission::create(['name' => 'tmp.view']);
 
-        $this->actingAs($admin)->get('/_test/gate')->assertOk();
+        $this->actingAs($admin)
+            ->deleteJson(route('permissions.destroy', $permission))
+            ->assertOk()
+            ->assertJson(['message' => 'Permiso eliminado correctamente.']);
+
+        $this->assertModelMissing($permission);
+    }
+
+    public function test_cannot_delete_permission_assigned_to_a_role(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleName::Admin->value);
+
+        $permission = Permission::findByName('users.view');
+
+        $this->actingAs($admin)
+            ->deleteJson(route('permissions.destroy', $permission))
+            ->assertForbidden();
     }
 }
