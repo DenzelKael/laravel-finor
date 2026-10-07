@@ -11,6 +11,7 @@ export class ApiError extends Error {
 
 const STATUS_ERROR_MAP = {
     401: 'auth',
+    403: 'forbidden',
     419: 'auth',
     404: 'not_found',
     422: 'validation',
@@ -57,7 +58,11 @@ class ApiClient {
         return http.put(url, body, config);
     }
 
-    patch(url, body = null, config = {}) {
+    patch(url, body, config = {}) {
+        if (body instanceof FormData) {
+            body.append('_method', 'PATCH');
+            return http.post(url, body, config);
+        }
         return http.patch(url, body, config);
     }
 
