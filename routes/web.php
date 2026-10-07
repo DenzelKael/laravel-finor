@@ -80,15 +80,15 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::controller(ClientController::class)
-        ->name('clients.')
-        ->group(function () {
-            Route::get('clients', 'index')->name('index');
-            Route::get('clients/create', 'create')->name('create');
-            Route::post('clients', 'store')->name('store');
-            Route::get('clients/{client}/edit', 'edit')->name('edit');
-            Route::put('clients/{client}', 'update')->name('update');
-            Route::delete('clients/{client}', 'destroy')->name('destroy');
-        });
+    ->name('clients.')
+    ->group(function () {
+        Route::get('clients', 'index')->name('index')->middleware('permission:clients.view');
+        Route::get('clients/create', 'create')->name('create')->middleware('permission:clients.create');
+        Route::post('clients', 'store')->name('store')->middleware('permission:clients.create');
+        Route::get('clients/{client}/edit', 'edit')->name('edit')->middleware('permission:clients.update');
+        Route::put('clients/{client}', 'update')->name('update')->middleware('permission:clients.update');
+        Route::delete('clients/{client}', 'destroy')->name('destroy')->middleware('permission:clients.delete');
+    });
     Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
 
     Route::controller(PaymentController::class)
