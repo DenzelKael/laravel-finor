@@ -27,56 +27,36 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::prefix('admin')->group(function () {
-        //users
-        Route::get('/users', [UserController::class, 'index'])
-            ->middleware('permission:users.view')
-            ->name('users.index');
 
-        Route::get('/users/{user}/edit', [UserController::class, 'edit'])
-            ->middleware('permission:users.update')
-            ->name('users.edit');
+        Route::controller(UserController::class)
+            ->prefix('users')
+            ->name('users.')
+            ->group(function () {
+                Route::get('/', 'index')->middleware('permission:users.view')->name('index');
+                Route::get('/{user}/edit', 'edit')->middleware('permission:users.update')->name('edit');
+                Route::put('/{user}', 'update')->middleware('permission:users.update')->name('update');
+            });
 
-        Route::put('/users/{user}', [UserController::class, 'update'])
-            ->middleware('permission:users.update')
-            ->name('users.update');
+        Route::controller(RoleController::class)
+            ->prefix('roles')
+            ->name('roles.')
+            ->group(function () {
+                Route::get('/', 'index')->middleware('permission:roles.view')->name('index');
+                Route::get('/{role}/edit', 'edit')->middleware('permission:roles.update')->name('edit');
+                Route::put('/{role}', 'update')->middleware('permission:roles.update')->name('update');
+            });
 
-        //roles
-        Route::get('/roles', [RoleController::class, 'index'])
-            ->middleware('permission:roles.view')
-            ->name('roles.index');
-
-        Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])
-            ->middleware('permission:roles.update')
-            ->name('roles.edit');
-
-        Route::put('/roles/{role}', [RoleController::class, 'update'])
-            ->middleware('permission:roles.update')
-            ->name('roles.update');
-
-        //permissions
-        Route::get('/permissions', [PermissionController::class, 'index'])
-            ->middleware('permission:permissions.view')
-            ->name('permissions.index');
-
-        Route::get('/permissions/create', [PermissionController::class, 'create'])
-            ->middleware('permission:permissions.create')
-            ->name('permissions.create');
-
-        Route::post('/permissions', [PermissionController::class, 'store'])
-            ->middleware('permission:permissions.create')
-            ->name('permissions.store');
-
-        Route::get('/permissions/{permission}/edit', [PermissionController::class, 'edit'])
-            ->middleware('permission:permissions.update')
-            ->name('permissions.edit');
-
-        Route::put('/permissions/{permission}', [PermissionController::class, 'update'])
-            ->middleware('permission:permissions.update')
-            ->name('permissions.update');
-
-        Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])
-            ->middleware('permission:permissions.delete')
-            ->name('permissions.destroy');
+        Route::controller(PermissionController::class)
+            ->prefix('permissions')
+            ->name('permissions.')
+            ->group(function () {
+                Route::get('/', 'index')->middleware('permission:permissions.view')->name('index');
+                Route::get('/create', 'create')->middleware('permission:permissions.create')->name('create');
+                Route::post('/', 'store')->middleware('permission:permissions.create')->name('store');
+                Route::get('/{permission}/edit', 'edit')->middleware('permission:permissions.update')->name('edit');
+                Route::put('/{permission}', 'update')->middleware('permission:permissions.update')->name('update');
+                Route::delete('/{permission}', 'destroy')->middleware('permission:permissions.delete')->name('destroy');
+            });
     });
 
     Route::controller(ClientController::class)

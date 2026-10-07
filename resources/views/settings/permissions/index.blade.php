@@ -53,7 +53,6 @@
     {{ $permissions->links() }}
 @endsection
 
-
 @section('js')
     @vite(['resources/js/permissions/index.js'])
 @endsection
