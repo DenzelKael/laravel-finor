@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use App\Enums\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,9 +42,52 @@ class Subscription extends Model
         return $this->hasMany(Payment::class);
     }
 
+    /**
+     * Return only valid registered payments.
+     */
+    public function registeredPayments(): HasMany
+    {
+        return $this->payments()
+            ->where('status', PaymentStatus::Registered->value);
+    }
+
+    /**
+     * Total amount already paid for this subscription.
+     */
+    public function paidAmount(): float
+    {
+        return round(
+            (float) $this->registeredPayments()->sum('amount'),
+            2
+        );
+    }
+
+    /**
+     * Remaining balance of this subscription.
+     */
+    public function pendingBalance(): float
+    {
+        $planPrice = (float) $this->plan->precio;
+        $paidAmount = $this->paidAmount();
+
+        return max(
+            0,
+            round($planPrice - $paidAmount, 2)
+        );
+    }
+
+    /**
+     * Determine whether the subscription has been fully paid.
+     */
+    public function isFullyPaid(): bool
+    {
+        return $this->pendingBalance() <= 0;
+    }
+
     public function scopeActive($query)
     {
-        return $query->where('status', SubscriptionStatus::Active->value)
+        return $query
+            ->where('status', SubscriptionStatus::Active->value)
             ->where('expiration_date', '>=', today());
     }
 

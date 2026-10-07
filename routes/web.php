@@ -91,17 +91,32 @@ Route::middleware('auth')->group(function () {
         });
     Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
 
-    Route::controller(PaymentController::class)
-        ->prefix('payments')
-        ->name('payments.')
-        ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::post('/', 'store')->name('store');
-            Route::get('/{payment}', 'show')->name('show');
-            Route::get('/{payment}/receipt', 'receipt')->name('receipt');
-            Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
-        });
+Route::controller(PaymentController::class)
+    ->prefix('payments')
+    ->name('payments.')
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+
+        Route::get(
+            '/subscription/{subscription}/history',
+            'historyBySubscription'
+        )->name('history.subscription');
+
+        Route::get(
+            '/client/{client}/history',
+            'historyByClient'
+        )->name('history.client');
+
+        Route::get('/{payment}', 'show')->name('show');
+        Route::get('/{payment}/receipt', 'receipt')->name('receipt');
+        Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
+        Route::get(
+    '/{payment}/receipt/pdf',
+    'receiptPdf'
+)->name('receipt.pdf');
+    });
 
 
     // Email verification — protect app routes with the `verified` middleware once

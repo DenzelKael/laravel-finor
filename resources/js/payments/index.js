@@ -39,33 +39,63 @@ function showAlert(message, type = 'success') {
 function confirmCancelPayment(id, url) {
     Swal.fire({
         title: '¿Está seguro de anular este pago?',
-        text: 'Esta acción cambiará el estado del pago a ANULADO y conservará el registro contable.',
+        text: 'El pago se conservará para mantener la trazabilidad contable.',
         icon: 'warning',
+        input: 'textarea',
+        inputLabel: 'Motivo de la anulación',
+        inputPlaceholder: 'Indique el motivo de la anulación...',
+        inputAttributes: {
+            maxlength: '255',
+        },
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, anular pago',
         cancelButtonText: 'Cancelar',
+        preConfirm: (reason) => {
+            const trimmedReason = reason.trim();
+
+            if (!trimmedReason) {
+                Swal.showValidationMessage(
+                    'Debe indicar el motivo de la anulación.'
+                );
+
+                return false;
+            }
+
+            return trimmedReason;
+        },
     }).then((result) => {
         if (result.isConfirmed) {
-            cancelPayment(id, url);
+            cancelPayment(id, url, result.value);
         }
     });
 }
 
-async function cancelPayment(id, url) {
+async function cancelPayment(id, url, reason) {
     try {
-        const data = await api.patch(url);
-        showAlert(data.message || 'Pago anulado correctamente.', 'success');
+        const data = await api.patch(url, {
+            void_reason: reason,
+        });
 
-        // Actualizar visualmente la fila del pago
-        const badgeEl = document.getElementById(`payment-status-${id}`);
+        showAlert(
+            data.message || 'Pago anulado correctamente.',
+            'success'
+        );
+
+        const badgeEl = document.getElementById(
+            `payment-status-${id}`
+        );
+
         if (badgeEl) {
             badgeEl.className = 'badge badge-danger';
             badgeEl.textContent = 'Anulado';
         }
 
-        const actionBtn = document.getElementById(`payment-action-${id}`);
+        const actionBtn = document.getElementById(
+            `payment-action-${id}`
+        );
+
         if (actionBtn) {
             actionBtn.remove();
         }
@@ -73,17 +103,34 @@ async function cancelPayment(id, url) {
         if (error instanceof ApiError) {
             showAlert(error.message, 'danger');
         } else {
-            showAlert('Ocurrió un error inesperado al anular el pago.', 'danger');
+            showAlert(
+                'Ocurrió un error inesperado al anular el pago.',
+                'danger'
+            );
         }
     }
 }
 
+document.addEventListener('click', function (event) {
+    const cancelButton = event.target.closest(
+        '[data-action="cancel-payment"]'
+    );
+
+    if (!cancelButton) {
+        return;
+    }
+
+    const id = cancelButton.dataset.paymentId;
+    const url = cancelButton.dataset.url;
+
+    confirmCancelPayment(id, url);
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const flashMessage = sessionStorage.getItem('flash_message');
+
     if (flashMessage) {
         showAlert(flashMessage, 'success');
         sessionStorage.removeItem('flash_message');
     }
 });
-
-

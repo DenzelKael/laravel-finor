@@ -136,39 +136,76 @@ class PaymentRegistrationTest extends TestCase
     /**
      * Test 4: An authorized user can cancel a registered payment.
      */
-    public function test_authorized_user_can_cancel_registered_payment(): void
-    {
-        $cancelPermission = Permission::findOrCreate(
-            'payments.cancel',
-            'web'
+    /**
+ * Test 4: An authorized user can void a registered payment.
+ */
+public function test_authorized_user_can_cancel_registered_payment(): void
+{
+    $cancelPermission = Permission::findOrCreate(
+        'payments.cancel',
+        'web'
+    );
+
+    $this->user->givePermissionTo($cancelPermission);
+
+    $payment = $this->activeSubscription
+        ->payments()
+        ->create([
+            'amount' => 150.00,
+            'payment_method' => PaymentMethod::Cash,
+            'payment_date' => now()->toDateString(),
+            'status' => PaymentStatus::Registered,
+        ]);
+
+    $response = $this->actingAs($this->user)
+        ->patchJson(
+            route('payments.cancel', $payment),
+            [
+                'void_reason' => 'Pago registrado por error.',
+            ]
         );
 
-        $this->user->givePermissionTo($cancelPermission);
+    $response->assertOk()
+        ->assertJsonPath(
+            'message',
+            'Pago anulado correctamente.'
+        );
 
-        $payment = $this->activeSubscription
-            ->payments()
-            ->create([
-                'amount' => 150.00,
-                'payment_method' => PaymentMethod::Cash,
-                'payment_date' => now()->toDateString(),
-                'status' => PaymentStatus::Registered,
-            ]);
+    $this->assertDatabaseHas('payments', [
+        'id' => $payment->id,
+        'subscription_id' => $this->activeSubscription->id,
+        'status' => PaymentStatus::Voided->value,
+        'void_reason' => 'Pago registrado por error.',
+    ]);
 
-        $response = $this->actingAs($this->user)
-            ->patchJson(
-                route('payments.cancel', $payment)
-            );
+    $payment->refresh();
 
-        $response->assertOk()
-            ->assertJsonPath(
-                'message',
-                'Pago anulado correctamente.'
-            );
+    $this->assertNotNull($payment->voided_at);
+}
+public function test_payment_fails_when_amount_exceeds_pending_balance(): void
+{
+    $this->activeSubscription->payments()->create([
+        'amount' => 100.00,
+        'payment_method' => PaymentMethod::Cash,
+        'payment_date' => now()->toDateString(),
+        'status' => PaymentStatus::Registered,
+    ]);
 
-        $this->assertDatabaseHas('payments', [
-            'id' => $payment->id,
-            'subscription_id' => $this->activeSubscription->id,
-            'status' => PaymentStatus::Cancelled->value,
+    $pendingBalance = $this->activeSubscription->pendingBalance();
+
+    $payload = [
+        'subscription_id' => $this->activeSubscription->id,
+        'amount' => $pendingBalance + 1,
+        'payment_method' => PaymentMethod::Cash->value,
+        'payment_date' => now()->toDateString(),
+    ];
+
+    $response = $this->actingAs($this->user)
+        ->postJson('/payments', $payload);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors([
+            'amount',
         ]);
-    }
+}
 }
