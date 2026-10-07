@@ -5,12 +5,16 @@ namespace App\Http\Requests;
 use App\DTOs\PaymentData;
 use App\Enums\PaymentMethod;
 use App\Models\Payment;
+use App\Models\Subscription;
 use App\Rules\ActiveSubscription;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use LogicException;
 
 class StorePaymentRequest extends FormRequest
 {
+    private ?ActiveSubscription $activeSubscriptionRule = null;
+
     public function authorize(): bool
     {
         return $this->user()?->can('create', Payment::class) ?? false;
@@ -18,12 +22,13 @@ class StorePaymentRequest extends FormRequest
 
     public function rules(): array
     {
+        $this->activeSubscriptionRule ??= new ActiveSubscription();
+
         return [
             'subscription_id' => [
                 'required',
                 'integer',
-                'exists:subscriptions,id',
-                new ActiveSubscription(),
+                $this->activeSubscriptionRule,
             ],
 
             'amount' => [
@@ -54,9 +59,6 @@ class StorePaymentRequest extends FormRequest
 
             'subscription_id.integer' =>
                 'La suscripción seleccionada no es válida.',
-
-            'subscription_id.exists' =>
-                'La suscripción seleccionada no existe en el sistema.',
 
             'amount.required' =>
                 'El monto es obligatorio.',
@@ -95,5 +97,21 @@ class StorePaymentRequest extends FormRequest
         return PaymentData::fromArray(
             $this->validated()
         );
+    }
+
+    /**
+     * Return the subscription resolved during validation.
+     */
+    public function subscription(): Subscription
+    {
+        $subscription = $this->activeSubscriptionRule?->subscription();
+
+        if (! $subscription) {
+            throw new LogicException(
+                'La suscripción no fue resuelta durante la validación.'
+            );
+        }
+
+        return $subscription;
     }
 }
