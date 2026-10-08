@@ -221,17 +221,24 @@ return [
             'icon' => 'bi bi-speedometer',
         ],
 
-        ['header' => 'GESTIÓN'],
+        ['header' => 'MANAGEMENT'],
         [
-            'text' => 'Clientes',
+            'text' => 'Clients',
             'url' => 'clients',
             'icon' => 'bi bi-people',
-            'active' => ['clientes*'],
+            'active' => ['clients*'],
         ],
         [
-            'text'    => 'Planes',
+            'text'    => 'Plans',
             'url'     => 'plans',
             'icon'    => 'bi bi-list-check',
+            'active'  => ['plans*'],
+        ],
+        [
+            'text'    => 'Subscriptions',
+            'url'     => 'subscriptions',
+            'icon'    => 'bi bi-arrow-repeat',
+            'active'  => ['subscriptions*'],
         ],
         [
             'text'    => 'Payments',
@@ -240,19 +247,13 @@ return [
             'active'  => ['payments*'],
         ],
 
-        ['header' => 'REPORTS'],
+        ['header' => 'SETTINGS'],
         [
-            'text' => 'Dashboard v1',
-            'url' => '/',
-            'icon' => 'bi bi-bar-chart-fill',
-        ],
-        ['header' => 'CONFIGURACIÓN'],
-        [
-            'text' => 'Configuración',
+            'text' => 'Settings',
             'icon' => 'bi bi-gear-fill',
             'submenu' => [
                 [
-                    'text' => 'Usuarios',
+                    'text' => 'Users',
                     'url' => 'admin/users',
                     'icon' => 'bi bi-people',
                     'can' => 'users.view',
@@ -264,7 +265,7 @@ return [
                     'can' => 'roles.view',
                 ],
                 [
-                    'text' => 'Permisos',
+                    'text' => 'Permissions',
                     'url' => 'admin/permissions',
                     'icon' => 'bi bi-key-fill',
                     'can' => 'permissions.view',
