@@ -128,11 +128,28 @@ Route::middleware('auth')->group(function () {
         ->prefix('subscriptions')
         ->name('subscriptions.')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::post('/', 'store')->name('store');
-            Route::get('/{subscription}', 'show')->name('show');
-            Route::patch('/{subscription}/renew', 'renew')->name('renew');
-            Route::patch('/{subscription}/cancel', 'cancel')->name('cancel');
+            Route::get('/', 'index')
+                ->middleware('permission:subscriptions.view')
+                ->name('index');
+                
+            Route::get('/create', 'create')
+                ->middleware('permission:subscriptions.create')
+                ->name('create');
+                
+            Route::post('/', 'store')
+                ->middleware('permission:subscriptions.create')
+                ->name('store');
+                
+            Route::get('/{subscription}', 'show')
+                ->middleware('permission:subscriptions.view')
+                ->name('show');
+                
+            Route::patch('/{subscription}/renew', 'renew')
+                ->middleware('permission:subscriptions.update')
+                ->name('renew');
+                
+            Route::patch('/{subscription}/cancel', 'cancel')
+                ->middleware('permission:subscriptions.delete')
+                ->name('cancel');
         });
 });
