@@ -243,7 +243,7 @@ return [
         ['header' => 'REPORTS'],
         [
             'text' => 'Dashboard v1',
-            'url' => '/',
+            'route' => 'dashboard.index',
             'icon' => 'bi bi-bar-chart-fill',
         ],
         ['header' => 'CONFIGURACIÓN'],

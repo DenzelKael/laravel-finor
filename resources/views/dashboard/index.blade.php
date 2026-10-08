@@ -1,56 +1,56 @@
 @extends('adminlte::page')
 
-@section('title', 'Main Dashboard')
+@section('title', 'Panel Principal')
 
 @section('content_header')
-    <h1>Main Dashboard</h1>
+    <h1>Panel Principal</h1>
 @stop
 
 @section('content')
     <div class="row">
-        <!-- Active Clients Card -->
+        <!-- Tarjeta de Clientes -->
         <div class="col-lg-4 col-6">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>{{ $clientesActivos }}</h3>
-                    <p>Active Clients</p>
+                    <h3>{{ $activeClients }}</h3>
+                    <p>Total de Clientes</p>
                 </div>
                 <div class="icon"><i class="fas fa-users"></i></div>
             </div>
         </div>
         
-        <!-- Monthly Revenue Card -->
+        <!-- Tarjeta de Ingresos -->
         <div class="col-lg-4 col-6">
             <div class="small-box bg-success">
                 <div class="inner">
-                    <h3>${{ number_format($ingresosMes, 2) }}</h3>
-                    <p>Monthly Revenue</p>
+                    <h3>Bs. {{ number_format($monthlyRevenue, 2) }}</h3>
+                    <p>Ingresos Mensuales</p>
                 </div>
                 <div class="icon"><i class="fas fa-dollar-sign"></i></div>
             </div>
         </div>
         
-        <!-- Expiring Subscriptions Card -->
+        <!-- Tarjeta de Suscripciones -->
         <div class="col-lg-4 col-6">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>{{ $suscripcionesPorVencer }}</h3>
-                    <p>Expiring Subscriptions</p>
+                    <h3>{{ $expiringSubscriptions }}</h3> 
+                    <p>Suscripciones por Vencer</p>
                 </div>
                 <div class="icon"><i class="fas fa-clock"></i></div>
             </div>
         </div>
     </div>
 
-    <!-- Chart Container -->
+    <!-- Gráfico con data-url
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Activity Overview</h3>
+                    <h3 class="card-title">Resumen de Actividad</h3>
                 </div>
                 <div class="card-body">
-                    <canvas id="mainChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    <canvas id="mainChart" data-url="{{ route('dashboard.chart') }}" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
             </div>
         </div>
@@ -58,35 +58,5 @@
 @stop
 
 @section('js')
-    <!-- Chart.js and DOM/Fetch Implementation -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fetch API to get chart data
-            fetch('/api/chart-data')
-                .then(response => response.json())
-                .then(data => {
-                    const ctx = document.getElementById('mainChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line', 
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Revenue ($)',
-                                data: data.data,
-                                backgroundColor: 'rgba(60,141,188,0.2)',
-                                borderColor: 'rgba(60,141,188,1)',
-                                borderWidth: 2,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                })
-                .catch(error => console.error('Error fetching chart data:', error));
-        });
-    </script>
+    @vite('resources/js/dashboard/main.js')
 @stop
