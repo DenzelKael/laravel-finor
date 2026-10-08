@@ -18,13 +18,16 @@ class SubscriptionController extends Controller
     /**
      * Listado de suscripciones (con relaciones cargadas)
      */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $subscriptions = Subscription::with(['client', 'plan'])->get();
-        
-        return response()->json(
-            SubscriptionResource::collection($subscriptions)
-        );
+        if ($request->expectsJson() || $request->ajax()) {
+            $subscriptions = Subscription::with(['client', 'plan'])->get();
+            return response()->json(
+                SubscriptionResource::collection($subscriptions)
+            );
+        }
+
+        return view('subscriptions.index');
     }
 
     /**
