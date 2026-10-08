@@ -7,7 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PaymentController;
-
+use App\Http\Controllers\SubscriptionController;
 
 
 // AdminLTE authentication routes
@@ -122,4 +122,17 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
         ->name('logout');
+
+    // Rutas explícitas de Suscripciones (Equipo D)
+    Route::controller(SubscriptionController::class)
+        ->prefix('subscriptions')
+        ->name('subscriptions.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{subscription}', 'show')->name('show');
+            Route::patch('/{subscription}/renew', 'renew')->name('renew');
+            Route::patch('/{subscription}/cancel', 'cancel')->name('cancel');
+        });
 });
