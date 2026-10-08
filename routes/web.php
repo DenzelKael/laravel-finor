@@ -116,10 +116,10 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
-
+    Route::controller(DashboardController::class)->prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/chart-data', 'chartData')->name('chart');
+    });
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
         ->name('logout');
 });

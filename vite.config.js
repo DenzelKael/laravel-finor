@@ -16,6 +16,7 @@ export default defineConfig({
                 'resources/js/payments/index.js',
                 'resources/js/pages/plan-form.js',
                 'resources/js/pages/plans-index.js',
+                'resources/js/dashboard/main.js',
             ],
             refresh: true,
             fonts: [
