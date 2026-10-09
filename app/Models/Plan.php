@@ -43,6 +43,6 @@ class Plan extends Model
      */
     public function getPrecioFormateadoAttribute(): string
     {
-        return '$' . number_format((float) $this->precio, 2);
+        return 'Bs ' . number_format((float) $this->precio, 2);
     }
 }
