@@ -221,39 +221,39 @@ return [
             'icon' => 'bi bi-speedometer',
         ],
 
-        ['header' => 'MANAGEMENT'],
+        ['header' => 'GESTIÓN'],
         [
-            'text' => 'Clients',
+            'text' => 'Clientes',
             'url' => 'clients',
             'icon' => 'bi bi-people',
             'active' => ['clients*'],
         ],
         [
-            'text'    => 'Plans',
+            'text'    => 'Planes',
             'url'     => 'plans',
             'icon'    => 'bi bi-list-check',
             'active'  => ['plans*'],
         ],
         [
-            'text'    => 'Subscriptions',
+            'text'    => 'Suscripciones',
             'url'     => 'subscriptions',
             'icon'    => 'bi bi-arrow-repeat',
             'active'  => ['subscriptions*'],
         ],
         [
-            'text'    => 'Payments',
+            'text'    => 'Pagos',
             'url'     => 'payments',
             'icon'    => 'bi bi-cash-stack',
             'active'  => ['payments*'],
         ],
 
-        ['header' => 'SETTINGS'],
+        ['header' => 'SISTEMA'],
         [
-            'text' => 'Settings',
+            'text' => 'Configuración',
             'icon' => 'bi bi-gear-fill',
             'submenu' => [
                 [
-                    'text' => 'Users',
+                    'text' => 'Usuarios',
                     'url' => 'admin/users',
                     'icon' => 'bi bi-people',
                     'can' => 'users.view',
@@ -265,7 +265,7 @@ return [
                     'can' => 'roles.view',
                 ],
                 [
-                    'text' => 'Permissions',
+                    'text' => 'Permisos',
                     'url' => 'admin/permissions',
                     'icon' => 'bi bi-key-fill',
                     'can' => 'permissions.view',

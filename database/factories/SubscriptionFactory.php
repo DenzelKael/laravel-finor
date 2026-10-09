@@ -37,7 +37,7 @@ class SubscriptionFactory extends Factory
                 'activo' => true,
             ])->id,
             'start_date' => now()->startOfMonth(),
-            'end_date' => now()->addMonths(3)->endOfDay(),
+            'expiration_date' => now()->addMonths(3)->endOfDay(),
             'status' => SubscriptionStatus::Active->value,
         ];
     }
@@ -50,7 +50,7 @@ class SubscriptionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => SubscriptionStatus::Active->value,
             'start_date' => now()->startOfMonth(),
-            'end_date' => now()->addMonths(3)->endOfDay(),
+            'expiration_date' => now()->addMonths(3)->endOfDay(),
         ]);
     }
 
@@ -62,7 +62,7 @@ class SubscriptionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => SubscriptionStatus::Expired->value,
             'start_date' => now()->subMonths(4),
-            'end_date' => now()->subDays(5)->endOfDay(),
+            'expiration_date' => now()->subDays(5)->endOfDay(),
         ]);
     }
 

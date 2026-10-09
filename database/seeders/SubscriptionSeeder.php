@@ -77,7 +77,7 @@ class SubscriptionSeeder extends Seeder
             ],
             [
                 'start_date' => now()->startOfMonth()->toDateString(),
-                'end_date' => now()->addMonths(3)->endOfDay()->toDateString(),
+                'expiration_date' => now()->addMonths(3)->endOfDay()->toDateString(),
                 'status' => SubscriptionStatus::Active->value,
             ]
         );
@@ -90,7 +90,7 @@ class SubscriptionSeeder extends Seeder
             ],
             [
                 'start_date' => now()->subMonths(4)->startOfMonth()->toDateString(),
-                'end_date' => now()->subDays(5)->endOfDay()->toDateString(),
+                'expiration_date' => now()->subDays(5)->endOfDay()->toDateString(),
                 'status' => SubscriptionStatus::Expired->value,
             ]
         );
@@ -103,7 +103,7 @@ class SubscriptionSeeder extends Seeder
             ],
             [
                 'start_date' => now()->subDays(10)->toDateString(),
-                'end_date' => now()->addMonths(6)->endOfDay()->toDateString(),
+                'expiration_date' => now()->addMonths(6)->endOfDay()->toDateString(),
                 'status' => SubscriptionStatus::Active->value,
             ]
         );

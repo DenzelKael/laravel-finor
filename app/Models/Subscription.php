@@ -16,13 +16,13 @@ class Subscription extends Model
         'client_id',
         'plan_id',
         'start_date',
-        'end_date',
+        'expiration_date',
         'status',
     ];
 
     protected $casts = [
         'start_date' => 'date',
-        'end_date' => 'date',
+        'expiration_date' => 'date',
         'status' => SubscriptionStatus::class,
     ];
 
@@ -44,12 +44,12 @@ class Subscription extends Model
     public function scopeActive($query)
     {
         return $query->where('status', SubscriptionStatus::Active->value)
-            ->where('end_date', '>=', today());
+            ->where('expiration_date', '>=', today());
     }
 
     public function isExpired(): bool
     {
         return $this->status === SubscriptionStatus::Expired
-            || $this->end_date->endOfDay()->isPast();
+            || $this->expiration_date->endOfDay()->isPast();
     }
 }
