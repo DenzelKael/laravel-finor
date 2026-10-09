@@ -30,7 +30,7 @@ class ClientControllerTest extends TestCase
     public function test_store_creates_a_client(): void
     {
         $response = $this->postJson(route('clients.store'), [
-            'name'  => 'Carlos Ferrel',
+            'name' => 'Carlos Ferrel',
             'email' => 'carlos@example.com',
         ]);
 
@@ -49,7 +49,7 @@ class ClientControllerTest extends TestCase
         $client = Client::create(['name' => 'Original', 'email' => 'original@example.com']);
 
         $response = $this->putJson(route('clients.update', $client), [
-            'name'  => 'Nombre Actualizado',
+            'name' => 'Nombre Actualizado',
             'email' => 'original@example.com',
         ]);
 

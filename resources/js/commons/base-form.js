@@ -65,19 +65,19 @@ export default class BaseForm {
         } catch (error) {
             if (!(error instanceof ApiError)) throw error;
 
-            switch (error.type) {
+                        switch (error.type) {
                 case 'validation':
                     this.showValidationErrors(error.data.errors);
                     break;
-               case 'auth':
-                    SwalMessages.error('Tu sesión expiró.');
+                case 'auth':
+                    await SwalMessages.error('Tu sesión expiró.');
                     window.location.href = '/login';
                     break;
                 case 'forbidden':
                     SwalMessages.error('No tienes permiso para realizar esta acción.');
                     break;
                 case 'not_found':
-                    SwalMessages.warning('Este registro ya no existe.');
+                    await SwalMessages.warning('Este registro ya no existe.');
                     window.location.href = this.form.dataset.indexUrl;
                     break;
                 default:
