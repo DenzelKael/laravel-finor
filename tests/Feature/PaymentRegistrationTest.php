@@ -129,4 +129,28 @@ $this->user->givePermissionTo($permission);
                 'subscription_id',
             ]);
     }
+
+    /**
+     * Test 4: The subscription instance is properly resolved by validation rule during happy path.
+     */
+    public function test_subscription_is_resolved_by_validation_rule_during_happy_path(): void
+    {
+        $payload = [
+            'subscription_id' => $this->activeSubscription->id,
+            'amount' => 150.00,
+            'payment_method' => PaymentMethod::Cash->value,
+            'payment_date' => now()->toDateString(),
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->postJson('/payments', $payload);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('payments', [
+            'subscription_id' => $this->activeSubscription->id,
+            'amount' => 150.00,
+            'status' => PaymentStatus::Registered->value,
+        ]);
+    }
 }
