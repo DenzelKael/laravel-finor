@@ -79,15 +79,16 @@ Route::middleware('auth')->group(function () {
             ->name('permissions.destroy');
     });
 
-    Route::controller(ClientController::class)
+        Route::controller(ClientController::class)
+        ->prefix('clients')
         ->name('clients.')
         ->group(function () {
-            Route::get('clients', 'index')->name('index');
-            Route::get('clients/create', 'create')->name('create');
-            Route::post('clients', 'store')->name('store');
-            Route::get('clients/{client}/edit', 'edit')->name('edit');
-            Route::put('clients/{client}', 'update')->name('update');
-            Route::delete('clients/{client}', 'destroy')->name('destroy');
+            Route::get('/', 'index')->middleware('permission:clients.view')->name('index');
+            Route::get('/create', 'create')->middleware('permission:clients.create')->name('create');
+            Route::post('/', 'store')->middleware('permission:clients.create')->name('store');
+            Route::get('/{client}/edit', 'edit')->middleware('permission:clients.update')->name('edit');
+            Route::put('/{client}', 'update')->middleware('permission:clients.update')->name('update');
+            Route::delete('/{client}', 'destroy')->middleware('permission:clients.delete')->name('destroy');
         });
     Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
 

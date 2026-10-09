@@ -1,4 +1,5 @@
 import api, { ApiError } from './api-client.js';
+import SwalMessages from './swal-messages.js';
 
 export default class BaseForm {
     constructor(form) {
@@ -28,7 +29,7 @@ export default class BaseForm {
             if (!feedback) {
                 feedback = document.createElement('span');
                 feedback.className = 'invalid-feedback';
-                group?.appendChild(feedback);
+                (group ?? input.parentElement).appendChild(feedback);
             }
 
             feedback.textContent = errors[field][0];
@@ -64,19 +65,23 @@ export default class BaseForm {
         } catch (error) {
             if (!(error instanceof ApiError)) throw error;
 
-            switch (error.type) {
+                        switch (error.type) {
                 case 'validation':
                     this.showValidationErrors(error.data.errors);
                     break;
                 case 'auth':
+                    await SwalMessages.error('Tu sesión expiró.');
                     window.location.href = '/login';
                     break;
+                case 'forbidden':
+                    SwalMessages.error('No tienes permiso para realizar esta acción.');
+                    break;
                 case 'not_found':
-                    alert('Este registro ya no existe.');
+                    await SwalMessages.warning('Este registro ya no existe.');
                     window.location.href = this.form.dataset.indexUrl;
                     break;
                 default:
-                    alert(error.message);
+                    SwalMessages.error(error.message);
             }
         }
     }
