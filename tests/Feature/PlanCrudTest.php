@@ -10,6 +10,13 @@ use Tests\TestCase;
 class PlanCrudTest extends TestCase
 {
     use RefreshDatabase;
+    
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
 
     protected function authUser(): User
     {
