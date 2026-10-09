@@ -18,41 +18,52 @@
 
 <div class="card">
     <div class="card-body">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Duración (días)</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($plans as $plan)
-                <tr>
-                    <td>{{ $plan->nombre }}</td>
-                    <td>{{ $plan->precio_formateado }}</td>
-                    <td>{{ $plan->duracion_dias }}</td>
-                    <td>
-                        @if ($plan->activo)
-                        <span class="badge bg-success">Activo</span>
-                        @else
-                        <span class="badge bg-secondary">Inactivo</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{ route('plans.edit', $plan) }}" class="btn btn-sm btn-warning">
-                            <i class="fas fa-edit"></i> editar
-                        </a>
-                        <button type="button" class="btn btn-sm btn-danger btn-delete-plan" data-id="{{ $plan->id }}">
-                            <i class="fas fa-trash"></i>eliminar
-                        </button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Duración (días)</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($plans as $plan)
+                    <tr id="plan-row-{{ $plan->id }}">
+                        <td>{{ $plan->nombre }}</td>
+                        <td>{{ $plan->precio_formateado }}</td>
+                        <td>{{ $plan->duracion_dias }}</td>
+                        <td>
+                            @if ($plan->activo)
+                            <span class="badge bg-success">Activo</span>
+                            @else
+                            <span class="badge bg-secondary">Inactivo</span>
+                            @endif
+                        </td>
+                        <td>
+                            <a href="{{ route('plans.edit', $plan) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <button type="button"
+                                class="btn btn-sm btn-danger btn-delete-plan"
+                                data-id="{{ $plan->id }}"
+                                data-url="{{ route('plans.destroy', $plan) }}">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No hay planes registrados todavía.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         {{ $plans->links() }}
     </div>
