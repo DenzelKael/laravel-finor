@@ -28,7 +28,7 @@ export default class SwalMessages {
         });
     }
 
-    static async confirm(text = '¿Estás seguro?', title = 'Confirmar') {
+    static async confirm(text = '¿Estás seguro?', title = 'Confirmar', confirmText = 'Sí, continuar') {
         const result = await Swal.fire({
             title,
             text,
@@ -36,7 +36,7 @@ export default class SwalMessages {
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Sí, continuar',
+            confirmButtonText: confirmText,
             cancelButtonText: 'Cancelar',
         });
         return result.isConfirmed;
