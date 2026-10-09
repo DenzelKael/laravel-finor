@@ -27,10 +27,9 @@ class PaymentRegistrationTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        
-        $permission = Permission::findOrCreate('payments.create', 'web');
 
-$this->user->givePermissionTo($permission);
+        $permission = Permission::findOrCreate('payments.create', 'web');
+        $this->user->givePermissionTo($permission);
 
         $client = Client::create([
             'name' => 'Cliente de Prueba',
@@ -151,6 +150,45 @@ $this->user->givePermissionTo($permission);
             'subscription_id' => $this->activeSubscription->id,
             'amount' => 150.00,
             'status' => PaymentStatus::Registered->value,
+        ]);
+    }
+
+    /**
+     * Test 5: An authorized user can cancel a registered payment.
+     */
+    public function test_authorized_user_can_cancel_registered_payment(): void
+    {
+        $cancelPermission = Permission::findOrCreate(
+            'payments.cancel',
+            'web'
+        );
+
+        $this->user->givePermissionTo($cancelPermission);
+
+        $payment = $this->activeSubscription
+            ->payments()
+            ->create([
+                'amount' => 150.00,
+                'payment_method' => PaymentMethod::Cash,
+                'payment_date' => now()->toDateString(),
+                'status' => PaymentStatus::Registered,
+            ]);
+
+        $response = $this->actingAs($this->user)
+            ->patchJson(
+                route('payments.cancel', $payment)
+            );
+
+        $response->assertOk()
+            ->assertJsonPath(
+                'message',
+                'Pago anulado correctamente.'
+            );
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->id,
+            'subscription_id' => $this->activeSubscription->id,
+            'status' => PaymentStatus::Cancelled->value,
         ]);
     }
 }
