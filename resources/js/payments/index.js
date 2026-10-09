@@ -78,6 +78,21 @@ async function cancelPayment(id, url) {
     }
 }
 
+document.addEventListener('click', function (event) {
+    const cancelButton = event.target.closest(
+        '[data-action="cancel-payment"]'
+    );
+
+    if (!cancelButton) {
+        return;
+    }
+
+    const id = cancelButton.dataset.paymentId;
+    const url = cancelButton.dataset.url;
+
+    confirmCancelPayment(id, url);
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const flashMessage = sessionStorage.getItem('flash_message');
     if (flashMessage) {
@@ -86,4 +101,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-window.confirmCancelPayment = confirmCancelPayment;
+
+
