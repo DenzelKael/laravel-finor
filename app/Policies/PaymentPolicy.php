@@ -13,15 +13,15 @@ class PaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('payments.view');
     }
 
     /**
-     * Determine whether the user can view the payment details and receipt.
+     * Determine whether the user can view a payment.
      */
     public function view(User $user, Payment $payment): bool
     {
-        return true;
+        return $user->can('payments.view');
     }
 
     /**
@@ -29,14 +29,15 @@ class PaymentPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->can('payments.create');
     }
 
     /**
-     * Determine whether the user can cancel the payment.
+     * Determine whether the user can cancel a payment.
      */
     public function cancel(User $user, Payment $payment): bool
     {
-        return $payment->status !== PaymentStatus::Cancelled;
+        return $user->can('payments.cancel')
+            && $payment->status !== PaymentStatus::Cancelled;
     }
 }

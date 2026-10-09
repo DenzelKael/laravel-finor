@@ -10,6 +10,7 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 
 class PaymentRegistrationTest extends TestCase
 {
@@ -26,6 +27,10 @@ class PaymentRegistrationTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
+        
+        $permission = Permission::findOrCreate('payments.create', 'web');
+
+$this->user->givePermissionTo($permission);
 
         $client = Client::create([
             'name' => 'Cliente de Prueba',
