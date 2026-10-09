@@ -2,7 +2,6 @@ import api, { ApiError } from '../commons/api-client.js';
 import SwalMessages from '../commons/swal-messages.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Mensaje de éxito al volver de crear/editar
     const flash = sessionStorage.getItem('flash_message');
     if (flash) {
         sessionStorage.removeItem('flash_message');
@@ -14,15 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmed = await SwalMessages.confirmDelete('Este plan');
             if (!confirmed) return;
 
+            const { id, url } = btn.dataset;
+
             try {
-                const data = await api.delete(`/plans/${btn.dataset.id}`);
-                btn.closest('tr').remove();
+                const data = await api.delete(url);
+                document.getElementById(`plan-row-${id}`)?.remove();
                 SwalMessages.success(data.message);
             } catch (error) {
-                if (error instanceof ApiError) {
-                    SwalMessages.error(error.message);
+                if (!(error instanceof ApiError)) throw error;
+
+                if (error.type === 'not_found') {
+                    document.getElementById(`plan-row-${id}`)?.remove();
+                    SwalMessages.warning('El plan ya no existía.');
                 } else {
-                    throw error;
+                    SwalMessages.error(error.message);
                 }
             }
         });

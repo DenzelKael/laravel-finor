@@ -45,8 +45,11 @@
                         <a href="{{ route('plans.edit', $plan) }}" class="btn btn-sm btn-warning">
                             <i class="fas fa-edit"></i> editar
                         </a>
-                        <button type="button" class="btn btn-sm btn-danger btn-delete-plan" data-id="{{ $plan->id }}">
-                            <i class="fas fa-trash"></i>eliminar
+                        <button type="button"
+                            class="btn btn-sm btn-danger btn-delete-plan"
+                            data-id="{{ $plan->id }}"
+                            data-url="{{ route('plans.destroy', $plan) }}">
+                            <i class="fas fa-trash"></i> Eliminar
                         </button>
                     </td>
                 </tr>
