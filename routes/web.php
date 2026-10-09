@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -7,7 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PaymentController;
-
+use App\Http\Controllers\PlanController;
 
 
 // AdminLTE authentication routes
@@ -89,7 +90,18 @@ Route::middleware('auth')->group(function () {
             Route::put('clients/{client}', 'update')->name('update');
             Route::delete('clients/{client}', 'destroy')->name('destroy');
         });
-    Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
+        
+    Route::controller(PlanController::class)
+        ->prefix('plans')
+        ->name('plans.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index')->middleware('permission:plans.view');
+            Route::get('/create', 'create')->name('create')->middleware('permission:plans.create');
+            Route::post('/', 'store')->name('store')->middleware('permission:plans.create');
+            Route::get('/{plan}/edit', 'edit')->name('edit')->middleware('permission:plans.update');
+            Route::put('/{plan}', 'update')->name('update')->middleware('permission:plans.update');
+            Route::delete('/{plan}', 'destroy')->name('destroy')->middleware('permission:plans.delete');
+        });
 
     Route::controller(PaymentController::class)
         ->prefix('payments')

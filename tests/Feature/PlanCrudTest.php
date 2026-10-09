@@ -5,15 +5,21 @@ namespace Tests\Feature;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class PlanCrudTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function authUser(): User
+    protected function authUser(array $permissions = ['plans.view', 'plans.create', 'plans.update', 'plans.delete']): User
     {
+        foreach ($permissions as $name) {
+            Permission::findOrCreate($name, 'web');
+        }
+
         $user = User::factory()->create();
+        $user->givePermissionTo($permissions);
         $this->actingAs($user);
 
         return $user;
@@ -136,5 +142,19 @@ class PlanCrudTest extends TestCase
         $response = $this->get(route('plans.index'));
 
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_usuario_sin_permisos_recibe_403_en_planes(): void
+    {
+        $plan = Plan::factory()->create();
+
+        $this->actingAs(User::factory()->create());
+
+        $this->get(route('plans.index'))->assertForbidden();
+        $this->get(route('plans.create'))->assertForbidden();
+        $this->postJson(route('plans.store'), [])->assertForbidden();
+        $this->get(route('plans.edit', $plan))->assertForbidden();
+        $this->putJson(route('plans.update', $plan), [])->assertForbidden();
+        $this->deleteJson(route('plans.destroy', $plan))->assertForbidden();
     }
 }
