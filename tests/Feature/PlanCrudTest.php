@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Plan;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -10,6 +11,13 @@ use Tests\TestCase;
 class PlanCrudTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
 
     protected function authUser(): User
     {
@@ -129,6 +137,19 @@ class PlanCrudTest extends TestCase
 
         $response->assertOk();
         $this->assertDatabaseMissing('plans', ['id' => $plan->id]);
+    }
+
+    public function test_no_elimina_plan_con_suscripciones(): void
+    {
+        $this->authUser();
+        $plan = Plan::factory()->create();
+        Subscription::factory()->create(['plan_id' => $plan->id]);
+
+        $response = $this->deleteJson(route('plans.destroy', $plan));
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('message', 'El plan tiene suscripciones; desactívelo en lugar de eliminarlo.');
+        $this->assertDatabaseHas('plans', ['id' => $plan->id]);
     }
 
     public function test_requiere_autenticacion_para_listar(): void
