@@ -137,4 +137,11 @@ class PlanCrudTest extends TestCase
 
         $response->assertRedirect(route('login'));
     }
+
+    public function test_formatea_el_precio_en_bolivianos(): void
+    {
+        $plan = Plan::factory()->make(['precio' => 29.9]);
+
+        $this->assertSame('Bs 29.90', $plan->precio_formateado);
+    }
 }
