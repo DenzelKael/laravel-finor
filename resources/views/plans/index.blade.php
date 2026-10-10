@@ -7,10 +7,6 @@
 @stop
 
 @section('content')
-@if (session('success'))
-<!--<div class="alert alert-success">{{ session('success') }}</div>-->
-<div id="flash-message" class="alert alert-success d-none"></div>
-@endif
 
 <a href="{{ route('plans.create') }}" class="btn btn-primary mb-3">
     <i class="fas fa-plus"></i> Nuevo Plan
