@@ -240,6 +240,15 @@ return [
             'active'  => ['payments*'],
         ],
 
+        [
+            'text'    => 'Suscripciones',
+            'url'     => 'subscriptions',
+            'icon'    => 'bi bi-arrow-repeat',
+            'active'  => ['subscriptions*'],
+            'can'     => 'subscriptions.view',
+        ],
+
+
         ['header' => 'REPORTS'],
         [
             'text' => 'Dashboard v1',

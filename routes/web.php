@@ -1,14 +1,13 @@
 <?php
-use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PaymentController;
-
-
+use App\Http\Controllers\SubscriptionController;
+use Illuminate\Support\Facades\Route;
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -27,7 +26,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::prefix('admin')->group(function () {
-        //users
+        // Users
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:users.view')
             ->name('users.index');
@@ -40,7 +39,7 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:users.update')
             ->name('users.update');
 
-        //roles
+        // Roles
         Route::get('/roles', [RoleController::class, 'index'])
             ->middleware('permission:roles.view')
             ->name('roles.index');
@@ -53,7 +52,7 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:roles.update')
             ->name('roles.update');
 
-        //permissions
+        // Permissions
         Route::get('/permissions', [PermissionController::class, 'index'])
             ->middleware('permission:permissions.view')
             ->name('permissions.index');
@@ -79,6 +78,7 @@ Route::middleware('auth')->group(function () {
             ->name('permissions.destroy');
     });
 
+    // Clients
     Route::controller(ClientController::class)
         ->name('clients.')
         ->group(function () {
@@ -89,8 +89,11 @@ Route::middleware('auth')->group(function () {
             Route::put('clients/{client}', 'update')->name('update');
             Route::delete('clients/{client}', 'destroy')->name('destroy');
         });
+
+    // Plans
     Route::resource('plans', \App\Http\Controllers\PlanController::class)->except('show');
 
+    // Payments
     Route::controller(PaymentController::class)
         ->prefix('payments')
         ->name('payments.')
@@ -103,23 +106,40 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{payment}/cancel', 'cancel')->name('cancel');
         });
 
+    // Subscriptions
+    Route::controller(SubscriptionController::class)
+        ->prefix('subscriptions')
+        ->name('subscriptions.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::patch('/{subscription}/renew', 'renew')->name('renew');
+            Route::patch('/{subscription}/cancel', 'cancel')->name('cancel');
+        });
 
-    // Email verification — protect app routes with the `verified` middleware once
+    // Email verification
+    // Protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
     Route::get('email/verify', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'notice'])->name('verification.notice');
-    Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'verify'])
-        ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-    Route::post('email/verification-notification', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'send'])
-        ->middleware('throttle:6,1')->name('verification.send');
 
-    // Password confirmation — guard sensitive actions with the `password.confirm` middleware.
+    Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('email/verification-notification', [\App\Http\Controllers\Auth\EmailVerificationController::class, 'send'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    // Password confirmation
     Route::get('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
+    // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
     Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
 
+    // Logout
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
         ->name('logout');
 });
