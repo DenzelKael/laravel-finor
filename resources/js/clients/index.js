@@ -1,4 +1,5 @@
 import api, { ApiError } from '../commons/api-client.js';
+import SwalMessages from '../commons/swal-messages.js';
 
 const tableBody = document.getElementById('clients-table-body');
 
@@ -15,17 +16,8 @@ function showAlert(message, type = 'success') {
 }
 
 async function deleteClient(id, url) {
-    const result = await Swal.fire({
-        title: 'Estas seguro',
-        text: 'Este cliente sera eliminado permanentemente.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Si, eliminar',
-    });
-
-    if (!result.isConfirmed) return;
+    const confirmed = await SwalMessages.confirmDelete('Este cliente');
+    if (!confirmed) return;
 
     try {
         const data = await api.delete(url);
