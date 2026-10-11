@@ -36,6 +36,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/', 'index')->middleware('permission:users.view')->name('index');
                 Route::get('/{user}/edit', 'edit')->middleware('permission:users.update')->name('edit');
                 Route::put('/{user}', 'update')->middleware('permission:users.update')->name('update');
+
+                Route::get('/create', 'create')->middleware('permission:users.create')->name('create');
+                Route::post('/', 'store')->middleware('permission:users.create')->name('store');
+
             });
 
         Route::controller(RoleController::class)
