@@ -247,7 +247,7 @@ return [
             'active'  => ['payments*'],
         ],
 
-        ['header' => 'CONFIGURACIÓN'],
+        ['header' => 'SISTEMA'],
         [
             'text' => 'Configuración',
             'icon' => 'bi bi-gear-fill',
