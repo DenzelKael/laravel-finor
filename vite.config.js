@@ -14,6 +14,7 @@ export default defineConfig({
                 'resources/js/clients/index.js',
                 'resources/js/payments/create.js',
                 'resources/js/payments/index.js',
+                'resources/js/payments/receipt.js',
                 'resources/js/pages/plan-form.js',
                 'resources/js/pages/plans-index.js',
             ],
