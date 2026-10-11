@@ -226,27 +226,28 @@ return [
             'text' => 'Clientes',
             'url' => 'clients',
             'icon' => 'bi bi-people',
-            'active' => ['clientes*'],
+            'active' => ['clients*'],
         ],
         [
             'text'    => 'Planes',
             'url'     => 'plans',
             'icon'    => 'bi bi-list-check',
+            'active'  => ['plans*'],
         ],
         [
-            'text'    => 'Payments',
+            'text'    => 'Suscripciones',
+            'url'     => 'subscriptions',
+            'icon'    => 'bi bi-arrow-repeat',
+            'active'  => ['subscriptions*'],
+        ],
+        [
+            'text'    => 'Pagos',
             'url'     => 'payments',
             'icon'    => 'bi bi-cash-stack',
             'active'  => ['payments*'],
         ],
 
-        ['header' => 'REPORTS'],
-        [
-            'text' => 'Dashboard v1',
-            'url' => '/',
-            'icon' => 'bi bi-bar-chart-fill',
-        ],
-        ['header' => 'CONFIGURACIÓN'],
+        ['header' => 'SISTEMA'],
         [
             'text' => 'Configuración',
             'icon' => 'bi bi-gear-fill',
