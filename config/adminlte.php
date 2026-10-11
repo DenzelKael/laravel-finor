@@ -224,19 +224,19 @@ return [
         ['header' => 'GESTIÓN'],
         [
             'text' => 'Clientes',
-            'url' => 'admin/clients',
+            'url' => 'clients',
             'icon' => 'bi bi-people',
             'active' => ['admin/clients*'],
         ],
         [
             'text' => 'Planes',
-            'url' => 'admin/plans',
+            'url' => 'plans',
             'icon' => 'bi bi-list-check',
             'active' => ['admin/plans*'],
         ],
         [
             'text' => 'Suscripciones',
-            'url' => 'admin/subscriptions',
+            'url' => 'payments',
             'icon' => 'bi bi-arrow-repeat',
             'active' => ['admin/subscriptions*'],
         ],
