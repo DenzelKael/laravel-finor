@@ -23,11 +23,12 @@
                     <th>Inicio</th>
                     <th>Fin (Vence)</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="subscriptions-table-body">
                 <tr>
-                    <td colspan="5" class="text-center">Cargando suscripciones...</td>
+                    <td colspan="6" class="text-center">Cargando suscripciones...</td>
                 </tr>
             </tbody>
         </table>

@@ -131,6 +131,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/', 'index')
                 ->middleware('permission:subscriptions.view')
                 ->name('index');
+
+            Route::get('/data', 'data')
+                ->middleware('permission:subscriptions.view')
+                ->name('data');
                 
             Route::get('/create', 'create')
                 ->middleware('permission:subscriptions.create')
@@ -148,6 +152,8 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permission:subscriptions.update')
                 ->name('renew');
                 
+            // La cancelación de suscripción se mapea a 'subscriptions.delete' siguiendo
+            // el esquema estándar de permisos CRUD de Spatie (view, create, update, delete).
             Route::patch('/{subscription}/cancel', 'cancel')
                 ->middleware('permission:subscriptions.delete')
                 ->name('cancel');

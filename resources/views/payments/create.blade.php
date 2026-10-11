@@ -31,7 +31,7 @@
                             <option value="">-- Seleccione una suscripción activa --</option>
                             @foreach ($subscriptions as $subscription)
                                 <option value="{{ $subscription->id }}" @selected(old('subscription_id') == $subscription->id)>
-                                    Cliente: {{ $subscription->client->name }} | Plan: {{ $subscription->plan->nombre }} (Vence: {{ $subscription->end_date->format('d/m/Y') }})
+                                    Cliente: {{ $subscription->client->name }} | Plan: {{ $subscription->plan->nombre }} (Vence: {{ $subscription->expiration_date->format('d/m/Y') }})
                                 </option>
                             @endforeach
                         </select>
