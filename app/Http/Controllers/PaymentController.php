@@ -20,7 +20,10 @@ class PaymentController extends Controller
     {
         $this->authorize('viewAny', Payment::class);
 
-        $payments = Payment::with(['subscription.client', 'subscription.plan'])
+        $payments = Payment::with([
+            'subscription.client',
+            'subscription.plan',
+        ])
             ->latest('payment_date')
             ->latest('id')
             ->paginate(15);
@@ -49,10 +52,8 @@ class PaymentController extends Controller
         StorePaymentRequest $request,
         PaymentService $paymentService
     ): JsonResponse {
-        $subscription = Subscription::findOrFail($request->validated('subscription_id'));
-
         $payment = $paymentService->registerPayment(
-            $subscription,
+            $request->subscription(),
             $request->toDto()
         );
 
@@ -69,7 +70,10 @@ class PaymentController extends Controller
     {
         $this->authorize('view', $payment);
 
-        $payment->load(['subscription.client', 'subscription.plan']);
+        $payment->load([
+            'subscription.client',
+            'subscription.plan',
+        ]);
 
         return view('payments.show', compact('payment'));
     }
@@ -81,13 +85,16 @@ class PaymentController extends Controller
     {
         $this->authorize('view', $payment);
 
-        $payment->load(['subscription.client', 'subscription.plan']);
+        $payment->load([
+            'subscription.client',
+            'subscription.plan',
+        ]);
 
         return view('payments.receipt', compact('payment'));
     }
 
     /**
-     * Anula un pago sin eliminar el registro físico (Trazabilidad contable).
+     * Anula un pago sin eliminar el registro físico.
      */
     public function cancel(Payment $payment): JsonResponse
     {

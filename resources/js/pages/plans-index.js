@@ -19,10 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.closest('tr').remove();
                 SwalMessages.success(data.message);
             } catch (error) {
-                if (error instanceof ApiError) {
-                    SwalMessages.error(error.message);
+                if (!(error instanceof ApiError)) throw error;
+
+                if (error.type === 'not_found') {
+                    document.getElementById(`plan-row-${id}`)?.remove();
+                    SwalMessages.warning('El plan ya no existía.');
+                } else if (error.type === 'validation') {
+                    SwalMessages.warning(error.message);
                 } else {
-                    throw error;
+                    SwalMessages.error(error.message);
                 }
             }
         });

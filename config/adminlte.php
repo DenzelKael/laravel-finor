@@ -217,32 +217,37 @@ return [
     'menu' => [
         [
             'text' => 'Dashboard',
-            'url' => '/',
+            'url' => 'admin',
             'icon' => 'bi bi-speedometer',
         ],
 
         ['header' => 'GESTIÓN'],
         [
             'text' => 'Clientes',
-            'url' => 'clients',
+            'url' => 'admin/clients',
             'icon' => 'bi bi-people',
-            'active' => ['clients*'],
+            'active' => ['admin/clients*'],
         ],
         [
-
             'text' => 'Planes',
-            'url' => 'plans',
+            'url' => 'admin/plans',
             'icon' => 'bi bi-list-check',
+            'active' => ['admin/plans*'],
         ],
         [
-            'text' => 'Payments',
-            'url' => 'payments',
+            'text' => 'Suscripciones',
+            'url' => 'admin/subscriptions',
+            'icon' => 'bi bi-arrow-repeat',
+            'active' => ['admin/subscriptions*'],
+        ],
+        [
+            'text' => 'Pagos',
+            'url' => 'admin/payments',
             'icon' => 'bi bi-cash-stack',
-            'active' => ['payments*'],
-
+            'active' => ['admin/payments*'],
         ],
 
-        ['header' => 'CONFIGURACIÓN'],
+        ['header' => 'SISTEMA'],
         [
             'text' => 'Configuración',
             'icon' => 'bi bi-gear-fill',
@@ -267,7 +272,6 @@ return [
                 ],
             ],
         ],
-
     ],
 
     /*

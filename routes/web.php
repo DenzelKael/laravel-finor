@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,8 +9,6 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PlanController;
-
-
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -86,6 +85,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{plan}/edit', 'edit')->middleware('permission:plans.update')->name('edit');
             Route::put('/{plan}', 'update')->middleware('permission:plans.update')->name('update');
             Route::delete('/{plan}', 'destroy')->middleware('permission:plans.delete')->name('destroy');
+
         });
 
     Route::controller(PaymentController::class)
