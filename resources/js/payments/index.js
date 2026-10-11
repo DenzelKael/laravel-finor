@@ -2,17 +2,38 @@ import api, { ApiError } from '../commons/api-client.js';
 
 function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
-    if (alertContainer) {
-        alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show m-3" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>`;
-        setTimeout(() => {
-            if (alertContainer) alertContainer.innerHTML = '';
-        }, 3500);
+
+    if (!alertContainer) {
+        return;
     }
+
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show m-3`;
+    alert.setAttribute('role', 'alert');
+
+    const messageElement = document.createElement('span');
+    messageElement.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'close';
+    closeButton.setAttribute('data-dismiss', 'alert');
+    closeButton.setAttribute('aria-label', 'Close');
+
+    const closeIcon = document.createElement('span');
+    closeIcon.setAttribute('aria-hidden', 'true');
+    closeIcon.textContent = '×';
+
+    closeButton.appendChild(closeIcon);
+
+    alert.appendChild(messageElement);
+    alert.appendChild(closeButton);
+
+    alertContainer.replaceChildren(alert);
+
+    setTimeout(() => {
+        alertContainer.replaceChildren();
+    }, 3500);
 }
 
 function confirmCancelPayment(id, url) {
