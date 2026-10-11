@@ -26,20 +26,20 @@ class DashboardStats
     }
     public function getChartData(): array
     {
-        $payments = Payment::selectRaw('WEEK(payment_date) as week, SUM(amount) as total')
-            ->whereYear('payment_date', now()->year)
-            ->groupBy('week')
-            ->orderBy('week')
-            ->get();
+        $payments = Payment::whereYear('payment_date', now()->year)->get();
+
+        $grouped = $payments->groupBy(function ($payment) {
+            return \Carbon\Carbon::parse($payment->payment_date)->weekOfYear;
+        })->sortKeys();
 
         $labels = [];
         $data = [];
 
-        foreach ($payments as $payment) {
-            $labels[] = 'Semana ' . $payment->week;
-            $data[] = (float) $payment->total;
-        }
+        foreach ($grouped as $week => $weekPayments) {
+            $labels[] = 'Semana ' . $week;
 
+            $data[] = (float) $weekPayments->sum('amount');
+        }
         return [
             'labels' => $labels,
             'data' => $data

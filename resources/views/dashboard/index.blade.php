@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <!-- Gráfico con data-url
+    <!-- Gráfico con data-url -->
     <div class="row">
         <div class="col-12">
             <div class="card">

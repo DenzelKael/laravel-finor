@@ -1,35 +1,52 @@
 import api, { ApiError } from '../commons/api-client.js';
+import SwalMessages from '../commons/swal-messages.js';
 
 function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
-    if (alertContainer) {
-        alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show m-3" role="alert">
-            ${message}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>`;
-        setTimeout(() => {
-            if (alertContainer) alertContainer.innerHTML = '';
-        }, 3500);
+
+    if (!alertContainer) {
+        return;
     }
+
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show m-3`;
+    alert.setAttribute('role', 'alert');
+
+    const messageElement = document.createElement('span');
+    messageElement.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'close';
+    closeButton.setAttribute('data-dismiss', 'alert');
+    closeButton.setAttribute('aria-label', 'Close');
+
+    const closeIcon = document.createElement('span');
+    closeIcon.setAttribute('aria-hidden', 'true');
+    closeIcon.textContent = '×';
+
+    closeButton.appendChild(closeIcon);
+
+    alert.appendChild(messageElement);
+    alert.appendChild(closeButton);
+
+    alertContainer.replaceChildren(alert);
+
+    setTimeout(() => {
+        alertContainer.replaceChildren();
+    }, 3500);
 }
 
-function confirmCancelPayment(id, url) {
-    Swal.fire({
-        title: '¿Está seguro de anular este pago?',
-        text: 'Esta acción cambiará el estado del pago a ANULADO y conservará el registro contable.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, anular pago',
-        cancelButtonText: 'Cancelar',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            cancelPayment(id, url);
-        }
-    });
+async function confirmCancelPayment(id, url) {
+    const confirmed = await SwalMessages.confirm(
+        'Esta acción cambiará el estado del pago a ANULADO y conservará el registro contable.',
+        '¿Está seguro de anular este pago?',
+        'Sí, anular pago'
+    );
+
+    if (confirmed) {
+        cancelPayment(id, url);
+    }
 }
 
 async function cancelPayment(id, url) {
@@ -57,6 +74,21 @@ async function cancelPayment(id, url) {
     }
 }
 
+document.addEventListener('click', function (event) {
+    const cancelButton = event.target.closest(
+        '[data-action="cancel-payment"]'
+    );
+
+    if (!cancelButton) {
+        return;
+    }
+
+    const id = cancelButton.dataset.paymentId;
+    const url = cancelButton.dataset.url;
+
+    confirmCancelPayment(id, url);
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const flashMessage = sessionStorage.getItem('flash_message');
     if (flashMessage) {
@@ -65,4 +97,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-window.confirmCancelPayment = confirmCancelPayment;
+
+
