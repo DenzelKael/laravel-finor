@@ -59,14 +59,14 @@ class SubscriptionController extends Controller
         // Si no mandan fecha de inicio, por defecto es hoy
         $startDate = isset($validated['start_date']) ? Carbon::parse($validated['start_date']) : today();
         
-        // Calculamos end_date sumando los días del plan
-        $endDate = $startDate->copy()->addDays($plan->duracion_dias);
+        // Calculamos expiration_date sumando los días del plan
+        $expirationDate = $startDate->copy()->addDays($plan->duracion_dias);
 
         $subscription = Subscription::create([
             'client_id' => $validated['client_id'],
             'plan_id' => $plan->id,
             'start_date' => $startDate,
-            'end_date' => $endDate,
+            'expiration_date' => $expirationDate,
             'status' => SubscriptionStatus::Active,
         ]);
 
@@ -99,12 +99,12 @@ class SubscriptionController extends Controller
         
         // Si la suscripción ya venció, la renovación aplica desde hoy.
         // Si aún está activa, suma los días a la fecha de vencimiento actual.
-        $baseDate = $subscription->isExpired() ? today() : Carbon::parse($subscription->end_date);
+        $baseDate = $subscription->isExpired() ? today() : Carbon::parse($subscription->expiration_date);
         
-        $newEndDate = $baseDate->addDays($plan->duracion_dias);
+        $newExpirationDate = $baseDate->addDays($plan->duracion_dias);
 
         $subscription->update([
-            'end_date' => $newEndDate,
+            'expiration_date' => $newExpirationDate,
             'status' => SubscriptionStatus::Active,
         ]);
 

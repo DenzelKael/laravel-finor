@@ -19,7 +19,7 @@ class SubscriptionResource extends JsonResource
             'client_id' => $this->client_id,
             'plan_id' => $this->plan_id,
             'start_date' => $this->start_date ? $this->start_date->format('Y-m-d') : null,
-            'end_date' => $this->end_date ? $this->end_date->format('Y-m-d') : null,
+            'expiration_date' => $this->expiration_date ? $this->expiration_date->format('Y-m-d') : null,
             'status' => $this->status?->value ?? $this->status,
             'client' => new ClientResource($this->whenLoaded('client')),
             'plan' => new PlanResource($this->whenLoaded('plan')),
