@@ -14,6 +14,14 @@ class SubscriptionService
      */
     public function createSubscription(array $data): Subscription
     {
+        $hasActive = Subscription::where('client_id', $data['client_id'])
+            ->active()
+            ->exists();
+
+        if ($hasActive) {
+            abort(422, 'El cliente ya cuenta con una suscripción activa.');
+        }
+
         $plan = Plan::findOrFail($data['plan_id']);
 
         $startDate = isset($data['start_date']) ? Carbon::parse($data['start_date'])->toDateString() : today()->toDateString();
@@ -28,6 +36,18 @@ class SubscriptionService
         ]);
 
         return $subscription->load(['client', 'plan']);
+    }
+
+    /**
+     * Método subscribe() según el requerimiento de la tarjeta escalable.
+     */
+    public function subscribe(\App\Models\Client $client, Plan $plan, ?string $startDate = null): Subscription
+    {
+        return $this->createSubscription([
+            'client_id' => $client->id,
+            'plan_id' => $plan->id,
+            'start_date' => $startDate,
+        ]);
     }
 
     /**
