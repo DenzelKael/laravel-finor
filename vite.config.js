@@ -17,6 +17,8 @@ export default defineConfig({
                 'resources/js/payments/receipt.js',
                 'resources/js/pages/plan-form.js',
                 'resources/js/pages/plans-index.js',
+                'resources/js/subscriptions/create.js',
+                'resources/js/subscriptions/index.js',
             ],
             refresh: true,
             fonts: [
