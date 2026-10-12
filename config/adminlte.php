@@ -242,7 +242,7 @@ return [
         ],
         [
             'text' => 'Pagos',
-            'url' => 'admin/payments',
+            'url' => 'payments',
             'icon' => 'bi bi-cash-stack',
             'active' => ['admin/payments*'],
         ],

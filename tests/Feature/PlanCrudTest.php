@@ -7,6 +7,7 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Database\Seeders\RolesAndPermissionsSeeder;
 
 class PlanCrudTest extends TestCase
 {
@@ -21,7 +22,17 @@ class PlanCrudTest extends TestCase
 
     protected function authUser(): User
     {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
         $user = User::factory()->create();
+
+        $user->givePermissionTo([
+            'plans.view',
+            'plans.create',
+            'plans.update',
+            'plans.delete',
+        ]);
+
         $this->actingAs($user);
 
         return $user;
