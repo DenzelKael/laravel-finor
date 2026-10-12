@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PermissionsAccessTest extends TestCase
 {
@@ -167,5 +168,44 @@ class PermissionsAccessTest extends TestCase
         $request->setUserResolver(fn() => $user);
 
         return $request;
+    }
+
+    #[DataProvider('moduleRoutes')]
+    public function test_user_without_role_gets_403_on_every_module(string $method, string $routeName): void
+    {
+        $user = User::factory()->create(); // sin rol
+
+        $this->actingAs($user)
+            ->{$method}(route($routeName), [])
+                ->assertForbidden();
+    }
+
+    #[DataProvider('moduleRoutes')]
+    public function test_admin_is_not_forbidden_on_any_module(string $method, string $routeName): void
+    {
+        $response = $this->actingAs($this->admin())
+            ->{$method}(route($routeName), []);
+
+        $this->assertNotEquals(403, $response->getStatusCode());
+    }
+
+    public static function moduleRoutes(): array
+    {
+        return [
+            'users index' => ['get', 'users.index'],
+            'roles index' => ['get', 'roles.index'],
+            'permissions index' => ['get', 'permissions.index'],
+            'permissions create' => ['get', 'permissions.create'],
+            'permissions store' => ['postJson', 'permissions.store'],
+            'clients index' => ['get', 'clients.index'],
+            'clients create' => ['get', 'clients.create'],
+            'clients store' => ['postJson', 'clients.store'],
+            'plans index' => ['get', 'plans.index'],
+            'plans create' => ['get', 'plans.create'],
+            'plans store' => ['postJson', 'plans.store'],
+            'payments index' => ['get', 'payments.index'],
+            'payments create' => ['get', 'payments.create'],
+            'payments store' => ['postJson', 'payments.store'],
+        ];
     }
 }
