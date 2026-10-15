@@ -259,4 +259,77 @@ class SubscriptionTest extends TestCase
                 ],
             ]);
     }
+
+    /**
+     * Test 9: No se puede duplicar una suscripción activa para un mismo cliente.
+     */
+    public function test_cannot_create_duplicate_active_subscription_for_same_client(): void
+    {
+        // Ya existe una suscripción activa
+        Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->toDateString(),
+            'expiration_date' => today()->addDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Active,
+        ]);
+
+        // Intentar crear otra suscripción activa para el mismo cliente
+        $response = $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+                'start_date' => today()->toDateString(),
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['client_id']);
+    }
+
+    /**
+     * Test 10: El comando subscriptions:expire marca como vencidas las suscripciones pasadas.
+     */
+    public function test_expire_subscriptions_command_marks_past_subscriptions_as_expired(): void
+    {
+        // Suscripción con fecha vencida pero status ACTIVE
+        $expiredSub = Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->subDays(40)->toDateString(),
+            'expiration_date' => today()->subDays(5)->toDateString(),
+            'status' => SubscriptionStatus::Active,
+        ]);
+
+        // Suscripción vigente que debe seguir ACTIVE
+        $activeSub = Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->toDateString(),
+            'expiration_date' => today()->addDays(20)->toDateString(),
+            'status' => SubscriptionStatus::Active,
+        ]);
+
+        $this->artisan('subscriptions:expire')
+            ->assertExitCode(0);
+
+        $this->assertEquals(SubscriptionStatus::Expired, $expiredSub->fresh()->status);
+        $this->assertEquals(SubscriptionStatus::Active, $activeSub->fresh()->status);
+    }
+
+    /**
+     * Test 11: Client y Plan tienen relación hasMany con Subscription.
+     */
+    public function test_client_and_plan_have_inverse_has_many_subscriptions_relation(): void
+    {
+        $sub = Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->toDateString(),
+            'expiration_date' => today()->addDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Active,
+        ]);
+
+        $this->assertTrue($this->client->subscriptions->contains($sub));
+        $this->assertTrue($this->activePlan->subscriptions->contains($sub));
+    }
 }
