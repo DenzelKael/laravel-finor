@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\SubscriptionStatus;
 use App\Models\Client;
+use App\Models\Plan;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -46,7 +49,7 @@ class ClientControllerTest extends TestCase
 
     public function test_update_with_same_email_succeeds(): void
     {
-        $client = Client::create(['name' => 'Original', 'email' => 'original@example.com']);
+        $client = Client::factory()->create(['email' => 'original@example.com']);
 
         $response = $this->putJson(route('clients.update', $client), [
             'name' => 'Nombre Actualizado',
@@ -58,11 +61,54 @@ class ClientControllerTest extends TestCase
 
     public function test_destroy_removes_a_client(): void
     {
-        $client = Client::create(['name' => 'A borrar', 'email' => 'borrar@example.com']);
+        $client = Client::factory()->create();
 
         $response = $this->deleteJson(route('clients.destroy', $client));
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('clients', ['id' => $client->id]);
+    }
+
+    public function test_destroy_fails_with_422_when_client_has_subscriptions(): void
+    {
+        $client = Client::factory()->create();
+
+        Subscription::create([
+            'client_id' => $client->id,
+            'plan_id' => Plan::factory()->create()->id,
+            'start_date' => today(),
+            'expiration_date' => today()->addMonth(),
+            'status' => SubscriptionStatus::Active,
+        ]);
+
+        $this->deleteJson(route('clients.destroy', $client))
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'No se puede eliminar un cliente con suscripciones.');
+
+        $this->assertDatabaseHas('clients', ['id' => $client->id]);
+    }
+
+    public function test_update_and_destroy_return_404_for_missing_client(): void
+    {
+        $this->putJson(route('clients.update', 999999), [
+            'name' => 'Nadie',
+            'email' => 'nadie@example.com',
+        ])->assertStatus(404);
+
+        $this->deleteJson(route('clients.destroy', 999999))->assertStatus(404);
+    }
+
+    public function test_user_without_permission_gets_403(): void
+    {
+        $client = Client::factory()->create();
+        $sinPermiso = User::factory()->create();
+
+        $this->actingAs($sinPermiso)
+            ->postJson(route('clients.store'), ['name' => 'X', 'email' => 'x@example.com'])
+            ->assertStatus(403);
+
+        $this->actingAs($sinPermiso)
+            ->deleteJson(route('clients.destroy', $client))
+            ->assertStatus(403);
     }
 }
