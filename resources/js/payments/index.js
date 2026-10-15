@@ -1,4 +1,5 @@
 import api, { ApiError } from '../commons/api-client.js';
+import SwalMessages from '../commons/swal-messages.js';
 
 function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
@@ -36,66 +37,31 @@ function showAlert(message, type = 'success') {
     }, 3500);
 }
 
-function confirmCancelPayment(id, url) {
-    Swal.fire({
-        title: '¿Está seguro de anular este pago?',
-        text: 'El pago se conservará para mantener la trazabilidad contable.',
-        icon: 'warning',
-        input: 'textarea',
-        inputLabel: 'Motivo de la anulación',
-        inputPlaceholder: 'Indique el motivo de la anulación...',
-        inputAttributes: {
-            maxlength: '255',
-        },
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, anular pago',
-        cancelButtonText: 'Cancelar',
-        preConfirm: (reason) => {
-            const trimmedReason = reason.trim();
+async function confirmCancelPayment(id, url) {
+    const confirmed = await SwalMessages.confirm(
+        'Esta acción cambiará el estado del pago a ANULADO y conservará el registro contable.',
+        '¿Está seguro de anular este pago?',
+        'Sí, anular pago'
+    );
 
-            if (!trimmedReason) {
-                Swal.showValidationMessage(
-                    'Debe indicar el motivo de la anulación.'
-                );
-
-                return false;
-            }
-
-            return trimmedReason;
-        },
-    }).then((result) => {
-        if (result.isConfirmed) {
-            cancelPayment(id, url, result.value);
-        }
-    });
+    if (confirmed) {
+        cancelPayment(id, url);
+    }
 }
 
-async function cancelPayment(id, url, reason) {
+async function cancelPayment(id, url) {
     try {
-        const data = await api.patch(url, {
-            void_reason: reason,
-        });
+        const data = await api.patch(url);
+        showAlert(data.message || 'Pago anulado correctamente.', 'success');
 
-        showAlert(
-            data.message || 'Pago anulado correctamente.',
-            'success'
-        );
-
-        const badgeEl = document.getElementById(
-            `payment-status-${id}`
-        );
-
+        // Actualizar visualmente la fila del pago
+        const badgeEl = document.getElementById(`payment-status-${id}`);
         if (badgeEl) {
             badgeEl.className = 'badge badge-danger';
             badgeEl.textContent = 'Anulado';
         }
 
-        const actionBtn = document.getElementById(
-            `payment-action-${id}`
-        );
-
+        const actionBtn = document.getElementById(`payment-action-${id}`);
         if (actionBtn) {
             actionBtn.remove();
         }
@@ -103,10 +69,7 @@ async function cancelPayment(id, url, reason) {
         if (error instanceof ApiError) {
             showAlert(error.message, 'danger');
         } else {
-            showAlert(
-                'Ocurrió un error inesperado al anular el pago.',
-                'danger'
-            );
+            showAlert('Ocurrió un error inesperado al anular el pago.', 'danger');
         }
     }
 }
@@ -128,9 +91,11 @@ document.addEventListener('click', function (event) {
 
 document.addEventListener('DOMContentLoaded', function () {
     const flashMessage = sessionStorage.getItem('flash_message');
-
     if (flashMessage) {
         showAlert(flashMessage, 'success');
         sessionStorage.removeItem('flash_message');
     }
 });
+
+
+
