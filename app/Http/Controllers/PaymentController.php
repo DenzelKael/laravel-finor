@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\PaymentStatus;
 use App\Http\Requests\StorePaymentRequest;
+use App\Http\Requests\VoidPaymentRequest;
 use App\Http\Resources\PaymentResource;
+use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Services\PaymentService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
-use App\Http\Requests\VoidPaymentRequest;
-use App\Models\Client;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
 class PaymentController extends Controller
 {
-    /**
-     * Muestra el listado paginado de pagos con sus relaciones.
-     */
     public function index(): View
     {
         $this->authorize('viewAny', Payment::class);
@@ -33,9 +31,6 @@ class PaymentController extends Controller
         return view('payments.index', compact('payments'));
     }
 
-    /**
-     * Muestra el formulario para registrar un nuevo pago.
-     */
     public function create(): View
     {
         $this->authorize('create', Payment::class);
@@ -47,9 +42,6 @@ class PaymentController extends Controller
         return view('payments.create', compact('subscriptions'));
     }
 
-    /**
-     * Registra un pago y responde en JSON para el ApiClient.
-     */
     public function store(
         StorePaymentRequest $request,
         PaymentService $paymentService
@@ -65,9 +57,6 @@ class PaymentController extends Controller
         ], 201);
     }
 
-    /**
-     * Muestra el detalle del pago.
-     */
     public function show(Payment $payment): View
     {
         $this->authorize('view', $payment);
@@ -80,9 +69,6 @@ class PaymentController extends Controller
         return view('payments.show', compact('payment'));
     }
 
-    /**
-     * Muestra el recibo del pago.
-     */
     public function receipt(Payment $payment): View
     {
         $this->authorize('view', $payment);
@@ -95,87 +81,115 @@ class PaymentController extends Controller
         return view('payments.receipt', compact('payment'));
     }
 
-    /**
-     * Anula un pago sin eliminar el registro físico.
-     */
-public function cancel(
-    VoidPaymentRequest $request,
-    Payment $payment,
-    PaymentService $paymentService
-): JsonResponse {
-    $paymentService->voidPayment(
-        $payment,
-        $request->voidReason()
-    );
+    public function cancel(
+        VoidPaymentRequest $request,
+        Payment $payment,
+        PaymentService $paymentService
+    ): JsonResponse {
+        $paymentService->voidPayment(
+            $payment,
+            $request->voidReason()
+        );
 
-    return response()->json([
-        'message' => 'Pago anulado correctamente.',
-    ]);
-}
-/**
- * Muestra el historial de pagos de una suscripción.
- */
-public function historyBySubscription(
-    Subscription $subscription
-): View {
-    $this->authorize('viewAny', Payment::class);
+        return response()->json([
+            'message' => 'Pago anulado correctamente.',
+        ]);
+    }
 
-    $subscription->load(['client', 'plan']);
+    public function historyBySubscription(
+        Request $request,
+        Subscription $subscription
+    ): JsonResponse|View {
+        $this->authorize('viewAny', Payment::class);
 
-    $payments = Payment::query()
-        ->forSubscription($subscription->id)
-        ->latest('payment_date')
-        ->latest('id')
-        ->paginate(15);
+        $subscription->load(['client', 'plan']);
 
-    return view('payments.history', [
-        'payments' => $payments,
-        'title' => 'Historial de Pagos por Suscripción',
-        'subtitle' => sprintf(
-            '%s — %s',
-            $subscription->client->name,
-            $subscription->plan->nombre
-        ),
-    ]);
-}
+        if (! $request->expectsJson()) {
+            return view('payments.history', [
+                'title' => 'Historial de Pagos por Suscripción',
+                'subtitle' => sprintf(
+                    '%s — %s',
+                    $subscription->client->name,
+                    $subscription->plan->nombre
+                ),
+                'historyUrl' => route(
+                    'payments.history.subscription',
+                    $subscription
+                ),
+            ]);
+        }
 
-/**
- * Muestra el historial de pagos de un cliente.
- */
-public function historyByClient(
-    Client $client
-): View {
-    $this->authorize('viewAny', Payment::class);
+        $payments = Payment::query()
+            ->forSubscription($subscription->id)
+            ->latest('payment_date')
+            ->latest('id')
+            ->paginate(15);
 
-    $payments = Payment::query()
-        ->with(['subscription.plan'])
-        ->forClient($client->id)
-        ->latest('payment_date')
-        ->latest('id')
-        ->paginate(15);
+        return response()->json([
+            'data' => PaymentResource::collection(
+                $payments->getCollection()
+            )->resolve($request),
+            'meta' => [
+                'current_page' => $payments->currentPage(),
+                'last_page' => $payments->lastPage(),
+                'per_page' => $payments->perPage(),
+                'total' => $payments->total(),
+            ],
+        ]);
+    }
 
-    return view('payments.history', [
-        'payments' => $payments,
-        'title' => 'Historial de Pagos por Cliente',
-        'subtitle' => $client->name,
-    ]);
-}
-public function receiptPdf(Payment $payment)
-{
-    $this->authorize('view', $payment);
+    public function historyByClient(
+        Request $request,
+        Client $client
+    ): JsonResponse|View {
+        $this->authorize('viewAny', Payment::class);
 
-    $payment->loadMissing([
-        'subscription.client',
-        'subscription.plan',
-    ]);
+        if (! $request->expectsJson()) {
+            return view('payments.history', [
+                'title' => 'Historial de Pagos por Cliente',
+                'subtitle' => $client->name,
+                'historyUrl' => route(
+                    'payments.history.client',
+                    $client
+                ),
+            ]);
+        }
 
-    $pdf = Pdf::loadView(
-        'payments.receipt-pdf',
-        compact('payment')
-    )->setPaper('a4');
+        $payments = Payment::query()
+            ->forClient($client->id)
+            ->latest('payment_date')
+            ->latest('id')
+            ->paginate(15);
 
-    return $pdf->download(
-        'recibo-pago-' . $payment->id . '.pdf'
-    );
-}
+        return response()->json([
+            'data' => PaymentResource::collection(
+                $payments->getCollection()
+            )->resolve($request),
+            'meta' => [
+                'current_page' => $payments->currentPage(),
+                'last_page' => $payments->lastPage(),
+                'per_page' => $payments->perPage(),
+                'total' => $payments->total(),
+            ],
+        ]);
+    }
+
+    public function receiptPdf(Payment $payment)
+    {
+        $this->authorize('view', $payment);
+
+        $payment->loadMissing([
+            'subscription.client',
+            'subscription.plan',
+        ]);
+
+        $pdf = Pdf::loadView(
+            'payments.receipt-pdf',
+            compact('payment')
+        )->setPaper('a4');
+
+        return $pdf->download(
+            'recibo-pago-' . $payment->id . '.pdf'
+        );
+    }
 }

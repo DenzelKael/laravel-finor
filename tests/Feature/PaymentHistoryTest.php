@@ -31,12 +31,12 @@ class PaymentHistoryTest extends TestCase
 
         $this->user = User::factory()->create();
 
-        $viewPermission = Permission::findOrCreate(
+        $permission = Permission::findOrCreate(
             'payments.view',
             'web'
         );
 
-        $this->user->givePermissionTo($viewPermission);
+        $this->user->givePermissionTo($permission);
 
         $this->clientA = Client::create([
             'name' => 'Cliente A',
@@ -59,10 +59,34 @@ class PaymentHistoryTest extends TestCase
         ]);
     }
 
-    public function test_history_by_subscription_only_contains_its_payments(): void
+    public function test_subscription_history_page_is_available(): void
     {
-        $subscriptionA = $this->createSubscription($this->clientA);
-        $subscriptionB = $this->createSubscription($this->clientB);
+        $subscription = $this->createSubscription(
+            $this->clientA
+        );
+
+        $response = $this->actingAs($this->user)
+            ->get(
+                route(
+                    'payments.history.subscription',
+                    $subscription
+                )
+            );
+
+        $response->assertOk()
+            ->assertViewIs('payments.history')
+            ->assertViewHas('historyUrl');
+    }
+
+    public function test_history_by_subscription_json_only_contains_its_payments(): void
+    {
+        $subscriptionA = $this->createSubscription(
+            $this->clientA
+        );
+
+        $subscriptionB = $this->createSubscription(
+            $this->clientB
+        );
 
         $paymentA = $this->createPayment(
             $subscriptionA,
@@ -75,7 +99,7 @@ class PaymentHistoryTest extends TestCase
         );
 
         $response = $this->actingAs($this->user)
-            ->get(
+            ->getJson(
                 route(
                     'payments.history.subscription',
                     $subscriptionA
@@ -83,25 +107,37 @@ class PaymentHistoryTest extends TestCase
             );
 
         $response->assertOk()
-            ->assertViewIs('payments.history')
-            ->assertViewHas('payments', function ($payments) use (
-                $paymentA,
-                $paymentB
-            ): bool {
-                $ids = $payments
-                    ->getCollection()
-                    ->pluck('id');
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath(
+                'data.0.id',
+                $paymentA->id
+            );
 
-                return $ids->contains($paymentA->id)
-                    && ! $ids->contains($paymentB->id);
-            });
+        $ids = collect($response->json('data'))
+            ->pluck('id');
+
+        $this->assertTrue(
+            $ids->contains($paymentA->id)
+        );
+
+        $this->assertFalse(
+            $ids->contains($paymentB->id)
+        );
     }
 
-    public function test_history_by_client_contains_payments_from_all_its_subscriptions(): void
+    public function test_history_by_client_json_contains_payments_from_all_its_subscriptions(): void
     {
-        $subscriptionA1 = $this->createSubscription($this->clientA);
-        $subscriptionA2 = $this->createSubscription($this->clientA);
-        $subscriptionB = $this->createSubscription($this->clientB);
+        $subscriptionA1 = $this->createSubscription(
+            $this->clientA
+        );
+
+        $subscriptionA2 = $this->createSubscription(
+            $this->clientA
+        );
+
+        $subscriptionB = $this->createSubscription(
+            $this->clientB
+        );
 
         $paymentA1 = $this->createPayment(
             $subscriptionA1,
@@ -119,7 +155,7 @@ class PaymentHistoryTest extends TestCase
         );
 
         $response = $this->actingAs($this->user)
-            ->get(
+            ->getJson(
                 route(
                     'payments.history.client',
                     $this->clientA
@@ -127,20 +163,22 @@ class PaymentHistoryTest extends TestCase
             );
 
         $response->assertOk()
-            ->assertViewIs('payments.history')
-            ->assertViewHas('payments', function ($payments) use (
-                $paymentA1,
-                $paymentA2,
-                $paymentB
-            ): bool {
-                $ids = $payments
-                    ->getCollection()
-                    ->pluck('id');
+            ->assertJsonPath('meta.total', 2);
 
-                return $ids->contains($paymentA1->id)
-                    && $ids->contains($paymentA2->id)
-                    && ! $ids->contains($paymentB->id);
-            });
+        $ids = collect($response->json('data'))
+            ->pluck('id');
+
+        $this->assertTrue(
+            $ids->contains($paymentA1->id)
+        );
+
+        $this->assertTrue(
+            $ids->contains($paymentA2->id)
+        );
+
+        $this->assertFalse(
+            $ids->contains($paymentB->id)
+        );
     }
 
     private function createSubscription(

@@ -36,13 +36,16 @@
             <x-payment-receipt
                 :payment="$payment"
             />
-<a
-    href="{{ route('payments.receipt.pdf', $payment) }}"
+<button
+    type="button"
     class="btn btn-danger btn-sm mr-1"
+    data-action="download-receipt"
+    data-url="{{ route('payments.receipt.pdf', $payment) }}"
+    data-filename="recibo-pago-{{ $payment->id }}.pdf"
 >
     <i class="fas fa-file-pdf mr-1"></i>
     Descargar PDF
-</a>
+</button>
             <div class="row no-print mt-3 d-print-none">
                 <div class="col-12">
                     <button

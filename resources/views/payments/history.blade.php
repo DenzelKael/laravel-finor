@@ -9,7 +9,10 @@
             <p class="text-muted mb-0">{{ $subtitle }}</p>
         </div>
 
-        <a href="{{ route('payments.index') }}" class="btn btn-secondary btn-sm">
+        <a
+            href="{{ route('payments.index') }}"
+            class="btn btn-secondary btn-sm"
+        >
             <i class="fas fa-arrow-left mr-1"></i>
             Volver
         </a>
@@ -17,6 +20,11 @@
 @endsection
 
 @section('content')
+    <div
+        id="history-alert-container"
+        class="mb-3"
+    ></div>
+
     <div class="card card-outline card-primary">
         <div class="card-body p-0 table-responsive">
             <table class="table table-hover table-striped">
@@ -31,53 +39,48 @@
                     </tr>
                 </thead>
 
-                <tbody>
-                    @forelse ($payments as $payment)
-                        <tr>
-                            <td>#{{ $payment->id }}</td>
-
-                            <td>
-                                {{ $payment->payment_date->format('d/m/Y') }}
-                            </td>
-
-                            <td>
-                                {{ $payment->payment_method->label() }}
-                            </td>
-
-                            <td>
-                                {{ $payment->formatted_amount }}
-                            </td>
-
-                            <td>
-                                <x-payment-status-badge
-                                    :status="$payment->status"
-                                />
-                            </td>
-
-                            <td>
-                                {{ $payment->void_reason ?? '—' }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td
-                                colspan="6"
-                                class="text-center text-muted py-4"
-                            >
-                                No existen pagos registrados.
-                            </td>
-                        </tr>
-                    @endforelse
+                <tbody
+                    id="payments-history-body"
+                    data-url="{{ $historyUrl }}"
+                >
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="text-center text-muted py-4"
+                        >
+                            Cargando pagos...
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
-        @if ($payments->hasPages())
-            <div class="card-footer clearfix">
-                <div class="float-right">
-                    {{ $payments->links() }}
-                </div>
-            </div>
-        @endif
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <button
+                type="button"
+                id="history-prev"
+                class="btn btn-secondary btn-sm"
+                disabled
+            >
+                Anterior
+            </button>
+
+            <span id="history-page-info">
+                Página 1
+            </span>
+
+            <button
+                type="button"
+                id="history-next"
+                class="btn btn-secondary btn-sm"
+                disabled
+            >
+                Siguiente
+            </button>
+        </div>
     </div>
+@endsection
+
+@section('js')
+    @vite(['resources/js/payments/history.js'])
 @endsection
