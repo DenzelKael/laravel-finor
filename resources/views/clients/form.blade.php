@@ -33,3 +33,18 @@
         <span class="invalid-feedback">{{ $message }}</span>
     @enderror
 </div>
+
+<div class="form-group">
+    <label for="status">Estado</label>
+    <select id="status" name="status" class="form-control @error('status') is-invalid @enderror">
+        @foreach (\App\Enums\ClientStatus::cases() as $status)
+            <option value="{{ $status->value }}"
+                @selected(old('status', isset($client) ? $client->status->value : 'active') === $status->value)>
+                {{ $status->label() }}
+            </option>
+        @endforeach
+    </select>
+    @error('status')
+        <span class="invalid-feedback">{{ $message }}</span>
+    @enderror
+</div>
