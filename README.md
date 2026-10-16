@@ -66,3 +66,58 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 # <h1>php artisan key:generate</h1>
 # <h1>php artisan migrate</h1>
 # <h1>composer run dev</h1>
+
+## Cómo reutilizar ApiClient, BaseForm y SwalMessages
+
+### ApiClient (`resources/js/commons/api-client.js`)
+Único punto de salida al backend, construido sobre Axios. No se usa `fetch` ni `axios` directo.
+Devuelve directamente el cuerpo JSON de la respuesta.
+
+```js
+import api, { ApiError } from '../commons/api-client.js';
+
+const { data, meta } = await api.get('/clients', { params: { q: 'ana', page: 2 } });
+await api.post('/clients', formData);
+await api.put(`/clients/${id}`, formData);
+await api.patch(`/payments/${id}/cancel`);
+await api.delete(`/clients/${id}`);
+const blob = await api.download('/clients/export', { params: { status: 'active' } });
+```
+
+Los errores llegan como `ApiError` con `type`, `status` y `data`.
+Tipos: `validation` (422), `auth` (401/419), `forbidden` (403), `not_found` (404),
+`server` (5xx), `network` y `unknown`.
+
+```js
+try {
+    await api.delete(url);
+} catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    if (error.type === 'forbidden') { /* sin permiso */ }
+}
+```
+
+### BaseForm (`resources/js/commons/base-form.js`)
+Clase base para formularios AJAX. Maneja el envío, los errores de validación
+(`.invalid-feedback` dentro de `.form-group`) y la redirección. Cada módulo hereda
+y sobrescribe solo los ganchos que necesite: `createResource`, `updateResource` y `onSuccess`.
+
+Atributos `data-*` del `<form>`: `data-store-url`, `data-update-url` (solo en edición)
+y `data-index-url`.
+
+```js
+import BaseForm from '../commons/base-form.js';
+
+class PlanForm extends BaseForm {
+    onSuccess(response) {
+        super.onSuccess(response); // o comportamiento propio
+    }
+}
+
+new PlanForm(document.getElementById('plan-form'));
+```
+
+### SwalMessages (`resources/js/commons/swal-messages.js`)
+`SwalMessages.success(msg)`, `.error(msg)`, `.warning(msg)`,
+`await SwalMessages.confirm(texto, titulo)` y `await SwalMessages.confirmDelete('Este registro')`.
+Todos devuelven una promesa: usa `await` si vas a redirigir justo después.
