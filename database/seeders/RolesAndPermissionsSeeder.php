@@ -40,6 +40,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'permissions.update']);
         Permission::firstOrCreate(['name' => 'permissions.delete']);
 
+
         // Clients
         Permission::firstOrCreate(['name' => 'clients.view']);
         Permission::firstOrCreate(['name' => 'clients.create']);
@@ -62,6 +63,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'subscriptions.create']);
         Permission::firstOrCreate(['name' => 'subscriptions.update']);
         Permission::firstOrCreate(['name' => 'subscriptions.cancel']);
+        Permission::firstOrCreate(['name' => 'subscriptions.delete']);
 
         $admin->syncPermissions(Permission::all());
 
@@ -78,6 +80,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'payments.create',
         ]);
 
+
         $admin->syncPermissions([
             'users.view',
             'users.create',
@@ -93,10 +96,16 @@ class RolesAndPermissionsSeeder extends Seeder
             'permissions.create',
             'permissions.update',
             'permissions.delete',
+
+            'subscriptions.view',
+            'subscriptions.create',
+            'subscriptions.update',
+            'subscriptions.delete',
         ]);
 
         $vendedor->syncPermissions([
             'users.view',
+            'subscriptions.view',
         ]);
     }
 }
