@@ -216,11 +216,10 @@ return [
 
     'menu' => [
         [
-            'text' => 'Dashboard',
-            'url' => '/',
-            'icon' => 'bi bi-speedometer',
+           'text' => 'Dashboard',
+           'route' => 'dashboard.index',
+           'icon' => 'bi bi-speedometer',
         ],
-
         ['header' => 'GESTIÓN'],
         [
             'text' => 'Clientes',

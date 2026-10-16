@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PlanController;
 
+Route::redirect('/', '/login');
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -130,10 +131,10 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [\App\Http\Controllers\Auth\ConfirmablePasswordController::class, 'store']);
 
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/api/chart-data', [DashboardController::class, 'chartData']);
-
+    Route::controller(DashboardController::class)->prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/chart-data', 'chartData')->name('chart');
+    });
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
         ->name('logout');
     // Rutas explícitas de Suscripciones (Equipo D)
