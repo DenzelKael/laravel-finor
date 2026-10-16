@@ -43,16 +43,19 @@ class Subscription extends Model
     }
 
     /**
-     * Return only valid registered payments.
+     * Retorna únicamente los pagos registrados válidos.
      */
     public function registeredPayments(): HasMany
     {
         return $this->payments()
-            ->where('status', PaymentStatus::Registered->value);
+            ->where(
+                'status',
+                PaymentStatus::Registered->value
+            );
     }
 
     /**
-     * Total amount already paid for this subscription.
+     * Retorna el total pagado de la suscripción.
      */
     public function paidAmount(): float
     {
@@ -63,7 +66,7 @@ class Subscription extends Model
     }
 
     /**
-     * Remaining balance of this subscription.
+     * Retorna el saldo pendiente de la suscripción.
      */
     public function pendingBalance(): float
     {
@@ -77,51 +80,41 @@ class Subscription extends Model
     }
 
     /**
-     * Determine whether the subscription has been fully paid.
+     * Determina si la suscripción está completamente pagada.
+     *
+     * El estado financiero se calcula a partir de los pagos
+     * y no modifica el ciclo de vida de la suscripción.
      */
     public function isFullyPaid(): bool
     {
         return $this->pendingBalance() <= 0;
     }
 
-public function scopeActive($query)
-{
-    return $query
-        ->whereIn('status', [
-            SubscriptionStatus::Active->value,
-            SubscriptionStatus::Paid->value,
-        ])
-        ->where('expiration_date', '>=', today());
-}
-public function scopePayable($query)
-{
-    return $query
-        ->where('status', SubscriptionStatus::Active->value)
-        ->where('expiration_date', '>=', today());
-}
+    /**
+     * Suscripciones activas según su ciclo de vida.
+     */
+    public function scopeActive($query)
+    {
+        return $query
+            ->where(
+                'status',
+                SubscriptionStatus::Active->value
+            )
+            ->where(
+                'expiration_date',
+                '>=',
+                today()
+            );
+    }
 
+    /**
+     * Determina si la suscripción está vencida.
+     */
     public function isExpired(): bool
     {
         return $this->status === SubscriptionStatus::Expired
-            || $this->expiration_date->endOfDay()->isPast();
+            || $this->expiration_date
+                ->endOfDay()
+                ->isPast();
     }
-    public function syncStatusFromPayments(): void
-{
-    if (
-        $this->status === SubscriptionStatus::Cancelled
-        || $this->isExpired()
-    ) {
-        return;
-    }
-
-    $newStatus = $this->isFullyPaid()
-        ? SubscriptionStatus::Paid
-        : SubscriptionStatus::Active;
-
-    if ($this->status !== $newStatus) {
-        $this->update([
-            'status' => $newStatus,
-        ]);
-    }
-}
 }

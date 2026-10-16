@@ -5,7 +5,6 @@ namespace App\Enums;
 enum SubscriptionStatus: string
 {
     case Active = 'ACTIVE';
-    case Paid = 'PAID';
     case Expired = 'EXPIRED';
     case Cancelled = 'CANCELLED';
 
@@ -13,7 +12,6 @@ enum SubscriptionStatus: string
     {
         return match ($this) {
             self::Active => 'Activa',
-            self::Paid => 'Pagada',
             self::Expired => 'Vencida',
             self::Cancelled => 'Cancelada',
         };

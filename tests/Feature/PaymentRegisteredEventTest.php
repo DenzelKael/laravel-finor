@@ -74,13 +74,17 @@ class PaymentRegisteredEventTest extends TestCase
             $this->subscription->status
         );
 
+        $this->assertFalse(
+            $this->subscription->isFullyPaid()
+        );
+
         $this->assertSame(
             100.00,
             $this->subscription->pendingBalance()
         );
     }
 
-    public function test_full_payment_marks_subscription_as_paid(): void
+    public function test_full_payment_keeps_subscription_active_and_marks_it_as_fully_paid(): void
     {
         $response = $this->actingAs($this->user)
             ->postJson('/payments', [
@@ -95,38 +99,99 @@ class PaymentRegisteredEventTest extends TestCase
         $this->subscription->refresh();
 
         $this->assertSame(
-            SubscriptionStatus::Paid,
+            SubscriptionStatus::Active,
             $this->subscription->status
+        );
+
+        $this->assertTrue(
+            $this->subscription->isFullyPaid()
         );
 
         $this->assertSame(
             0.00,
             $this->subscription->pendingBalance()
         );
+
+        $this->assertTrue(
+            Subscription::active()
+                ->whereKey($this->subscription->id)
+                ->exists()
+        );
     }
-    public function test_paid_subscription_is_still_active_while_not_expired(): void
+    public function test_full_payment_does_not_allow_another_active_subscription_for_same_client(): void
 {
-    $response = $this->actingAs($this->user)
+    $subscriptionPermission = Permission::findOrCreate(
+        'subscriptions.create',
+        'web'
+    );
+
+    $this->user->givePermissionTo(
+        $subscriptionPermission
+    );
+
+    // Pagar completamente la suscripción existente.
+    $paymentResponse = $this->actingAs($this->user)
         ->postJson('/payments', [
             'subscription_id' => $this->subscription->id,
             'amount' => 150.00,
-            'payment_method' => PaymentMethod::Qr->value,
+            'payment_method' => PaymentMethod::Cash->value,
             'payment_date' => now()->toDateString(),
         ]);
 
-    $response->assertCreated();
+    $paymentResponse->assertCreated();
 
     $this->subscription->refresh();
 
+    // El pago completo NO modifica el ciclo de vida.
     $this->assertSame(
-        SubscriptionStatus::Paid,
+        SubscriptionStatus::Active,
         $this->subscription->status
     );
 
     $this->assertTrue(
+        $this->subscription->isFullyPaid()
+    );
+
+    $this->assertSame(
+        0.00,
+        $this->subscription->pendingBalance()
+    );
+
+    // La suscripción sigue siendo considerada activa.
+    $this->assertTrue(
         Subscription::active()
             ->whereKey($this->subscription->id)
             ->exists()
+    );
+
+    // Intentar crear una segunda suscripción
+    // para el mismo cliente.
+    $secondSubscriptionResponse = $this
+        ->actingAs($this->user)
+        ->postJson('/subscriptions', [
+            'client_id' => $this->subscription->client_id,
+            'plan_id' => $this->subscription->plan_id,
+            'start_date' => today()->toDateString(),
+        ]);
+
+    // Debe ser rechazada porque el cliente
+    // todavía posee una suscripción ACTIVE.
+    $secondSubscriptionResponse
+        ->assertStatus(422)
+        ->assertJsonValidationErrors([
+            'client_id',
+        ]);
+
+    // Debe continuar existiendo una sola
+    // suscripción activa para ese cliente.
+    $this->assertSame(
+        1,
+        Subscription::where(
+            'client_id',
+            $this->subscription->client_id
+        )
+            ->active()
+            ->count()
     );
 }
 }

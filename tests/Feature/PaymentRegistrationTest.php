@@ -209,7 +209,7 @@ public function test_payment_fails_when_amount_exceeds_pending_balance(): void
             'amount',
         ]);
 }
-public function test_voiding_full_payment_reactivates_subscription(): void
+public function test_voiding_full_payment_restores_pending_balance(): void
 {
     $cancelPermission = Permission::findOrCreate(
         'payments.cancel',
@@ -218,7 +218,6 @@ public function test_voiding_full_payment_reactivates_subscription(): void
 
     $this->user->givePermissionTo($cancelPermission);
 
-    // Registrar el pago completo.
     $createResponse = $this->actingAs($this->user)
         ->postJson('/payments', [
             'subscription_id' => $this->activeSubscription->id,
@@ -231,10 +230,13 @@ public function test_voiding_full_payment_reactivates_subscription(): void
 
     $this->activeSubscription->refresh();
 
-    // El pago completo deja la suscripción en PAID.
     $this->assertSame(
-        SubscriptionStatus::Paid,
+        SubscriptionStatus::Active,
         $this->activeSubscription->status
+    );
+
+    $this->assertTrue(
+        $this->activeSubscription->isFullyPaid()
     );
 
     $this->assertSame(
@@ -247,7 +249,6 @@ public function test_voiding_full_payment_reactivates_subscription(): void
         ->latest('id')
         ->firstOrFail();
 
-    // Anular el pago completo.
     $voidResponse = $this->actingAs($this->user)
         ->patchJson(
             route('payments.cancel', $payment),
@@ -260,16 +261,18 @@ public function test_voiding_full_payment_reactivates_subscription(): void
 
     $this->activeSubscription->refresh();
 
-    // El pago VOIDED ya no debe contar en el saldo.
-    $this->assertSame(
-        150.00,
-        $this->activeSubscription->pendingBalance()
-    );
-
-    // Si vuelve a tener deuda, debe regresar a ACTIVE.
     $this->assertSame(
         SubscriptionStatus::Active,
         $this->activeSubscription->status
+    );
+
+    $this->assertFalse(
+        $this->activeSubscription->isFullyPaid()
+    );
+
+    $this->assertSame(
+        150.00,
+        $this->activeSubscription->pendingBalance()
     );
 }
 }
