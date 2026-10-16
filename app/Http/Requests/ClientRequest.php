@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Enums\ClientStatus;
 
 class ClientRequest extends FormRequest
 {
@@ -25,6 +26,7 @@ class ClientRequest extends FormRequest
             'email' => ['required', 'email', Rule::unique('clients', 'email')->ignore($clientId)],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:255'],
+            'status' => ['sometimes', Rule::enum(ClientStatus::class)],
         ];
     }
 }
