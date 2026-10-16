@@ -45,11 +45,18 @@ class ClientController extends Controller
     }
 
     public function destroy(Client $client)
-    {
+     {
+        if ($client->subscriptions()->exists()) {
+            return response()->json([
+                'data' => null,
+                'message' => 'No se puede eliminar un cliente con suscripciones.',
+            ], 422);
+        }
+
         $client->delete();
 
         return response()->json([
-            'data'    => null,
+            'data' => null,
             'message' => 'Cliente eliminado exitosamente.',
         ]);
     }
