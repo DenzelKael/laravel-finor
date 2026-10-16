@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
+use App\Enums\SubscriptionStatus;
 
 class PaymentRegistrationTest extends TestCase
 {
@@ -207,5 +208,68 @@ public function test_payment_fails_when_amount_exceeds_pending_balance(): void
         ->assertJsonValidationErrors([
             'amount',
         ]);
+}
+public function test_voiding_full_payment_reactivates_subscription(): void
+{
+    $cancelPermission = Permission::findOrCreate(
+        'payments.cancel',
+        'web'
+    );
+
+    $this->user->givePermissionTo($cancelPermission);
+
+    // Registrar el pago completo.
+    $createResponse = $this->actingAs($this->user)
+        ->postJson('/payments', [
+            'subscription_id' => $this->activeSubscription->id,
+            'amount' => 150.00,
+            'payment_method' => PaymentMethod::Cash->value,
+            'payment_date' => now()->toDateString(),
+        ]);
+
+    $createResponse->assertCreated();
+
+    $this->activeSubscription->refresh();
+
+    // El pago completo deja la suscripción en PAID.
+    $this->assertSame(
+        SubscriptionStatus::Paid,
+        $this->activeSubscription->status
+    );
+
+    $this->assertSame(
+        0.00,
+        $this->activeSubscription->pendingBalance()
+    );
+
+    $payment = $this->activeSubscription
+        ->payments()
+        ->latest('id')
+        ->firstOrFail();
+
+    // Anular el pago completo.
+    $voidResponse = $this->actingAs($this->user)
+        ->patchJson(
+            route('payments.cancel', $payment),
+            [
+                'void_reason' => 'Pago completo anulado por error.',
+            ]
+        );
+
+    $voidResponse->assertOk();
+
+    $this->activeSubscription->refresh();
+
+    // El pago VOIDED ya no debe contar en el saldo.
+    $this->assertSame(
+        150.00,
+        $this->activeSubscription->pendingBalance()
+    );
+
+    // Si vuelve a tener deuda, debe regresar a ACTIVE.
+    $this->assertSame(
+        SubscriptionStatus::Active,
+        $this->activeSubscription->status
+    );
 }
 }

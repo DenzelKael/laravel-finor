@@ -84,16 +84,44 @@ class Subscription extends Model
         return $this->pendingBalance() <= 0;
     }
 
-    public function scopeActive($query)
-    {
-        return $query
-            ->where('status', SubscriptionStatus::Active->value)
-            ->where('expiration_date', '>=', today());
-    }
+public function scopeActive($query)
+{
+    return $query
+        ->whereIn('status', [
+            SubscriptionStatus::Active->value,
+            SubscriptionStatus::Paid->value,
+        ])
+        ->where('expiration_date', '>=', today());
+}
+public function scopePayable($query)
+{
+    return $query
+        ->where('status', SubscriptionStatus::Active->value)
+        ->where('expiration_date', '>=', today());
+}
 
     public function isExpired(): bool
     {
         return $this->status === SubscriptionStatus::Expired
             || $this->expiration_date->endOfDay()->isPast();
     }
+    public function syncStatusFromPayments(): void
+{
+    if (
+        $this->status === SubscriptionStatus::Cancelled
+        || $this->isExpired()
+    ) {
+        return;
+    }
+
+    $newStatus = $this->isFullyPaid()
+        ? SubscriptionStatus::Paid
+        : SubscriptionStatus::Active;
+
+    if ($this->status !== $newStatus) {
+        $this->update([
+            'status' => $newStatus,
+        ]);
+    }
+}
 }

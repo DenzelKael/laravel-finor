@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\DB;
 use App\Events\PaymentRegistered;
+use App\Events\PaymentVoided;
 
 class PaymentService
 {
@@ -46,10 +47,11 @@ public function registerPayment(
      * Void a payment while preserving its accounting record.
      */
     public function voidPayment(
-        Payment $payment,
-        string $reason
-    ): Payment {
-        return DB::transaction(function () use ($payment, $reason): Payment {
+    Payment $payment,
+    string $reason
+): Payment {
+    $payment = DB::transaction(
+        function () use ($payment, $reason): Payment {
             $payment->update([
                 'status' => PaymentStatus::Voided,
                 'void_reason' => $reason,
@@ -57,6 +59,11 @@ public function registerPayment(
             ]);
 
             return $payment->refresh();
-        });
-    }
+        }
+    );
+
+    PaymentVoided::dispatch($payment);
+
+    return $payment;
+}
 }

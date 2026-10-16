@@ -104,4 +104,29 @@ class PaymentRegisteredEventTest extends TestCase
             $this->subscription->pendingBalance()
         );
     }
+    public function test_paid_subscription_is_still_active_while_not_expired(): void
+{
+    $response = $this->actingAs($this->user)
+        ->postJson('/payments', [
+            'subscription_id' => $this->subscription->id,
+            'amount' => 150.00,
+            'payment_method' => PaymentMethod::Qr->value,
+            'payment_date' => now()->toDateString(),
+        ]);
+
+    $response->assertCreated();
+
+    $this->subscription->refresh();
+
+    $this->assertSame(
+        SubscriptionStatus::Paid,
+        $this->subscription->status
+    );
+
+    $this->assertTrue(
+        Subscription::active()
+            ->whereKey($this->subscription->id)
+            ->exists()
+    );
+}
 }

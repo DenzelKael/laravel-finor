@@ -34,10 +34,9 @@ class PaymentController extends Controller
     public function create(): View
     {
         $this->authorize('create', Payment::class);
-
-        $subscriptions = Subscription::active()
-            ->with(['client', 'plan'])
-            ->get();
+$subscriptions = Subscription::payable()
+    ->with(['client', 'plan'])
+    ->get();
 
         return view('payments.create', compact('subscriptions'));
     }
