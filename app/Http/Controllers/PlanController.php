@@ -69,6 +69,12 @@ class PlanController extends Controller
      */
     public function destroy(Plan $plan): JsonResponse
     {
+        if ($plan->subscriptions()->exists()) {
+            return response()->json([
+                'message' => 'El plan tiene suscripciones; desactívelo en lugar de eliminarlo.',
+            ], 422);
+        }
+
         $plan->delete();
 
         return response()->json([

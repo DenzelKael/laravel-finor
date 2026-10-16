@@ -27,10 +27,9 @@ class PaymentRegistrationTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        
-        $permission = Permission::findOrCreate('payments.create', 'web');
 
-$this->user->givePermissionTo($permission);
+        $permission = Permission::findOrCreate('payments.create', 'web');
+        $this->user->givePermissionTo($permission);
 
         $client = Client::create([
             'name' => 'Cliente de Prueba',
@@ -128,5 +127,68 @@ $this->user->givePermissionTo($permission);
             ->assertJsonValidationErrors([
                 'subscription_id',
             ]);
+    }
+
+    /**
+     * Test 4: The subscription instance is properly resolved by validation rule during happy path.
+     */
+    public function test_subscription_is_resolved_by_validation_rule_during_happy_path(): void
+    {
+        $payload = [
+            'subscription_id' => $this->activeSubscription->id,
+            'amount' => 150.00,
+            'payment_method' => PaymentMethod::Cash->value,
+            'payment_date' => now()->toDateString(),
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->postJson('/payments', $payload);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('payments', [
+            'subscription_id' => $this->activeSubscription->id,
+            'amount' => 150.00,
+            'status' => PaymentStatus::Registered->value,
+        ]);
+    }
+
+    /**
+     * Test 5: An authorized user can cancel a registered payment.
+     */
+    public function test_authorized_user_can_cancel_registered_payment(): void
+    {
+        $cancelPermission = Permission::findOrCreate(
+            'payments.cancel',
+            'web'
+        );
+
+        $this->user->givePermissionTo($cancelPermission);
+
+        $payment = $this->activeSubscription
+            ->payments()
+            ->create([
+                'amount' => 150.00,
+                'payment_method' => PaymentMethod::Cash,
+                'payment_date' => now()->toDateString(),
+                'status' => PaymentStatus::Registered,
+            ]);
+
+        $response = $this->actingAs($this->user)
+            ->patchJson(
+                route('payments.cancel', $payment)
+            );
+
+        $response->assertOk()
+            ->assertJsonPath(
+                'message',
+                'Pago anulado correctamente.'
+            );
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->id,
+            'subscription_id' => $this->activeSubscription->id,
+            'status' => PaymentStatus::Cancelled->value,
+        ]);
     }
 }

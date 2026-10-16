@@ -8,6 +8,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class ActiveSubscription implements ValidationRule
 {
+    private ?Subscription $subscription = null;
+
     /**
      * Validate that the subscription exists and is not expired.
      */
@@ -16,16 +18,24 @@ class ActiveSubscription implements ValidationRule
         mixed $value,
         Closure $fail
     ): void {
-        $subscription = Subscription::find($value);
+        $this->subscription = Subscription::find($value);
 
-        if (! $subscription) {
+        if (! $this->subscription) {
             $fail('La suscripción seleccionada no existe.');
 
             return;
         }
 
-        if ($subscription->isExpired()) {
+        if ($this->subscription->isExpired()) {
             $fail('No se puede registrar un pago en una suscripción vencida.');
         }
+    }
+
+    /**
+     * Return the subscription resolved during validation.
+     */
+    public function subscription(): ?Subscription
+    {
+        return $this->subscription;
     }
 }
