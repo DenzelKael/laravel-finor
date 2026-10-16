@@ -18,6 +18,8 @@ export default defineConfig({
                 'resources/js/pages/plan-form.js',
                 'resources/js/pages/plans-index.js',
                 'resources/js/dashboard/main.js',
+                'resources/js/subscriptions/create.js',
+                'resources/js/subscriptions/index.js',
             ],
             refresh: true,
             fonts: [

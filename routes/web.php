@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PlanController;
 
 Route::redirect('/', '/login');
@@ -136,4 +137,39 @@ Route::middleware('auth')->group(function () {
     });
     Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
         ->name('logout');
+    // Rutas explícitas de Suscripciones (Equipo D)
+    Route::controller(SubscriptionController::class)
+        ->prefix('subscriptions')
+        ->name('subscriptions.')
+        ->group(function () {
+            Route::get('/', 'index')
+                ->middleware('permission:subscriptions.view')
+                ->name('index');
+
+            Route::get('/data', 'data')
+                ->middleware('permission:subscriptions.view')
+                ->name('data');
+                
+            Route::get('/create', 'create')
+                ->middleware('permission:subscriptions.create')
+                ->name('create');
+                
+            Route::post('/', 'store')
+                ->middleware('permission:subscriptions.create')
+                ->name('store');
+                
+            Route::get('/{subscription}', 'show')
+                ->middleware('permission:subscriptions.view')
+                ->name('show');
+                
+            Route::patch('/{subscription}/renew', 'renew')
+                ->middleware('permission:subscriptions.update')
+                ->name('renew');
+                
+            // La cancelación de suscripción se mapea a 'subscriptions.delete' siguiendo
+            // el esquema estándar de permisos CRUD de Spatie (view, create, update, delete).
+            Route::patch('/{subscription}/cancel', 'cancel')
+                ->middleware('permission:subscriptions.delete')
+                ->name('cancel');
+        });
 });
