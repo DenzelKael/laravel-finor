@@ -53,10 +53,13 @@ class PermissionController extends Controller
         abort_if(
             $permission->roles()->exists(),
             403,
-            'The permission is assigned to one or more roles.'
+            'El permiso está asignado a uno o más roles.'
         );
+
         $permission->delete();
-        return redirect()
-            ->route('permissions.index');
+
+        return response()->json([
+            'message' => 'Permiso eliminado correctamente.',
+        ]);
     }
 }
