@@ -4,6 +4,7 @@ use ColorlibHQ\AdminLte\Menu\Filters\ActiveFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\GateFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\HrefFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\SearchFilter;
+use App\Menu\Filters\SubmenuGateFilter;
 
 return [
 
@@ -227,24 +228,28 @@ return [
             'url' => 'clients',
             'icon' => 'bi bi-people',
             'active' => ['admin/clients*'],
+            'can' => 'clients.view',
         ],
         [
             'text' => 'Planes',
             'url' => 'plans',
             'icon' => 'bi bi-list-check',
             'active' => ['admin/plans*'],
+            'can' => 'plans.view',
         ],
         [
             'text' => 'Suscripciones',
             'url' => 'payments',
             'icon' => 'bi bi-arrow-repeat',
             'active' => ['admin/subscriptions*'],
+            'can' => 'subscriptions.view',
         ],
         [
             'text' => 'Pagos',
             'url' => 'payments',
             'icon' => 'bi bi-cash-stack',
             'active' => ['admin/payments*'],
+            'can' => 'payments.view',
         ],
 
         ['header' => 'SISTEMA'],
@@ -285,8 +290,10 @@ return [
     |
     */
 
+
+
     'filters' => [
-        GateFilter::class,
+        SubmenuGateFilter::class,
         HrefFilter::class,
         ActiveFilter::class,
         SearchFilter::class,
