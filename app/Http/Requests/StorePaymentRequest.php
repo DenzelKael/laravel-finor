@@ -114,4 +114,36 @@ class StorePaymentRequest extends FormRequest
 
         return $subscription;
     }
+    public function after(): array
+{
+    return [
+        function ($validator): void {
+            if ($validator->errors()->has('subscription_id')
+                || $validator->errors()->has('amount')) {
+                return;
+            }
+
+            $subscription = $this->activeSubscriptionRule?->subscription();
+
+            if (! $subscription) {
+                return;
+            }
+
+            $amountInCents = (int) round(
+                (float) $this->input('amount') * 100
+            );
+
+            $pendingBalanceInCents = (int) round(
+                $subscription->pendingBalance() * 100
+            );
+
+            if ($amountInCents > $pendingBalanceInCents) {
+                $validator->errors()->add(
+                    'amount',
+                    'El monto no puede superar el saldo pendiente de la suscripción.'
+                );
+            }
+        },
+    ];
+}
 }

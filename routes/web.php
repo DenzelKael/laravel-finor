@@ -70,7 +70,9 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::get('/', 'index')->middleware('permission:clients.view')->name('index');
             Route::get('/create', 'create')->middleware('permission:clients.create')->name('create');
+            Route::get('/export', 'export')->middleware('permission:clients.view')->name('export');
             Route::post('/', 'store')->middleware('permission:clients.create')->name('store');
+            Route::get('/{client}', 'show')->middleware('permission:clients.view')->name('show');
             Route::get('/{client}/edit', 'edit')->middleware('permission:clients.update')->name('edit');
             Route::put('/{client}', 'update')->middleware('permission:clients.update')->name('update');
             Route::delete('/{client}', 'destroy')->middleware('permission:clients.delete')->name('destroy');
@@ -88,7 +90,6 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{plan}', 'destroy')->middleware('permission:plans.delete')->name('destroy');
 
         });
-
     Route::controller(PaymentController::class)
         ->prefix('payments')
         ->name('payments.')
@@ -96,11 +97,26 @@ Route::middleware('auth')->group(function () {
             Route::get('/', 'index')->middleware('permission:payments.view')->name('index');
             Route::get('/create', 'create')->middleware('permission:payments.create')->name('create');
             Route::post('/', 'store')->middleware('permission:payments.create')->name('store');
+
+            Route::get(
+                '/subscription/{subscription}/history',
+                'historyBySubscription'
+            )->middleware('permission:payments.view')->name('history.subscription');
+
+            Route::get(
+                '/client/{client}/history',
+                'historyByClient'
+            )->middleware('permission:payments.view')->name('history.client');
+
             Route::get('/{payment}', 'show')->middleware('permission:payments.view')->name('show');
             Route::get('/{payment}/receipt', 'receipt')->middleware('permission:payments.view')->name('receipt');
             Route::patch('/{payment}/cancel', 'cancel')->middleware('permission:payments.cancel')->name('cancel');
-        });
 
+            Route::get(
+                '/{payment}/receipt/pdf',
+                'receiptPdf'
+            )->middleware('permission:payments.view')->name('receipt.pdf');
+        });
 
     // Email verification — protect app routes with the `verified` middleware once
     // your User model implements MustVerifyEmail (adminlte:make-auth wires it in).
@@ -133,23 +149,23 @@ Route::middleware('auth')->group(function () {
             Route::get('/data', 'data')
                 ->middleware('permission:subscriptions.view')
                 ->name('data');
-                
+
             Route::get('/create', 'create')
                 ->middleware('permission:subscriptions.create')
                 ->name('create');
-                
+
             Route::post('/', 'store')
                 ->middleware('permission:subscriptions.create')
                 ->name('store');
-                
+
             Route::get('/{subscription}', 'show')
                 ->middleware('permission:subscriptions.view')
                 ->name('show');
-                
+
             Route::patch('/{subscription}/renew', 'renew')
                 ->middleware('permission:subscriptions.update')
                 ->name('renew');
-                
+
             // La cancelación de suscripción se mapea a 'subscriptions.delete' siguiendo
             // el esquema estándar de permisos CRUD de Spatie (view, create, update, delete).
             Route::patch('/{subscription}/cancel', 'cancel')

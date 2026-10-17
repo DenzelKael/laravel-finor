@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!confirmed) return;
 
             try {
-                const data = await api.delete(`/plans/${btn.dataset.id}`);
+                const data = await api.delete(btn.dataset.url);
                 btn.closest('tr').remove();
                 SwalMessages.success(data.message);
             } catch (error) {

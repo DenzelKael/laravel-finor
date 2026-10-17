@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Enums\SubscriptionStatus;
 use App\Models\Subscription;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -10,9 +11,6 @@ class ActiveSubscription implements ValidationRule
 {
     private ?Subscription $subscription = null;
 
-    /**
-     * Validate that the subscription exists and is not expired.
-     */
     public function validate(
         string $attribute,
         mixed $value,
@@ -28,12 +26,15 @@ class ActiveSubscription implements ValidationRule
 
         if ($this->subscription->isExpired()) {
             $fail('No se puede registrar un pago en una suscripción vencida.');
+
+            return;
+        }
+
+        if ($this->subscription->status !== SubscriptionStatus::Active) {
+            $fail('La suscripción seleccionada no se encuentra activa.');
         }
     }
 
-    /**
-     * Return the subscription resolved during validation.
-     */
     public function subscription(): ?Subscription
     {
         return $this->subscription;

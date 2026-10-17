@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $user->assignRole('Admin');
 
         $this->call([
+            ClientSeeder::class,
             PlanSeeder::class,
             SubscriptionSeeder::class,
         ]);
