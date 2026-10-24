@@ -34,6 +34,7 @@ class UpdateRolePermissionsRequest extends FormRequest
         ];
 
     }
+
     public function messages(): array
     {
         return [

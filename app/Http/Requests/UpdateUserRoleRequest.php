@@ -38,6 +38,7 @@ class UpdateUserRoleRequest extends FormRequest
             ],
         ];
     }
+
     public function messages(): array
     {
         return [

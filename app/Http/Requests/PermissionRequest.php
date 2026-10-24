@@ -15,7 +15,7 @@ class PermissionRequest extends FormRequest
     {
         $user = $this->user();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -40,6 +40,7 @@ class PermissionRequest extends FormRequest
             ],
         ];
     }
+
     public function messages(): array
     {
         return [

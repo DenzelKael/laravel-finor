@@ -10,9 +10,9 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 class PermissionsAccessTest extends TestCase
 {
@@ -62,10 +62,10 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn() => 'ok');
+            ->get('/_test/gate-can', fn () => 'ok');
 
         Route::middleware(['web', 'auth', 'permission:reports.view'])
-            ->get('/_test/gate-permission', fn() => 'ok');
+            ->get('/_test/gate-permission', fn () => 'ok');
 
         $admin = $this->admin();
 
@@ -80,7 +80,7 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn() => 'ok');
+            ->get('/_test/gate-can', fn () => 'ok');
 
         $this->actingAs($this->vendedor())
             ->get('/_test/gate-can')
@@ -119,7 +119,6 @@ class PermissionsAccessTest extends TestCase
         $this->assertTrue($admin->fresh()->hasRole(RoleName::Admin->value));
     }
 
-
     public function test_admin_can_delete_unassigned_permission_via_json(): void
     {
         $permission = Permission::create(['name' => 'tmp.view']);
@@ -143,7 +142,6 @@ class PermissionsAccessTest extends TestCase
         $this->assertModelExists($permission);
     }
 
-
     public function test_update_user_role_request_authorize(): void
     {
         $this->assertTrue($this->requestFor(UpdateUserRoleRequest::class, $this->admin())->authorize());
@@ -164,8 +162,8 @@ class PermissionsAccessTest extends TestCase
 
     private function requestFor(string $class, User $user)
     {
-        $request = new $class();
-        $request->setUserResolver(fn() => $user);
+        $request = new $class;
+        $request->setUserResolver(fn () => $user);
 
         return $request;
     }
@@ -177,7 +175,7 @@ class PermissionsAccessTest extends TestCase
 
         $this->actingAs($user)
             ->{$method}(route($routeName), [])
-                ->assertForbidden();
+            ->assertForbidden();
     }
 
     #[DataProvider('moduleRoutes')]
