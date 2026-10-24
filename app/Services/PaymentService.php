@@ -22,7 +22,7 @@ class PaymentService
         PaymentData $data
     ): Payment {
         if ($subscription->isExpired()) {
-            throw new ExpiredSubscriptionException();
+            throw new ExpiredSubscriptionException;
         }
 
         $payment = DB::transaction(

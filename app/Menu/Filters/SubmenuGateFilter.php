@@ -9,13 +9,13 @@ class SubmenuGateFilter implements FilterInterface
 {
     public function transform(array $item): ?array
     {
-        if (!$this->allowed($item)) {
+        if (! $this->allowed($item)) {
             return null;
         }
 
         if (isset($item['submenu'])) {
             $item['submenu'] = array_values(array_filter(
-                array_map(fn($child) => $this->transform($child), $item['submenu'])
+                array_map(fn ($child) => $this->transform($child), $item['submenu'])
             ));
 
             if ($item['submenu'] === []) {
@@ -28,7 +28,7 @@ class SubmenuGateFilter implements FilterInterface
 
     private function allowed(array $item): bool
     {
-        if (!isset($item['can'])) {
+        if (! isset($item['can'])) {
             return true;
         }
 

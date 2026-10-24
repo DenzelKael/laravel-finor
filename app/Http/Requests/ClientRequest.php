@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ClientStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Enums\ClientStatus;
 
 class ClientRequest extends FormRequest
 {

@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use App\Http\Requests\UpdateUserRoleRequest;
 use App\Enums\RoleName;
-
+use App\Http\Requests\UpdateUserRoleRequest;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     public function index()
     {
         $users = User::paginate(10);
+
         return view('settings.users.index', compact('users'));
     }
 
@@ -35,6 +34,7 @@ class UserController extends Controller
             )
         );
     }
+
     public function update(UpdateUserRoleRequest $request, User $user)
     {
         $validated = $request->validated();
@@ -48,7 +48,7 @@ class UserController extends Controller
         ) {
             return back()
                 ->withErrors([
-                    'role' => 'Debe existir al menos un administrador.'
+                    'role' => 'Debe existir al menos un administrador.',
                 ]);
         }
 
@@ -56,11 +56,11 @@ class UserController extends Controller
         $user->syncPermissions(
             $validated['permissions'] ?? []
         );
+
         return response()->json([
             'message' => 'Usuario actualizado correctamente.',
         ]);
     }
-
 
     public function create()
     {
@@ -90,5 +90,4 @@ class UserController extends Controller
             ->route('users.index')
             ->with('success', 'Usuario creado correctamente.');
     }
-
 }

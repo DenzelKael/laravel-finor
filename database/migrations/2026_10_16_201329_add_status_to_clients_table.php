@@ -9,20 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
-{
-    Schema::table('clients', function (Blueprint $table) {
-        $table->string('status', 20)
-            ->default('active')
-            ->after('address')
-            ->index();
-    });
-}
+    public function up(): void
+    {
+        Schema::table('clients', function (Blueprint $table) {
+            $table->string('status', 20)
+                ->default('active')
+                ->after('address')
+                ->index();
+        });
+    }
 
-public function down(): void
-{
-    Schema::table('clients', function (Blueprint $table) {
-        $table->dropColumn('status');
-    });
-}
+    public function down(): void
+    {
+        Schema::table('clients', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
+    }
 };

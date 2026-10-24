@@ -17,8 +17,11 @@ class SubscriptionTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Client $client;
+
     private Plan $activePlan;
+
     private Plan $inactivePlan;
 
     protected function setUp(): void

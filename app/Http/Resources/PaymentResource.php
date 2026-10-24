@@ -25,7 +25,7 @@ class PaymentResource extends JsonResource
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'void_reason' => $this->void_reason,
-'voided_at' => $this->voided_at?->toISOString(),
+            'voided_at' => $this->voided_at?->toISOString(),
             'created_at' => $this->created_at?->toISOString(),
         ];
     }
