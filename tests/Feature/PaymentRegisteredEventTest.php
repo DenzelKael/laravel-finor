@@ -118,80 +118,81 @@ class PaymentRegisteredEventTest extends TestCase
                 ->exists()
         );
     }
+
     public function test_full_payment_does_not_allow_another_active_subscription_for_same_client(): void
-{
-    $subscriptionPermission = Permission::findOrCreate(
-        'subscriptions.create',
-        'web'
-    );
+    {
+        $subscriptionPermission = Permission::findOrCreate(
+            'subscriptions.create',
+            'web'
+        );
 
-    $this->user->givePermissionTo(
-        $subscriptionPermission
-    );
+        $this->user->givePermissionTo(
+            $subscriptionPermission
+        );
 
-    // Pagar completamente la suscripción existente.
-    $paymentResponse = $this->actingAs($this->user)
-        ->postJson('/payments', [
-            'subscription_id' => $this->subscription->id,
-            'amount' => 150.00,
-            'payment_method' => PaymentMethod::Cash->value,
-            'payment_date' => now()->toDateString(),
-        ]);
+        // Pagar completamente la suscripción existente.
+        $paymentResponse = $this->actingAs($this->user)
+            ->postJson('/payments', [
+                'subscription_id' => $this->subscription->id,
+                'amount' => 150.00,
+                'payment_method' => PaymentMethod::Cash->value,
+                'payment_date' => now()->toDateString(),
+            ]);
 
-    $paymentResponse->assertCreated();
+        $paymentResponse->assertCreated();
 
-    $this->subscription->refresh();
+        $this->subscription->refresh();
 
-    // El pago completo NO modifica el ciclo de vida.
-    $this->assertSame(
-        SubscriptionStatus::Active,
-        $this->subscription->status
-    );
+        // El pago completo NO modifica el ciclo de vida.
+        $this->assertSame(
+            SubscriptionStatus::Active,
+            $this->subscription->status
+        );
 
-    $this->assertTrue(
-        $this->subscription->isFullyPaid()
-    );
+        $this->assertTrue(
+            $this->subscription->isFullyPaid()
+        );
 
-    $this->assertSame(
-        0.00,
-        $this->subscription->pendingBalance()
-    );
+        $this->assertSame(
+            0.00,
+            $this->subscription->pendingBalance()
+        );
 
-    // La suscripción sigue siendo considerada activa.
-    $this->assertTrue(
-        Subscription::active()
-            ->whereKey($this->subscription->id)
-            ->exists()
-    );
+        // La suscripción sigue siendo considerada activa.
+        $this->assertTrue(
+            Subscription::active()
+                ->whereKey($this->subscription->id)
+                ->exists()
+        );
 
-    // Intentar crear una segunda suscripción
-    // para el mismo cliente.
-    $secondSubscriptionResponse = $this
-        ->actingAs($this->user)
-        ->postJson('/subscriptions', [
-            'client_id' => $this->subscription->client_id,
-            'plan_id' => $this->subscription->plan_id,
-            'start_date' => today()->toDateString(),
-        ]);
+        // Intentar crear una segunda suscripción
+        // para el mismo cliente.
+        $secondSubscriptionResponse = $this
+            ->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->subscription->client_id,
+                'plan_id' => $this->subscription->plan_id,
+                'start_date' => today()->toDateString(),
+            ]);
 
-    // Debe ser rechazada porque el cliente
-    // todavía posee una suscripción ACTIVE.
-    $secondSubscriptionResponse
-        ->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'client_id',
-        ]);
+        // Debe ser rechazada porque el cliente
+        // todavía posee una suscripción ACTIVE.
+        $secondSubscriptionResponse
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'client_id',
+            ]);
 
-    // Debe continuar existiendo una sola
-    // suscripción activa para ese cliente.
-    $this->assertSame(
-        1,
-        Subscription::where(
-            'client_id',
-            $this->subscription->client_id
-        )
-            ->active()
-            ->count()
-    );
-}
+        // Debe continuar existiendo una sola
+        // suscripción activa para ese cliente.
+        $this->assertSame(
+            1,
+            Subscription::where(
+                'client_id',
+                $this->subscription->client_id
+            )
+                ->active()
+                ->count()
+        );
+    }
 }

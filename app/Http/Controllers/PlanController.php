@@ -25,7 +25,7 @@ class PlanController extends Controller
      */
     public function create(): View
     {
-        $plan = new Plan();
+        $plan = new Plan;
 
         return view('plans.create', compact('plan'));
     }

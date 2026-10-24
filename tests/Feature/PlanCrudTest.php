@@ -5,9 +5,9 @@ namespace Tests\Feature;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 
 class PlanCrudTest extends TestCase
 {

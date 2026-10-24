@@ -2,25 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\PermissionRequest;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
 class PermissionController extends Controller
 {
     public function index()
     {
         $permissions = Permission::paginate(10);
         $roles = Role::all();
+
         return view(
             'settings.permissions.index',
             compact('permissions', 'roles')
         );
     }
+
     public function create()
     {
         return view('settings.permissions.create');
     }
+
     public function store(PermissionRequest $request)
     {
         $permission = Permission::create(
@@ -32,6 +35,7 @@ class PermissionController extends Controller
             'data' => $permission,
         ]);
     }
+
     public function edit(Permission $permission)
     {
         return view(
@@ -39,15 +43,18 @@ class PermissionController extends Controller
             compact('permission')
         );
     }
+
     public function update(PermissionRequest $request, Permission $permission)
     {
         $permission->update(
             $request->validated()
         );
+
         return response()->json([
             'message' => 'Permiso actualizado correctamente.',
         ]);
     }
+
     public function destroy(Permission $permission)
     {
         abort_if(
