@@ -3,8 +3,15 @@
 @section('title', 'Users')
 
 @section('content')
-    <h3>Usuarios</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Usuarios</h3>
 
+        @can('users.create')
+            <a href="{{ route('users.create') }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Añadir usuario
+            </a>
+        @endcan
+    </div>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -34,3 +41,9 @@
     </table>
     {{ $users->links() }}
 @endsection
+
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif

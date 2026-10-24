@@ -9,6 +9,9 @@ use Spatie\Permission\Models\Permission;
 use App\Http\Requests\UpdateUserRoleRequest;
 use App\Enums\RoleName;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+
 
 class UserController extends Controller
 {
@@ -57,4 +60,35 @@ class UserController extends Controller
             'message' => 'Usuario actualizado correctamente.',
         ]);
     }
+
+
+    public function create()
+    {
+        $roles = Role::all();
+
+        return view('settings.users.create', compact('roles'));
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+            'role' => ['required', 'exists:roles,name'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+
+        $user->assignRole($data['role']);
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'Usuario creado correctamente.');
+    }
+
 }
