@@ -29,6 +29,26 @@ jobs:
       - name: Verificar nombres de archivo PSR-4
         run: composer dump-autoload --optimize --strict-psr
 
+      - name: Formato de código (pint)
+        run: vendor/bin/pint --test
+
+      - name: Rutas explícitas (sin Route::resource / apiResource)
+        run: |
+          if grep -rnE "(Route::|->)(apiResources?|resources?)\(" routes; then
+            echo "::error::Declarar las rutas una por una; Route::resource y apiResource no están permitidos."
+            exit 1
+          fi
+
+      - name: AJAX solo a través de ApiClient
+        # TODO: quitar la excepción del dashboard cuando el Equipo G mueva su JS a ApiClient
+        run: |
+          if grep -rnE "\bfetch\(|\baxios\b|\$\.ajax|XMLHttpRequest" resources/js resources/views \
+            | grep -v "^resources/js/commons/api-client.js:" \
+            | grep -v "^resources/views/dashboard/index.blade.php:"; then
+            echo "::error::Usar ApiClient (resources/js/commons/api-client.js) en lugar de fetch, axios o \$.ajax directos."
+            exit 1
+          fi
+
       - name: Instalar dependencias JS
         run: npm ci
 
