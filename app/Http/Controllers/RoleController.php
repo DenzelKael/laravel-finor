@@ -7,6 +7,8 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\UpdateRolePermissionsRequest;
 
+use Spatie\Permission\PermissionRegistrar;
+
 class RoleController extends Controller
 {
     public function index()
@@ -24,6 +26,7 @@ class RoleController extends Controller
         return view('settings.roles.edit', compact('role', 'permissions'));
     }
 
+
     public function update(UpdateRolePermissionsRequest $request, Role $role)
     {
         $validated = $request->validated();
@@ -32,8 +35,11 @@ class RoleController extends Controller
             $validated['permissions'] ?? []
         );
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         return response()->json([
             'message' => 'Rol actualizado correctamente.',
         ]);
     }
+
 }
