@@ -13,7 +13,6 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-
     public function index(Request $request)
     {
         $search = $request->input('q');
@@ -37,7 +36,6 @@ class UserController extends Controller
 
         return view('settings.users.index', compact('users', 'roles', 'search', 'role'));
     }
-
 
     public function edit(User $user)
     {

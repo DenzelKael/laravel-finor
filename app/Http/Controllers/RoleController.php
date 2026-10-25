@@ -27,7 +27,6 @@ class RoleController extends Controller
         return view('settings.roles.edit', compact('role', 'permissions'));
     }
 
-
     public function update(UpdateRolePermissionsRequest $request, Role $role)
     {
         $validated = $request->validated();
@@ -89,5 +88,4 @@ class RoleController extends Controller
             'data' => $role,
         ]);
     }
-
 }

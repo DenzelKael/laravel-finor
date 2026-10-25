@@ -12,9 +12,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
-use Tests\TestCase;
 use Spatie\Permission\Models\Role;
-
+use Tests\TestCase;
 
 class PermissionsAccessTest extends TestCase
 {
@@ -64,10 +63,10 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn() => 'ok');
+            ->get('/_test/gate-can', fn () => 'ok');
 
         Route::middleware(['web', 'auth', 'permission:reports.view'])
-            ->get('/_test/gate-permission', fn() => 'ok');
+            ->get('/_test/gate-permission', fn () => 'ok');
 
         $admin = $this->admin();
 
@@ -82,7 +81,7 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn() => 'ok');
+            ->get('/_test/gate-can', fn () => 'ok');
 
         $this->actingAs($this->vendedor())
             ->get('/_test/gate-can')
@@ -165,7 +164,7 @@ class PermissionsAccessTest extends TestCase
     private function requestFor(string $class, User $user)
     {
         $request = new $class;
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
         return $request;
     }
@@ -177,7 +176,7 @@ class PermissionsAccessTest extends TestCase
 
         $this->actingAs($user)
             ->{$method}(route($routeName), [])
-                ->assertForbidden();
+            ->assertForbidden();
     }
 
     #[DataProvider('moduleRoutes')]
@@ -208,6 +207,7 @@ class PermissionsAccessTest extends TestCase
             'payments store' => ['postJson', 'payments.store'],
         ];
     }
+
     public function test_admin_can_create_role_with_permissions(): void
     {
         $this->actingAs($this->admin())
@@ -234,5 +234,4 @@ class PermissionsAccessTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors('permissions.0');
     }
-
 }
