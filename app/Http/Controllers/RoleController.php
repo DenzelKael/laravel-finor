@@ -7,6 +7,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\UpdateRolePermissionsRequest;
 use App\Enums\RoleName;
+use App\Http\Requests\StoreRoleRequest;
 
 use Spatie\Permission\PermissionRegistrar;
 
@@ -62,6 +63,32 @@ class RoleController extends Controller
 
         return response()->json([
             'message' => 'Rol eliminado correctamente.',
+        ]);
+    }
+
+    public function create()
+    {
+        $permissions = Permission::all();
+
+        return view('settings.roles.create', compact('permissions'));
+    }
+
+    public function store(StoreRoleRequest $request)
+    {
+        $validated = $request->validated();
+
+        $role = Role::create([
+            'name' => $validated['name'],
+            'guard_name' => 'web',
+        ]);
+
+        $role->syncPermissions($validated['permissions'] ?? []);
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        return response()->json([
+            'message' => 'Rol creado correctamente.',
+            'data' => $role,
         ]);
     }
 

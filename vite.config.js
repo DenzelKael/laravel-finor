@@ -24,6 +24,9 @@ export default defineConfig({
                 'resources/js/subscriptions/create.js',
                 'resources/js/subscriptions/index.js',
                 'resources/js/profile/edit.js',
+                'resources/js/roles/create.js',
+                'resources/js/roles/edit.js',
+                'resources/js/roles/index.js',
             ],
             refresh: true,
             fonts: [

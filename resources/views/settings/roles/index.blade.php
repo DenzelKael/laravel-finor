@@ -5,6 +5,12 @@
 @section('content')
     <h4>Roles</h4>
 
+    <div class="mb-3">
+        @can('roles.create')
+            <a href="{{ route('roles.create') }}" class="btn btn-success">Nuevo rol</a>
+        @endcan
+    </div>
+
     <table class="table table-bordered">
         <thead>
             <tr>

@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
             ->name('roles.')
             ->group(function () {
                 Route::get('/', 'index')->middleware('permission:roles.view')->name('index');
+                Route::get('/create', 'create')->middleware('permission:roles.create')->name('create');
+                Route::post('/', 'store')->middleware('permission:roles.create')->name('store');
                 Route::get('/{role}/edit', 'edit')->middleware('permission:roles.update')->name('edit');
                 Route::put('/{role}', 'update')->middleware('permission:roles.update')->name('update');
                 Route::delete('/{role}', 'destroy')->middleware('permission:roles.delete')->name('destroy');

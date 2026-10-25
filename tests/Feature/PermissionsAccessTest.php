@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Permission\Models\Role;
 
 class PermissionsAccessTest extends TestCase
 {
@@ -207,5 +208,32 @@ class PermissionsAccessTest extends TestCase
             'payments create' => ['get', 'payments.create'],
             'payments store' => ['postJson', 'payments.store'],
         ];
+    }
+
+    public function test_admin_can_create_role_with_permissions(): void
+    {
+        $this->actingAs($this->admin())
+            ->postJson(route('roles.store'), [
+                'name' => 'Contador',
+                'permissions' => ['clients.view', 'payments.view'],
+            ])
+            ->assertOk();
+
+        $role = Role::findByName('Contador');
+
+        $this->assertTrue($role->hasPermissionTo('clients.view'));
+        $this->assertTrue($role->hasPermissionTo('payments.view'));
+        $this->assertFalse($role->hasPermissionTo('clients.delete'));
+    }
+
+    public function test_cannot_create_role_with_nonexistent_permission(): void
+    {
+        $this->actingAs($this->admin())
+            ->postJson(route('roles.store'), [
+                'name' => 'Contador',
+                'permissions' => ['no.existe'],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('permissions.0');
     }
 }
