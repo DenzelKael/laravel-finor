@@ -1,10 +1,9 @@
 <?php
 
+use App\Menu\Filters\SubmenuGateFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\ActiveFilter;
-use ColorlibHQ\AdminLte\Menu\Filters\GateFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\HrefFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\SearchFilter;
-use App\Menu\Filters\SubmenuGateFilter;
 
 return [
 
@@ -125,7 +124,7 @@ return [
     |
     */
 
-    'footer_left' => 'Copyright &copy; 2014-' . date('Y') . ' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
+    'footer_left' => 'Copyright &copy; 2014-'.date('Y').' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
     'footer_right' => 'Anything you want',
     'preloader' => false,
     'control_sidebar' => false,
@@ -289,8 +288,6 @@ return [
     | The defaults handle gates, active state, hrefs, and search items.
     |
     */
-
-
 
     'filters' => [
         SubmenuGateFilter::class,

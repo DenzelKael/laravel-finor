@@ -10,10 +10,11 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
+
 
 class PermissionsAccessTest extends TestCase
 {
@@ -120,7 +121,6 @@ class PermissionsAccessTest extends TestCase
         $this->assertTrue($admin->fresh()->hasRole(RoleName::Admin->value));
     }
 
-
     public function test_admin_can_delete_unassigned_permission_via_json(): void
     {
         $permission = Permission::create(['name' => 'tmp.view']);
@@ -144,7 +144,6 @@ class PermissionsAccessTest extends TestCase
         $this->assertModelExists($permission);
     }
 
-
     public function test_update_user_role_request_authorize(): void
     {
         $this->assertTrue($this->requestFor(UpdateUserRoleRequest::class, $this->admin())->authorize());
@@ -165,7 +164,7 @@ class PermissionsAccessTest extends TestCase
 
     private function requestFor(string $class, User $user)
     {
-        $request = new $class();
+        $request = new $class;
         $request->setUserResolver(fn() => $user);
 
         return $request;
@@ -209,7 +208,6 @@ class PermissionsAccessTest extends TestCase
             'payments store' => ['postJson', 'payments.store'],
         ];
     }
-
     public function test_admin_can_create_role_with_permissions(): void
     {
         $this->actingAs($this->admin())
@@ -236,4 +234,5 @@ class PermissionsAccessTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors('permissions.0');
     }
+
 }

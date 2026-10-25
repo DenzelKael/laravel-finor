@@ -22,7 +22,7 @@ class StorePaymentRequest extends FormRequest
 
     public function rules(): array
     {
-        $this->activeSubscriptionRule ??= new ActiveSubscription();
+        $this->activeSubscriptionRule ??= new ActiveSubscription;
 
         return [
             'subscription_id' => [
@@ -54,38 +54,27 @@ class StorePaymentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'subscription_id.required' =>
-                'Debe seleccionar una suscripción.',
+            'subscription_id.required' => 'Debe seleccionar una suscripción.',
 
-            'subscription_id.integer' =>
-                'La suscripción seleccionada no es válida.',
+            'subscription_id.integer' => 'La suscripción seleccionada no es válida.',
 
-            'amount.required' =>
-                'El monto es obligatorio.',
+            'amount.required' => 'El monto es obligatorio.',
 
-            'amount.numeric' =>
-                'El monto debe ser un valor numérico.',
+            'amount.numeric' => 'El monto debe ser un valor numérico.',
 
-            'amount.min' =>
-                'El monto debe ser mayor a cero.',
+            'amount.min' => 'El monto debe ser mayor a cero.',
 
-            'amount.max' =>
-                'El monto excede el límite máximo permitido.',
+            'amount.max' => 'El monto excede el límite máximo permitido.',
 
-            'payment_method.required' =>
-                'Debe seleccionar un método de pago.',
+            'payment_method.required' => 'Debe seleccionar un método de pago.',
 
-            'payment_method.Illuminate\Validation\Rules\Enum' =>
-                'El método de pago seleccionado no es válido.',
+            'payment_method.Illuminate\Validation\Rules\Enum' => 'El método de pago seleccionado no es válido.',
 
-            'payment_date.required' =>
-                'La fecha de pago es obligatoria.',
+            'payment_date.required' => 'La fecha de pago es obligatoria.',
 
-            'payment_date.date' =>
-                'La fecha de pago no es una fecha válida.',
+            'payment_date.date' => 'La fecha de pago no es una fecha válida.',
 
-            'payment_date.before_or_equal' =>
-                'La fecha de pago no puede ser una fecha futura.',
+            'payment_date.before_or_equal' => 'La fecha de pago no puede ser una fecha futura.',
         ];
     }
 
@@ -114,36 +103,37 @@ class StorePaymentRequest extends FormRequest
 
         return $subscription;
     }
+
     public function after(): array
-{
-    return [
-        function ($validator): void {
-            if ($validator->errors()->has('subscription_id')
-                || $validator->errors()->has('amount')) {
-                return;
-            }
+    {
+        return [
+            function ($validator): void {
+                if ($validator->errors()->has('subscription_id')
+                    || $validator->errors()->has('amount')) {
+                    return;
+                }
 
-            $subscription = $this->activeSubscriptionRule?->subscription();
+                $subscription = $this->activeSubscriptionRule?->subscription();
 
-            if (! $subscription) {
-                return;
-            }
+                if (! $subscription) {
+                    return;
+                }
 
-            $amountInCents = (int) round(
-                (float) $this->input('amount') * 100
-            );
-
-            $pendingBalanceInCents = (int) round(
-                $subscription->pendingBalance() * 100
-            );
-
-            if ($amountInCents > $pendingBalanceInCents) {
-                $validator->errors()->add(
-                    'amount',
-                    'El monto no puede superar el saldo pendiente de la suscripción.'
+                $amountInCents = (int) round(
+                    (float) $this->input('amount') * 100
                 );
-            }
-        },
-    ];
-}
+
+                $pendingBalanceInCents = (int) round(
+                    $subscription->pendingBalance() * 100
+                );
+
+                if ($amountInCents > $pendingBalanceInCents) {
+                    $validator->errors()->add(
+                        'amount',
+                        'El monto no puede superar el saldo pendiente de la suscripción.'
+                    );
+                }
+            },
+        ];
+    }
 }

@@ -11,7 +11,7 @@ class PlanFactory extends Factory
         return [
             'nombre' => $this->faker->randomElement([
                 'Plan Básico', 'Plan Estándar', 'Plan Premium', 'Plan Anual', 'Plan Empresarial',
-            ]) . ' ' . $this->faker->unique()->numberBetween(100, 999),
+            ]).' '.$this->faker->unique()->numberBetween(100, 999),
             'descripcion' => $this->faker->sentence(12),
             'precio' => $this->faker->randomFloat(2, 9.99, 499.99),
             'duracion_dias' => $this->faker->randomElement([7, 30, 90, 180, 365]),

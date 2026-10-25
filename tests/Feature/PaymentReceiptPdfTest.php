@@ -74,8 +74,8 @@ class PaymentReceiptPdfTest extends TestCase
 
         $response->assertHeader(
             'content-disposition',
-            'attachment; filename=recibo-pago-' .
-            $payment->id .
+            'attachment; filename=recibo-pago-'.
+            $payment->id.
             '.pdf'
         );
 
