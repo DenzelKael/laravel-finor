@@ -3,14 +3,27 @@
 @section('title', 'Users')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Usuarios</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+
+        <div class="d-flex align-items-center gap-2">
+            <h3 class="mb-0 me-3">Usuarios</h3>
+
+            <form method="GET" class="d-flex">
+                <input type="text" name="q" class="form-control" style="width: 300px"
+                    placeholder="Buscar por nombre o correo" value="{{ request('q') }}">
+
+                <button type="submit" class="btn btn-primary ms-2">
+                    Buscar
+                </button>
+            </form>
+        </div>
 
         @can('users.create')
             <a href="{{ route('users.create') }}" class="btn btn-success">
                 <i class="fas fa-plus"></i> Añadir usuario
             </a>
         @endcan
+
     </div>
     <table class="table table-bordered">
         <thead>
