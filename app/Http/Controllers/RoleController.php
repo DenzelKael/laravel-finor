@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\UpdateRolePermissionsRequest;
+use App\Enums\RoleName;
 
 use Spatie\Permission\PermissionRegistrar;
 
@@ -13,7 +14,8 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('users', 'permissions')
+        $roles = Role::withCount('users')
+            ->with('permissions')
             ->paginate(10);
 
         return view('settings.roles.index', compact('roles'));
@@ -39,6 +41,27 @@ class RoleController extends Controller
 
         return response()->json([
             'message' => 'Rol actualizado correctamente.',
+        ]);
+    }
+
+    public function destroy(Role $role)
+    {
+        abort_if(
+            $role->name === RoleName::Admin->value,
+            403,
+            'El rol Admin no se puede eliminar.'
+        );
+
+        abort_if(
+            $role->users()->exists(),
+            403,
+            'El rol tiene usuarios asignados.'
+        );
+
+        $role->delete();
+
+        return response()->json([
+            'message' => 'Rol eliminado correctamente.',
         ]);
     }
 

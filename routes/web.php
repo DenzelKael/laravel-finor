@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/', 'index')->middleware('permission:roles.view')->name('index');
                 Route::get('/{role}/edit', 'edit')->middleware('permission:roles.update')->name('edit');
                 Route::put('/{role}', 'update')->middleware('permission:roles.update')->name('update');
+                Route::delete('/{role}', 'destroy')->middleware('permission:roles.delete')->name('destroy');
             });
 
         Route::controller(PermissionController::class)
