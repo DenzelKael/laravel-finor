@@ -8,14 +8,31 @@
         <div class="d-flex align-items-center gap-2">
             <h3 class="mb-0 me-3">Usuarios</h3>
 
-            <form method="GET" class="d-flex">
+
+            <form method="GET" action="{{ route('users.index') }}" class="d-flex flex-wrap gap-2">
+
                 <input type="text" name="q" class="form-control" style="width: 300px"
                     placeholder="Buscar por nombre o correo" value="{{ request('q') }}">
 
-                <button type="submit" class="btn btn-primary ms-2">
+                <select name="role" class="form-select">
+                    <option value="">Todos los roles</option>
+
+                    @foreach ($roles as $item)
+                        <option value="{{ $item->name }}" {{ request('role') == $item->name ? 'selected' : '' }}>
+                            {{ $item->name }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="submit" class="btn btn-primary">
                     Buscar
                 </button>
+
+                <a href="{{ route('users.index') }}" class="btn btn-secondary">
+                    Limpiar
+                </a>
             </form>
+
         </div>
 
         @can('users.create')

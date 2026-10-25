@@ -15,20 +15,31 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+
     public function index(Request $request)
     {
         $search = $request->input('q');
+        $role = $request->input('role');
 
         $users = User::query()
             ->when($search, function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
             })
+            ->when($role, function ($query) use ($role) {
+                $query->role($role);
+            })
+            ->with('roles')
             ->paginate(10)
             ->withQueryString();
 
-        return view('settings.users.index', compact('users'));
+        $roles = \Spatie\Permission\Models\Role::orderBy('name')->get();
+
+        return view('settings.users.index', compact('users', 'roles', 'search', 'role'));
     }
+
 
     public function edit(User $user)
     {
