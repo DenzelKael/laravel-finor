@@ -10,6 +10,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\ProfileController;
 
 // AdminLTE authentication routes
 Route::middleware('guest')->group(function () {
@@ -63,6 +64,14 @@ Route::middleware('auth')->group(function () {
                 Route::delete('/{permission}', 'destroy')->middleware('permission:permissions.delete')->name('destroy');
             });
     });
+
+    Route::controller(ProfileController::class)
+        ->prefix('profile')
+        ->name('profile.')
+        ->group(function () {
+            Route::get('/', 'edit')->name('edit');
+            Route::put('/', 'update')->name('update');
+        });
 
     Route::controller(ClientController::class)
         ->prefix('clients')

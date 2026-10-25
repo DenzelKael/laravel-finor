@@ -23,6 +23,7 @@ export default defineConfig({
                 'resources/js/permissions/edit.js',
                 'resources/js/subscriptions/create.js',
                 'resources/js/subscriptions/index.js',
+                'resources/js/profile/edit.js',
             ],
             refresh: true,
             fonts: [
