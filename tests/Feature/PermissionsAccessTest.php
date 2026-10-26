@@ -63,10 +63,10 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn () => 'ok');
+            ->get('/_test/gate-can', fn() => 'ok');
 
         Route::middleware(['web', 'auth', 'permission:reports.view'])
-            ->get('/_test/gate-permission', fn () => 'ok');
+            ->get('/_test/gate-permission', fn() => 'ok');
 
         $admin = $this->admin();
 
@@ -81,7 +81,7 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn () => 'ok');
+            ->get('/_test/gate-can', fn() => 'ok');
 
         $this->actingAs($this->vendedor())
             ->get('/_test/gate-can')
@@ -164,7 +164,7 @@ class PermissionsAccessTest extends TestCase
     private function requestFor(string $class, User $user)
     {
         $request = new $class;
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(fn() => $user);
 
         return $request;
     }
@@ -176,7 +176,7 @@ class PermissionsAccessTest extends TestCase
 
         $this->actingAs($user)
             ->{$method}(route($routeName), [])
-            ->assertForbidden();
+                ->assertForbidden();
     }
 
     #[DataProvider('moduleRoutes')]
@@ -233,5 +233,32 @@ class PermissionsAccessTest extends TestCase
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors('permissions.0');
+    }
+
+    public function test_user_without_permission_sees_403_page_in_spanish(): void
+    {
+        $this->actingAs($this->vendedor())
+            ->get(route('roles.index'))
+            ->assertForbidden()
+            ->assertSee('Acceso denegado')
+            ->assertSee('No tienes permisos para acceder a esta página.');
+    }
+
+    public function test_forbidden_ajax_request_returns_json_not_html(): void
+    {
+        $permission = Permission::findByName('users.view');
+
+        $this->actingAs($this->vendedor())
+            ->deleteJson(route('permissions.destroy', $permission))
+            ->assertForbidden()
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_unknown_route_shows_404_page_in_spanish(): void
+    {
+        $this->actingAs($this->admin())
+            ->get('/ruta-que-no-existe')
+            ->assertNotFound()
+            ->assertSee('404');
     }
 }

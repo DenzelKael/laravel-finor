@@ -17,7 +17,7 @@
         </a>
 
         <button type="button" class="btn btn-outline-secondary ml-2" onclick="history.back()">
-            <i class="fas fa-arrow-left mr-1"></i>
+            <i class="bi bi-arrow-left me-1"></i>
             Volver atrás
         </button>
 

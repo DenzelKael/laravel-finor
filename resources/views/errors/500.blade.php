@@ -1,25 +1,41 @@
-@extends('adminlte::page')
+<!DOCTYPE html>
+<html lang="es">
 
-@section('title', 'Error interno del servidor')
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Error interno del servidor</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            text-align: center;
+            margin-top: 15vh;
+            color: #333;
+        }
 
-@section('content')
-    <div class="text-center mt-5">
-        <h1 class="display-1 text-danger">500</h1>
+        h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: #dc3545;
+        }
 
-        <h3>Error interno del servidor</h3>
+        a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: .5rem 1rem;
+            background: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            border-radius: .25rem;
+        }
+    </style>
+</head>
 
-        <p>
-            Ha ocurrido un error inesperado.
-        </p>
+<body>
+    <h1>500</h1>
+    <h3>Error interno del servidor</h3>
+    <p>Ha ocurrido un error inesperado.</p>
+    <a href="/">Volver al inicio</a>
+</body>
 
-        <a href="{{ url('/') }}" class="btn btn-primary">
-            Volver al inicio
-        </a>
-
-        <button type="button" class="btn btn-outline-secondary ml-2" onclick="history.back()">
-            <i class="fas fa-arrow-left mr-1"></i>
-            Volver atrás
-        </button>
-
-    </div>
-@endsection
+</html>
