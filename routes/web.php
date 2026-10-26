@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserController;
@@ -51,8 +52,11 @@ Route::middleware('auth')->group(function () {
             ->name('roles.')
             ->group(function () {
                 Route::get('/', 'index')->middleware('permission:roles.view')->name('index');
+                Route::get('/create', 'create')->middleware('permission:roles.create')->name('create');
+                Route::post('/', 'store')->middleware('permission:roles.create')->name('store');
                 Route::get('/{role}/edit', 'edit')->middleware('permission:roles.update')->name('edit');
                 Route::put('/{role}', 'update')->middleware('permission:roles.update')->name('update');
+                Route::delete('/{role}', 'destroy')->middleware('permission:roles.delete')->name('destroy');
             });
 
         Route::controller(PermissionController::class)
@@ -67,6 +71,14 @@ Route::middleware('auth')->group(function () {
                 Route::delete('/{permission}', 'destroy')->middleware('permission:permissions.delete')->name('destroy');
             });
     });
+
+    Route::controller(ProfileController::class)
+        ->prefix('profile')
+        ->name('profile.')
+        ->group(function () {
+            Route::get('/', 'edit')->name('edit');
+            Route::put('/', 'update')->name('update');
+        });
 
     Route::controller(ClientController::class)
         ->prefix('clients')

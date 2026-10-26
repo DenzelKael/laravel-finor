@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PermissionRequest;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionController extends Controller
 {
@@ -30,6 +31,10 @@ class PermissionController extends Controller
             $request->validated()
         );
 
+        $permission = Permission::create($request->validated());
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         return response()->json([
             'message' => 'Permiso creado correctamente.',
             'data' => $permission,
@@ -50,6 +55,8 @@ class PermissionController extends Controller
             $request->validated()
         );
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         return response()->json([
             'message' => 'Permiso actualizado correctamente.',
         ]);
@@ -64,6 +71,8 @@ class PermissionController extends Controller
         );
 
         $permission->delete();
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         return response()->json([
             'message' => 'Permiso eliminado correctamente.',

@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class PermissionsAccessTest extends TestCase
@@ -205,5 +206,59 @@ class PermissionsAccessTest extends TestCase
             'payments create' => ['get', 'payments.create'],
             'payments store' => ['postJson', 'payments.store'],
         ];
+    }
+
+    public function test_admin_can_create_role_with_permissions(): void
+    {
+        $this->actingAs($this->admin())
+            ->postJson(route('roles.store'), [
+                'name' => 'Contador',
+                'permissions' => ['clients.view', 'payments.view'],
+            ])
+            ->assertOk();
+
+        $role = Role::findByName('Contador');
+
+        $this->assertTrue($role->hasPermissionTo('clients.view'));
+        $this->assertTrue($role->hasPermissionTo('payments.view'));
+        $this->assertFalse($role->hasPermissionTo('clients.delete'));
+    }
+
+    public function test_cannot_create_role_with_nonexistent_permission(): void
+    {
+        $this->actingAs($this->admin())
+            ->postJson(route('roles.store'), [
+                'name' => 'Contador',
+                'permissions' => ['no.existe'],
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('permissions.0');
+    }
+
+    public function test_user_without_permission_sees_403_page_in_spanish(): void
+    {
+        $this->actingAs($this->vendedor())
+            ->get(route('roles.index'))
+            ->assertForbidden()
+            ->assertSee('Acceso denegado')
+            ->assertSee('No tienes permisos para acceder a esta página.');
+    }
+
+    public function test_forbidden_ajax_request_returns_json_not_html(): void
+    {
+        $permission = Permission::findByName('users.view');
+
+        $this->actingAs($this->vendedor())
+            ->deleteJson(route('permissions.destroy', $permission))
+            ->assertForbidden()
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_unknown_route_shows_404_page_in_spanish(): void
+    {
+        $this->actingAs($this->admin())
+            ->get('/ruta-que-no-existe')
+            ->assertNotFound()
+            ->assertSee('404');
     }
 }

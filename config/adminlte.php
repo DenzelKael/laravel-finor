@@ -94,7 +94,7 @@ return [
     'usermenu_header_class' => 'text-bg-primary',
     'usermenu_image' => false,
     'usermenu_desc' => false,
-    'usermenu_profile_url' => false,
+    'usermenu_profile_url' => 'profile',
 
     /*
     |--------------------------------------------------------------------------
