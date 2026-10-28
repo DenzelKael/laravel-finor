@@ -23,6 +23,18 @@ function resolveErrorType(status) {
     return 'unknown';
 }
 
+// Un error en una descarga (responseType 'blob') llega como Blob; hay que leerlo como JSON.
+async function parseErrorBody(data) {
+    if (data instanceof Blob) {
+        try {
+            return JSON.parse(await data.text());
+        } catch {
+            return {};
+        }
+    }
+    return data;
+}
+
 const http = axios.create({
     headers: {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
@@ -32,11 +44,12 @@ const http = axios.create({
 
 http.interceptors.response.use(
     (response) => response.data,
-    (error) => {
+    async (error) => {
         if (!error.response) {
             throw new ApiError('network', 0, { message: 'No se pudo conectar con el servidor.' });
         }
-        const { status, data } = error.response;
+        const { status } = error.response;
+        const data = await parseErrorBody(error.response.data);
         throw new ApiError(resolveErrorType(status), status, data);
     }
 );
@@ -44,6 +57,10 @@ http.interceptors.response.use(
 class ApiClient {
     get(url, config = {}) {
         return http.get(url, config);
+    }
+
+    download(url, config = {}) {
+        return http.get(url, { ...config, responseType: 'blob' });
     }
 
     post(url, body, config = {}) {

@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -33,6 +32,7 @@ class DatabaseSeeder extends Seeder
         $user->assignRole('Admin');
 
         $this->call([
+            ClientSeeder::class,
             PlanSeeder::class,
             SubscriptionSeeder::class,
         ]);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,8 @@ class Payment extends Model
         'payment_method',
         'payment_date',
         'status',
+        'void_reason',
+        'voided_at',
     ];
 
     protected $casts = [
@@ -25,6 +28,7 @@ class Payment extends Model
         'payment_date' => 'date',
         'status' => PaymentStatus::class,
         'payment_method' => PaymentMethod::class,
+        'voided_at' => 'datetime',
     ];
 
     public function subscription(): BelongsTo
@@ -34,7 +38,12 @@ class Payment extends Model
 
     public function getFormattedAmountAttribute(): string
     {
-        return 'Bs ' . number_format((float) $this->amount, 2, ',', '.');
+        return 'Bs '.number_format(
+            (float) $this->amount,
+            2,
+            ',',
+            '.'
+        );
     }
 
     public function getPaymentMethodLabelAttribute(): string
@@ -49,5 +58,38 @@ class Payment extends Model
         return $this->status instanceof PaymentStatus
             ? $this->status->label()
             : (string) $this->status;
+    }
+
+    public function scopeForSubscription(
+        Builder $query,
+        int $subscriptionId
+    ): Builder {
+        return $query->where('subscription_id', $subscriptionId);
+    }
+
+    public function scopeForClient(
+        Builder $query,
+        int $clientId
+    ): Builder {
+        return $query->whereHas(
+            'subscription',
+            fn (Builder $subscriptionQuery) => $subscriptionQuery->where('client_id', $clientId)
+        );
+    }
+
+    /**
+     * Filter registered payments from the current month.
+     */
+    public function scopeTotalOfMonth(Builder $query): Builder
+    {
+        return $query
+            ->where(
+                'status',
+                PaymentStatus::Registered->value
+            )
+            ->whereBetween('payment_date', [
+                now()->startOfMonth()->toDateString(),
+                now()->endOfMonth()->toDateString(),
+            ]);
     }
 }
