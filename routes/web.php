@@ -189,3 +189,16 @@ Route::middleware('auth')->group(function () {
                 ->name('cancel');
         });
 });
+
+// AdminLTE audit log routes
+Route::middleware(['web', 'auth'])
+    ->prefix('admin')
+    ->name('adminlte.')
+    ->group(function () {
+        Route::get('activity', [
+            \App\Http\Controllers\AdminLte\ActivityController::class,
+            'index',
+        ])
+            ->middleware('permission:audit.view')
+            ->name('activity.index');
+    });

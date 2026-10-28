@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateRolePermissionsRequest;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use ColorlibHQ\AdminLte\Support\ActivityLogger;
 
 class RoleController extends Controller
 {

@@ -63,10 +63,10 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn () => 'ok');
+            ->get('/_test/gate-can', fn() => 'ok');
 
         Route::middleware(['web', 'auth', 'permission:reports.view'])
-            ->get('/_test/gate-permission', fn () => 'ok');
+            ->get('/_test/gate-permission', fn() => 'ok');
 
         $admin = $this->admin();
 
@@ -81,7 +81,7 @@ class PermissionsAccessTest extends TestCase
         Permission::create(['name' => 'reports.view']);
 
         Route::middleware(['web', 'auth', 'can:reports.view'])
-            ->get('/_test/gate-can', fn () => 'ok');
+            ->get('/_test/gate-can', fn() => 'ok');
 
         $this->actingAs($this->vendedor())
             ->get('/_test/gate-can')
@@ -164,7 +164,7 @@ class PermissionsAccessTest extends TestCase
     private function requestFor(string $class, User $user)
     {
         $request = new $class;
-        $request->setUserResolver(fn () => $user);
+        $request->setUserResolver(fn() => $user);
 
         return $request;
     }
@@ -176,7 +176,7 @@ class PermissionsAccessTest extends TestCase
 
         $this->actingAs($user)
             ->{$method}(route($routeName), [])
-            ->assertForbidden();
+                ->assertForbidden();
     }
 
     #[DataProvider('moduleRoutes')]
@@ -260,5 +260,41 @@ class PermissionsAccessTest extends TestCase
             ->get('/ruta-que-no-existe')
             ->assertNotFound()
             ->assertSee('404');
+    }
+
+    public function test_admin_can_update_role_permissions(): void
+    {
+        $role = Role::create(['name' => 'Contador']);
+
+        $this->actingAs($this->admin())
+            ->putJson(route('roles.update', $role), [
+                'permissions' => ['clients.view', 'payments.view'],
+            ])
+            ->assertOk();
+
+        $this->assertTrue($role->fresh()->hasPermissionTo('clients.view'));
+        $this->assertTrue($role->fresh()->hasPermissionTo('payments.view'));
+    }
+
+    public function test_admin_can_remove_all_permissions_from_role(): void
+    {
+        $role = Role::findByName('Vendedor');
+
+        $this->actingAs($this->admin())
+            ->putJson(route('roles.update', $role), ['permissions' => []])
+            ->assertOk();
+
+        $this->assertCount(0, $role->fresh()->permissions);
+    }
+
+    public function test_syncing_role_permissions_is_audited(): void
+    {
+        $role = Role::create(['name' => 'Contador']);
+
+        $this->actingAs($this->admin())
+            ->putJson(route('roles.update', $role), ['permissions' => ['clients.view']])
+            ->assertOk();
+
+        $this->assertDatabaseHas('activity_log', ['event' => 'permission.attached']);
     }
 }

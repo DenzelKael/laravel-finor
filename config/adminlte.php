@@ -124,7 +124,7 @@ return [
     |
     */
 
-    'footer_left' => 'Copyright &copy; 2014-'.date('Y').' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
+    'footer_left' => 'Copyright &copy; 2014-' . date('Y') . ' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
     'footer_right' => 'Anything you want',
     'preloader' => false,
     'control_sidebar' => false,
@@ -273,6 +273,12 @@ return [
                     'url' => 'admin/permissions',
                     'icon' => 'bi bi-key-fill',
                     'can' => 'permissions.view',
+                ],
+                [
+                    'text' => 'Auditoría',
+                    'url' => 'admin/activity',
+                    'icon' => 'bi bi-clipboard-data',
+                    'can' => 'audit.view',
                 ],
             ],
         ],
