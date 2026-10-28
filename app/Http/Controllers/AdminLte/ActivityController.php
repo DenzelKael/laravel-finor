@@ -19,9 +19,9 @@ class ActivityController extends Controller
         ]);
 
         $activities = Activity::with('user')
-            ->when($filters['user_id'] ?? null, fn($q, $id) => $q->where('user_id', $id))
-            ->when($filters['from'] ?? null, fn($q, $d) => $q->whereDate('created_at', '>=', $d))
-            ->when($filters['to'] ?? null, fn($q, $d) => $q->whereDate('created_at', '<=', $d))
+            ->when($filters['user_id'] ?? null, fn ($q, $id) => $q->where('user_id', $id))
+            ->when($filters['from'] ?? null, fn ($q, $d) => $q->whereDate('created_at', '>=', $d))
+            ->when($filters['to'] ?? null, fn ($q, $d) => $q->whereDate('created_at', '<=', $d))
             ->latest('created_at')
             ->paginate(30)
             ->withQueryString();

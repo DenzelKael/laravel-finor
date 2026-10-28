@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Observers\PermissionObserver;
 use App\Observers\RoleObserver;
 use App\Policies\PaymentPolicy;
+use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -28,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrapFive();
 
-        \Carbon\Carbon::setLocale('es');
+        Carbon::setLocale('es');
 
         Gate::policy(Payment::class, PaymentPolicy::class);
 
