@@ -251,6 +251,15 @@ return [
             'can' => 'payments.view',
         ],
 
+        ['header' => 'REPORTES'],
+        [
+            'text' => 'Suscripciones por vencer',
+            'route' => 'reports.subscriptions.expiring',
+            'icon' => 'bi bi-calendar-event',
+            'active' => ['reports/expiring-subscriptions*'],
+            'can' => 'subscriptions.view',
+        ],
+
         ['header' => 'SISTEMA'],
         [
             'text' => 'Configuración',

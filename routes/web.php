@@ -13,6 +13,7 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -187,5 +188,15 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{subscription}/cancel', 'cancel')
                 ->middleware('permission:subscriptions.delete')
                 ->name('cancel');
+        });
+
+    // Reportes (Equipo G)
+    Route::controller(SubscriptionReportController::class)
+        ->prefix('reports')
+        ->name('reports.')
+        ->group(function () {
+            Route::get('/expiring-subscriptions', 'expiringSubscriptions')
+                ->middleware('permission:subscriptions.view')
+                ->name('subscriptions.expiring');
         });
 });
