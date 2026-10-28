@@ -14,7 +14,7 @@ class RoleObserver
 
     public function updated(Role $role): void
     {
-        if (!$role->wasChanged('name')) {
+        if (! $role->wasChanged('name')) {
             return;
         }
 

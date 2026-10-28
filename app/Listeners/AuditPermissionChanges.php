@@ -50,7 +50,7 @@ class AuditPermissionChanges
             "permission.{$action}",
             $model,
             ['permissions' => $names],
-            "Permisos {$verb} a «{$target}»: " . implode(', ', $names)
+            "Permisos {$verb} a «{$target}»: ".implode(', ', $names)
         );
     }
 
@@ -69,7 +69,7 @@ class AuditPermissionChanges
             "role.{$action}",
             $model,
             ['roles' => $names],
-            "Roles {$verb} a «{$target}»: " . implode(', ', $names)
+            "Roles {$verb} a «{$target}»: ".implode(', ', $names)
         );
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLte\ActivityController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -196,7 +197,7 @@ Route::middleware(['web', 'auth'])
     ->name('adminlte.')
     ->group(function () {
         Route::get('activity', [
-            \App\Http\Controllers\AdminLte\ActivityController::class,
+            ActivityController::class,
             'index',
         ])
             ->middleware('permission:audit.view')

@@ -14,7 +14,7 @@ class PermissionObserver
 
     public function updated(Permission $permission): void
     {
-        if (!$permission->wasChanged('name')) {
+        if (! $permission->wasChanged('name')) {
             return;
         }
 

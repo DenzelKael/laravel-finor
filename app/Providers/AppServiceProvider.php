@@ -5,12 +5,12 @@ namespace App\Providers;
 use App\Enums\RoleName;
 use App\Models\Payment;
 use App\Models\User;
+use App\Observers\PermissionObserver;
+use App\Observers\RoleObserver;
 use App\Policies\PaymentPolicy;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use App\Observers\PermissionObserver;
-use App\Observers\RoleObserver;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
