@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Client extends Model
 {
-    public const STATUS_ACTIVE = 'activo';
     use HasFactory;
 
     protected $fillable = [
