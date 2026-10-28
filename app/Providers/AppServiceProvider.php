@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrapFive();
 
+        \Carbon\Carbon::setLocale('es');
+
         Gate::policy(Payment::class, PaymentPolicy::class);
 
         Gate::before(function (User $user) {
