@@ -148,7 +148,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-
     Route::post('logout', [LoginController::class, 'logout'])
         ->name('logout');
     // Rutas explícitas de Suscripciones (Equipo D)
