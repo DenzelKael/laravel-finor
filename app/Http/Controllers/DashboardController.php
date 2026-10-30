@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClientStatus;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -11,14 +12,17 @@ class DashboardController extends Controller
         try {
             // Requerimiento: Query Builder
             // Intenta consultar la base de datos real
-            $clientesActivos = DB::table('clients')->where('status', 'activo')->count();
+            $clientesActivos = DB::table('clients')->where('status', ClientStatus::Active->value)->count();
 
             $ingresosMes = DB::table('payments')
                 ->whereMonth('created_at', now()->month)
                 ->sum('amount');
 
             $suscripcionesPorVencer = DB::table('subscriptions')
-                ->whereBetween('end_date', [now(), now()->addDays(7)])
+                ->whereBetween('expiration_date', [
+                    today(),
+                    today()->addDays(7),
+                ])
                 ->count();
 
         } catch (\Exception $e) {
