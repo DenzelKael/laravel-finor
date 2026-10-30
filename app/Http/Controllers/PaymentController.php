@@ -34,9 +34,9 @@ class PaymentController extends Controller
     public function create(): View
     {
         $this->authorize('create', Payment::class);
-$subscriptions = Subscription::active()
-    ->with(['client', 'plan'])
-    ->get();
+        $subscriptions = Subscription::active()
+            ->with(['client', 'plan'])
+            ->get();
 
         return view('payments.create', compact('subscriptions'));
     }
@@ -188,7 +188,7 @@ $subscriptions = Subscription::active()
         )->setPaper('a4');
 
         return $pdf->download(
-            'recibo-pago-' . $payment->id . '.pdf'
+            'recibo-pago-'.$payment->id.'.pdf'
         );
     }
 }

@@ -35,9 +35,9 @@ class PaymentPolicy
     /**
      * Determine whether the user can cancel a payment.
      */
-public function cancel(User $user, Payment $payment): bool
-{
-    return $user->can('payments.cancel')
-        && $payment->status !== PaymentStatus::Voided;
-}
+    public function cancel(User $user, Payment $payment): bool
+    {
+        return $user->can('payments.cancel')
+            && $payment->status !== PaymentStatus::Voided;
+    }
 }

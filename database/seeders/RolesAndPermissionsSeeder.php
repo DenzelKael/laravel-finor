@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -13,6 +14,7 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         // Roles
         $admin = Role::firstOrCreate([
@@ -40,36 +42,43 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'permissions.update']);
         Permission::firstOrCreate(['name' => 'permissions.delete']);
 
+        // Clients
+        Permission::firstOrCreate(['name' => 'clients.view']);
+        Permission::firstOrCreate(['name' => 'clients.create']);
+        Permission::firstOrCreate(['name' => 'clients.update']);
+        Permission::firstOrCreate(['name' => 'clients.delete']);
+
+        // Plans
+        Permission::firstOrCreate(['name' => 'plans.view']);
+        Permission::firstOrCreate(['name' => 'plans.create']);
+        Permission::firstOrCreate(['name' => 'plans.update']);
+        Permission::firstOrCreate(['name' => 'plans.delete']);
+
+        // Payments
+        Permission::firstOrCreate(['name' => 'payments.view']);
+        Permission::firstOrCreate(['name' => 'payments.create']);
+        Permission::firstOrCreate(['name' => 'payments.cancel']);
+
         // Subscriptions
         Permission::firstOrCreate(['name' => 'subscriptions.view']);
         Permission::firstOrCreate(['name' => 'subscriptions.create']);
         Permission::firstOrCreate(['name' => 'subscriptions.update']);
         Permission::firstOrCreate(['name' => 'subscriptions.delete']);
 
-        $admin->syncPermissions([
-            'users.view',
-            'users.create',
-            'users.update',
-            'users.delete',
-
-            'roles.view',
-            'roles.create',
-            'roles.update',
-            'roles.delete',
-
-            'permissions.view',
-            'permissions.create',
-            'permissions.update',
-            'permissions.delete',
-
-            'subscriptions.view',
-            'subscriptions.create',
-            'subscriptions.update',
-            'subscriptions.delete',
-        ]);
+        $admin->syncPermissions(Permission::all());
 
         $vendedor->syncPermissions([
             'users.view',
+
+            'clients.view',
+            'clients.create',
+            'clients.update',
+
+            'plans.view',
+
+            'payments.view',
+            'payments.create',
+
             'subscriptions.view',
         ]);
     }

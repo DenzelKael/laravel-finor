@@ -12,7 +12,7 @@ class UpdateRolePermissionsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('roles.update') ?? false;
     }
 
     /**
@@ -23,6 +23,13 @@ class UpdateRolePermissionsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:roles,name',
+            ],
+
             'permissions' => [
                 'nullable',
                 'array',
@@ -34,9 +41,13 @@ class UpdateRolePermissionsRequest extends FormRequest
         ];
 
     }
+
     public function messages(): array
     {
         return [
+            'name.required' => 'El nombre del rol es obligatorio.',
+            'name.unique' => 'Ya existe un rol con ese nombre.',
+            'name.max' => 'El nombre no puede pasar de 50 caracteres.',
             'permissions.array' => 'Los permisos deben enviarse correctamente.',
             'permissions.*.exists' => 'Uno de los permisos no existe.',
         ];

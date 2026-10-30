@@ -29,7 +29,9 @@
 
     <div class="card-body table-responsive p-0">
         <table id="clients-table" class="table table-bordered table-hover"
-               data-base-url="{{ route('clients.index', [], false) }}">
+               data-base-url="{{ route('clients.index', [], false) }}"
+               data-can-update="@json(auth()->user()->can('clients.update'))"
+               data-can-delete="@json(auth()->user()->can('clients.delete'))">
             <thead>
                 <tr>
                     <th>#</th>

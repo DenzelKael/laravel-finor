@@ -2,6 +2,8 @@ import api, { ApiError } from '../commons/api-client.js';
 import SwalMessages from '../commons/swal-messages.js';
 
 const clientsTable = document.getElementById('clients-table');
+const canUpdate = clientsTable?.dataset.canUpdate === 'true';
+const canDelete = clientsTable?.dataset.canDelete === 'true';
 const tableBody = document.getElementById('clients-table-body');
 const baseUrl = clientsTable?.dataset.baseUrl;
 const searchInput = document.getElementById('client-search');
@@ -63,7 +65,17 @@ function buildRow(client) {
     withIcon(del, 'fas fa-trash', 'Eliminar');
 
     const actionsTd = document.createElement('td');
-    actionsTd.append(view, ' ', edit, ' ', del);
+
+    actionsTd.append(view);
+
+    if (canUpdate) {
+        actionsTd.append(' ', edit);
+    }
+
+    if (canDelete) {
+        actionsTd.append(' ', del);
+    }
+
 
     tr.append(
         textCell(client.id),

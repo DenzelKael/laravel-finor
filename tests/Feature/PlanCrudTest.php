@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,7 +22,17 @@ class PlanCrudTest extends TestCase
 
     protected function authUser(): User
     {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
         $user = User::factory()->create();
+
+        $user->givePermissionTo([
+            'plans.view',
+            'plans.create',
+            'plans.update',
+            'plans.delete',
+        ]);
+
         $this->actingAs($user);
 
         return $user;

@@ -29,14 +29,11 @@ class VoidPaymentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'void_reason.required' =>
-                'Debe indicar el motivo de la anulación.',
+            'void_reason.required' => 'Debe indicar el motivo de la anulación.',
 
-            'void_reason.string' =>
-                'El motivo de la anulación debe ser un texto válido.',
+            'void_reason.string' => 'El motivo de la anulación debe ser un texto válido.',
 
-            'void_reason.max' =>
-                'El motivo de la anulación no puede superar los 255 caracteres.',
+            'void_reason.max' => 'El motivo de la anulación no puede superar los 255 caracteres.',
         ];
     }
 

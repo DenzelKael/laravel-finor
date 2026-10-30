@@ -1,7 +1,7 @@
 <?php
 
+use App\Menu\Filters\SubmenuGateFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\ActiveFilter;
-use ColorlibHQ\AdminLte\Menu\Filters\GateFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\HrefFilter;
 use ColorlibHQ\AdminLte\Menu\Filters\SearchFilter;
 
@@ -94,7 +94,7 @@ return [
     'usermenu_header_class' => 'text-bg-primary',
     'usermenu_image' => false,
     'usermenu_desc' => false,
-    'usermenu_profile_url' => false,
+    'usermenu_profile_url' => 'profile',
 
     /*
     |--------------------------------------------------------------------------
@@ -124,7 +124,7 @@ return [
     |
     */
 
-    'footer_left' => 'Copyright &copy; 2014-' . date('Y') . ' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
+    'footer_left' => 'Copyright &copy; 2014-'.date('Y').' <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>. All rights reserved.',
     'footer_right' => 'Anything you want',
     'preloader' => false,
     'control_sidebar' => false,
@@ -133,17 +133,17 @@ return [
     // Documentation URL used by the navbar "Documentation" link and the sidebar
     // "View documentation" CTA (false to hide the CTA). Defaults to the in-app
     // docs viewer served at /docs (see the `docs` keys below).
-    'sidebar_docs_url' => '/docs',
+    'sidebar_docs_url' => false,
 
     // Bundled demo/showcase pages (Dashboard v2/v3, Widgets, UI, Forms, Tables,
     // Layout Options, Theme Generate, auth variants, error pages). Set false to
     // skip registering their routes in production.
-    'demo' => true,
+    'demo' => false,
     'demo_middleware' => ['web', 'auth'],
 
     // In-app documentation viewer: renders this package's docs/*.md files at
     // /docs and /docs/{page}. Set 'docs' => false to disable the route.
-    'docs' => true,
+    'docs' => false,
     'docs_middleware' => ['web'],
 
     'sidebar_breakpoint' => 'lg',     // sidebar-expand-{breakpoint}
@@ -217,7 +217,7 @@ return [
     'menu' => [
         [
             'text' => 'Dashboard',
-            'url' => '/',
+            'url' => 'admin',
             'icon' => 'bi bi-speedometer',
         ],
 
@@ -226,25 +226,29 @@ return [
             'text' => 'Clientes',
             'url' => 'clients',
             'icon' => 'bi bi-people',
-            'active' => ['clients*'],
+            'active' => ['admin/clients*'],
+            'can' => 'clients.view',
         ],
         [
-            'text'    => 'Planes',
-            'url'     => 'plans',
-            'icon'    => 'bi bi-list-check',
-            'active'  => ['plans*'],
+            'text' => 'Planes',
+            'url' => 'plans',
+            'icon' => 'bi bi-list-check',
+            'active' => ['admin/plans*'],
+            'can' => 'plans.view',
         ],
         [
-            'text'    => 'Suscripciones',
-            'url'     => 'subscriptions',
-            'icon'    => 'bi bi-arrow-repeat',
-            'active'  => ['subscriptions*'],
+            'text' => 'Suscripciones',
+            'url' => 'payments',
+            'icon' => 'bi bi-arrow-repeat',
+            'active' => ['admin/subscriptions*'],
+            'can' => 'subscriptions.view',
         ],
         [
-            'text'    => 'Pagos',
-            'url'     => 'payments',
-            'icon'    => 'bi bi-cash-stack',
-            'active'  => ['payments*'],
+            'text' => 'Pagos',
+            'url' => 'payments',
+            'icon' => 'bi bi-cash-stack',
+            'active' => ['admin/payments*'],
+            'can' => 'payments.view',
         ],
 
         ['header' => 'SISTEMA'],
@@ -272,7 +276,6 @@ return [
                 ],
             ],
         ],
-
     ],
 
     /*
@@ -287,7 +290,7 @@ return [
     */
 
     'filters' => [
-        GateFilter::class,
+        SubmenuGateFilter::class,
         HrefFilter::class,
         ActiveFilter::class,
         SearchFilter::class,
