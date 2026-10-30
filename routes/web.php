@@ -148,8 +148,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/api/chart-data', [DashboardController::class, 'chartData'])
-        ->middleware('permission:payments.view');
 
     Route::post('logout', [LoginController::class, 'logout'])
         ->name('logout');
