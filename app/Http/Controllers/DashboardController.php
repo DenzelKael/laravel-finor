@@ -18,11 +18,8 @@ class DashboardController extends Controller
 
         $ingresosMes = (float) Payment::totalOfMonth()->sum('amount');
 
-        $suscripcionesPorVencer = Subscription::active()
-            ->whereBetween('expiration_date', [
-                today()->toDateString(),
-                today()->addDays(7)->toDateString(),
-            ])
+       $suscripcionesPorVencer = Subscription::active()
+            ->where('expiration_date', '<', today()->addDays(8)->toDateString())
             ->count();
 
         return view('dashboard.index', compact('clientesActivos', 'ingresosMes', 'suscripcionesPorVencer'));
