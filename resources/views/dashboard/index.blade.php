@@ -18,18 +18,18 @@
                 <div class="icon"><i class="fas fa-users"></i></div>
             </div>
         </div>
-        
+
         <!-- Monthly Revenue Card -->
         <div class="col-lg-4 col-6">
             <div class="small-box bg-success">
                 <div class="inner">
-                    <h3>${{ number_format($ingresosMes, 2) }}</h3>
+                    <h3>Bs {{ number_format($ingresosMes, 2, ',','.') }}</h3>
                     <p>Monthly Revenue</p>
                 </div>
-                <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="icon"><i class="fas fa-coins"></i></div>
             </div>
         </div>
-        
+
         <!-- Expiring Subscriptions Card -->
         <div class="col-lg-4 col-6">
             <div class="small-box bg-warning">
@@ -68,11 +68,11 @@
                 .then(data => {
                     const ctx = document.getElementById('mainChart').getContext('2d');
                     new Chart(ctx, {
-                        type: 'line', 
+                        type: 'line',
                         data: {
                             labels: data.labels,
                             datasets: [{
-                                label: 'Revenue ($)',
+                                label: 'Revenue (Bs)',
                                 data: data.data,
                                 backgroundColor: 'rgba(60,141,188,0.2)',
                                 borderColor: 'rgba(60,141,188,1)',

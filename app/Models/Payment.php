@@ -82,14 +82,10 @@ class Payment extends Model
      */
     public function scopeTotalOfMonth(Builder $query): Builder
     {
+
         return $query
-            ->where(
-                'status',
-                PaymentStatus::Registered->value
-            )
-            ->whereBetween('payment_date', [
-                now()->startOfMonth()->toDateString(),
-                now()->endOfMonth()->toDateString(),
-            ]);
+            ->where('status', PaymentStatus::Registered->value)
+            ->where('payment_date', '>=', now()->startOfMonth()->toDateString())
+            ->where('payment_date', '<', now()->startOfMonth()->addMonth()->toDateString());
     }
 }
