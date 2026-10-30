@@ -2,31 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Client;
+use App\Models\Payment;
+use App\Models\Subscription;
 
 class DashboardController extends Controller
 {
-    public function index()
+   public function index()
     {
-        try {
-            // Requerimiento: Query Builder
-            // Intenta consultar la base de datos real
-            $clientesActivos = DB::table('clients')->where('status', 'activo')->count();
 
-            $ingresosMes = DB::table('payments')
-                ->whereMonth('created_at', now()->month)
-                ->sum('amount');
+        $clientesActivos = Client::whereHas(
+            'subscriptions',
+            fn ($q) => $q->active()
+        )->count();
 
-            $suscripcionesPorVencer = DB::table('subscriptions')
-                ->whereBetween('end_date', [now(), now()->addDays(7)])
-                ->count();
+        $ingresosMes = (float) Payment::totalOfMonth()->sum('amount');
 
-        } catch (\Exception $e) {
-            // Si las tablas de los otros equipos aún no existen, usamos datos de prueba para no bloquear el diseño
-            $clientesActivos = 124;
-            $ingresosMes = 3580.50;
-            $suscripcionesPorVencer = 8;
-        }
+       $suscripcionesPorVencer = Subscription::active()
+            ->where('expiration_date', '<', today()->addDays(8)->toDateString())
+            ->count();
 
         return view('dashboard.index', compact('clientesActivos', 'ingresosMes', 'suscripcionesPorVencer'));
     }
