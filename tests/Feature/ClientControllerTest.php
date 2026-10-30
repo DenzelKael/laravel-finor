@@ -88,7 +88,7 @@ class ClientControllerTest extends TestCase
 
         $response = $this->deleteJson(route('clients.destroy', $client));
 
-        $response->assertStatus(200);
+        $response->assertNoContent();
         $this->assertDatabaseMissing('clients', ['id' => $client->id]);
     }
 

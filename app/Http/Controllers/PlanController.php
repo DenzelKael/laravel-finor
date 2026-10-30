@@ -7,15 +7,21 @@ use App\Http\Resources\PlanResource;
 use App\Models\Plan;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class PlanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index(Request $request)
     {
         $plans = Plan::latest()->paginate(10);
+
+        if ($request->expectsJson()) {
+            return PlanResource::collection($plans);
+        }
 
         return view('plans.index', compact('plans'));
     }
@@ -28,6 +34,11 @@ class PlanController extends Controller
         $plan = new Plan;
 
         return view('plans.create', compact('plan'));
+    }
+
+    public function show(Plan $plan): PlanResource
+    {
+        return new PlanResource($plan);
     }
 
     /**
@@ -67,7 +78,7 @@ class PlanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Plan $plan): JsonResponse
+    public function destroy(Plan $plan): JsonResponse|Response
     {
         if ($plan->subscriptions()->exists()) {
             return response()->json([
@@ -77,8 +88,6 @@ class PlanController extends Controller
 
         $plan->delete();
 
-        return response()->json([
-            'message' => 'Plan eliminado correctamente.',
-        ]);
+        return response()->noContent();
     }
 }

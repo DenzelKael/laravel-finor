@@ -6,6 +6,7 @@ use App\Http\Requests\ClientIndexRequest;
 use App\Http\Requests\ClientRequest;
 use App\Http\Resources\ClientResource;
 use App\Models\Client;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ClientController extends Controller
@@ -39,8 +40,12 @@ class ClientController extends Controller
             ->setStatusCode(201);
     }
 
-    public function show(Client $client)
+    public function show(Request $request, Client $client)
     {
+        if ($request->expectsJson()) {
+            return new ClientResource($client);
+        }
+
         $client->load(['subscriptions.plan', 'subscriptions.payments']);
         $payments = $client->subscriptions->flatMap->payments->sortByDesc('payment_date');
 
@@ -72,10 +77,7 @@ class ClientController extends Controller
 
         $client->delete();
 
-        return response()->json([
-            'data' => null,
-            'message' => 'Cliente eliminado exitosamente.',
-        ]);
+        return response()->noContent();
     }
 
     public function export(ClientIndexRequest $request): StreamedResponse
