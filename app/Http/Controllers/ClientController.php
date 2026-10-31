@@ -72,10 +72,7 @@ class ClientController extends Controller
 
         $client->delete();
 
-        return response()->json([
-            'data' => null,
-            'message' => 'Cliente eliminado exitosamente.',
-        ]);
+        return response()->noContent();
     }
 
     public function export(ClientIndexRequest $request): StreamedResponse

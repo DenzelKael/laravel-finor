@@ -146,7 +146,7 @@ class PlanCrudTest extends TestCase
 
         $response = $this->deleteJson(route('plans.destroy', $plan));
 
-        $response->assertOk();
+        $response->assertNoContent();
         $this->assertDatabaseMissing('plans', ['id' => $plan->id]);
     }
 
