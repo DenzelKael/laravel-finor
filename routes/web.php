@@ -148,9 +148,10 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/api/chart-data', [DashboardController::class, 'chartData'])
-        ->middleware('permission:payments.view');
+        ->name('dashboard.chart');
 
     Route::post('logout', [LoginController::class, 'logout'])
         ->name('logout');

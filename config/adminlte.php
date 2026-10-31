@@ -217,7 +217,7 @@ return [
     'menu' => [
         [
             'text' => 'Dashboard',
-            'url' => 'admin',
+            'route' => 'dashboard',
             'icon' => 'bi bi-speedometer',
         ],
 
