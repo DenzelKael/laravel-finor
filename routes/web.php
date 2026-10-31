@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLte\ActivityController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -189,3 +190,16 @@ Route::middleware('auth')->group(function () {
                 ->name('cancel');
         });
 });
+
+// AdminLTE audit log routes
+Route::middleware(['web', 'auth'])
+    ->prefix('admin')
+    ->name('adminlte.')
+    ->group(function () {
+        Route::get('activity', [
+            ActivityController::class,
+            'index',
+        ])
+            ->middleware('permission:audit.view')
+            ->name('activity.index');
+    });

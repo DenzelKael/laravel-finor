@@ -5,10 +5,15 @@ namespace App\Providers;
 use App\Enums\RoleName;
 use App\Models\Payment;
 use App\Models\User;
+use App\Observers\PermissionObserver;
+use App\Observers\RoleObserver;
 use App\Policies\PaymentPolicy;
+use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +24,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Role::observe(RoleObserver::class);
+        Permission::observe(PermissionObserver::class);
+
         Paginator::useBootstrapFive();
+
+        Carbon::setLocale('es');
 
         Gate::policy(Payment::class, PaymentPolicy::class);
 

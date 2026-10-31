@@ -27,10 +27,6 @@ class PermissionController extends Controller
 
     public function store(PermissionRequest $request)
     {
-        $permission = Permission::create(
-            $request->validated()
-        );
-
         $permission = Permission::create($request->validated());
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

@@ -261,4 +261,40 @@ class PermissionsAccessTest extends TestCase
             ->assertNotFound()
             ->assertSee('404');
     }
+
+    public function test_admin_can_update_role_permissions(): void
+    {
+        $role = Role::create(['name' => 'Contador']);
+
+        $this->actingAs($this->admin())
+            ->putJson(route('roles.update', $role), [
+                'permissions' => ['clients.view', 'payments.view'],
+            ])
+            ->assertOk();
+
+        $this->assertTrue($role->fresh()->hasPermissionTo('clients.view'));
+        $this->assertTrue($role->fresh()->hasPermissionTo('payments.view'));
+    }
+
+    public function test_admin_can_remove_all_permissions_from_role(): void
+    {
+        $role = Role::findByName('Vendedor');
+
+        $this->actingAs($this->admin())
+            ->putJson(route('roles.update', $role), ['permissions' => []])
+            ->assertOk();
+
+        $this->assertCount(0, $role->fresh()->permissions);
+    }
+
+    public function test_syncing_role_permissions_is_audited(): void
+    {
+        $role = Role::create(['name' => 'Contador']);
+
+        $this->actingAs($this->admin())
+            ->putJson(route('roles.update', $role), ['permissions' => ['clients.view']])
+            ->assertOk();
+
+        $this->assertDatabaseHas('activity_log', ['event' => 'permission.attached']);
+    }
 }

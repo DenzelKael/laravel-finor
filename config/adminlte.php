@@ -274,6 +274,12 @@ return [
                     'icon' => 'bi bi-key-fill',
                     'can' => 'permissions.view',
                 ],
+                [
+                    'text' => 'Auditoría',
+                    'url' => 'admin/activity',
+                    'icon' => 'bi bi-clipboard-data',
+                    'can' => 'audit.view',
+                ],
             ],
         ],
     ],
