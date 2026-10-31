@@ -26,6 +26,11 @@
         'permission.deleted' => 'Permiso eliminado',
         'permission.attached' => 'Permisos asignados',
         'permission.detached' => 'Permisos quitados',
+        'payment.created' => 'Pago registrado',
+        'payment.voided' => 'Pago anulado',
+        'subscription.created' => 'Suscripción creada',
+        'subscription.cancelled' => 'Suscripción cancelada',
+        'subscription.renewed' => 'Suscripción renovada',
     ];
 @endphp
 

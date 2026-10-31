@@ -2,10 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Enums\PaymentStatus;
 use App\Enums\RoleName;
+use App\Enums\SubscriptionStatus;
 use App\Http\Requests\PermissionRequest;
 use App\Http\Requests\UpdateRolePermissionsRequest;
 use App\Http\Requests\UpdateUserRoleRequest;
+use App\Models\Payment;
+use App\Models\Subscription;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -296,5 +300,48 @@ class PermissionsAccessTest extends TestCase
             ->assertOk();
 
         $this->assertDatabaseHas('activity_log', ['event' => 'permission.attached']);
+    }
+
+    public function test_registering_and_voiding_a_payment_is_audited(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleName::Admin->value);
+        $this->actingAs($admin);
+
+        $payment = Payment::factory()->create();
+
+        $this->assertDatabaseHas('activity_log', [
+            'event' => 'payment.created',
+            'subject_id' => $payment->id,
+            'user_id' => $admin->id,
+        ]);
+
+        $payment->update([
+            'status' => PaymentStatus::Voided,
+            'void_reason' => 'Error de monto',
+            'voided_at' => now(),
+        ]);
+
+        $this->assertDatabaseHas('activity_log', [
+            'event' => 'payment.voided',
+            'subject_id' => $payment->id,
+        ]);
+    }
+
+    public function test_cancelling_a_subscription_is_audited(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleName::Admin->value);
+        $this->actingAs($admin);
+
+        $subscription = Subscription::factory()->create();
+
+        $subscription->update(['status' => SubscriptionStatus::Cancelled]); // ajusta el caso
+
+        $this->assertDatabaseHas('activity_log', [
+            'event' => 'subscription.cancelled',
+            'subject_id' => $subscription->id,
+            'user_id' => $admin->id,
+        ]);
     }
 }
