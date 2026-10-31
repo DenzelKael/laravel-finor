@@ -67,6 +67,13 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 # <h1>php artisan migrate</h1>
 # <h1>composer run dev</h1>
 
+## Documentación del Proyecto
+
+- 📖 **[Manual de Usuario](docs/manual-usuario.md)**: Guía detallada de uso por rol (Administrador y Vendedor) para todos los módulos del sistema.
+- 🗄️ **[Diagrama Entidad-Relación (ER)](docs/diagrama-er.md)**: Especificación técnica del modelo relacional en Mermaid a partir de las migraciones finales.
+- 📊 **[Diagrama de Clases](docs/diagrama_clases.md)**: Modelado de clases del dominio y servicios en Mermaid.
+- 🛡️ **[Catálogo de Permisos](docs/permissions.md)**: Matriz de permisos granulares por módulo (`modulo.accion`).
+
 ## Cómo reutilizar ApiClient, BaseForm y SwalMessages
 
 ### ApiClient (`resources/js/commons/api-client.js`)
