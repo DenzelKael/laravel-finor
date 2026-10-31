@@ -75,4 +75,16 @@ class SubscriptionFactory extends Factory
             'status' => SubscriptionStatus::Cancelled->value,
         ]);
     }
+
+    /**
+     * Indicate that the subscription is expiring in a specific number of days.
+     */
+    public function expiringInDays(int $days): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => SubscriptionStatus::Active->value,
+            'start_date' => today()->subDays(30),
+            'expiration_date' => today()->addDays($days),
+        ]);
+    }
 }
