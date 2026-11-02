@@ -238,7 +238,7 @@ return [
         ],
         [
             'text' => 'Suscripciones',
-            'url' => 'payments',
+            'url' => 'subscriptions',
             'icon' => 'bi bi-arrow-repeat',
             'active' => ['admin/subscriptions*'],
             'can' => 'subscriptions.view',

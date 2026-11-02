@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use App\Enums\RoleName;
 use App\Models\Payment;
+use App\Models\Subscription;
 use App\Models\User;
+use App\Observers\PaymentObserver;
 use App\Observers\PermissionObserver;
 use App\Observers\RoleObserver;
+use App\Observers\SubscriptionObserver;
 use App\Policies\PaymentPolicy;
 use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
@@ -26,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Role::observe(RoleObserver::class);
         Permission::observe(PermissionObserver::class);
+        Payment::observe(PaymentObserver::class);
+        Subscription::observe(SubscriptionObserver::class);
 
         Paginator::useBootstrapFive();
 
