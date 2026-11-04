@@ -23,7 +23,7 @@ class DashboardStats
             ->sum('amount');
     }
 
-    public function getExpiringSubscriptions(int $days = 7): int
+    public function getExpiringSubscriptions(int $days = 15): int
     {
         return Subscription::query()
             ->where('status', SubscriptionStatus::Active->value)

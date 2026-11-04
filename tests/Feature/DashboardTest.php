@@ -76,7 +76,7 @@ class DashboardTest extends TestCase
             ->assertOk()
             ->assertViewHas('activeClients', 6)
             ->assertViewHas('monthlyRevenue', 350.5)
-            ->assertViewHas('expiringSubscriptions', 4);
+            ->assertViewHas('expiringSubscriptions', 5);
     }
 
     public function test_active_client_is_counted_once_even_with_several_current_subscriptions(): void
