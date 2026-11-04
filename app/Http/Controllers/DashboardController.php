@@ -2,37 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
-use App\Models\Payment;
-use App\Models\Subscription;
+use App\Services\DashboardStats;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-   public function index()
+    public function __construct(private DashboardStats $stats) {}
+
+    public function index(): View
     {
+        $activeClients = $this->stats->getActiveClients();
+        $monthlyRevenue = $this->stats->getMonthlyRevenue();
+        $expiringSubscriptions = $this->stats->getExpiringSubscriptions();
 
-        $clientesActivos = Client::whereHas(
-            'subscriptions',
-            fn ($q) => $q->active()
-        )->count();
-
-        $ingresosMes = (float) Payment::totalOfMonth()->sum('amount');
-
-       $suscripcionesPorVencer = Subscription::active()
-            ->where('expiration_date', '<', today()->addDays(8)->toDateString())
-            ->count();
-
-        return view('dashboard.index', compact('clientesActivos', 'ingresosMes', 'suscripcionesPorVencer'));
+        return view('dashboard.index', compact(
+            'activeClients',
+            'monthlyRevenue',
+            'expiringSubscriptions'
+        ));
     }
 
-    public function chartData()
+    public function chartData(): JsonResponse
     {
-        // Endpoint para DOM/Fetch y Chart.js
-        $datos = [
-            'labels' => ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-            'data' => [150, 300, 250, 400],
-        ];
-
-        return response()->json($datos);
+        return response()->json($this->stats->getChartData());
     }
 }

@@ -150,8 +150,8 @@ async function deleteClient(id, url) {
     if (!confirmed) return;
 
     try {
-        const data = await api.delete(url);
-        SwalMessages.success(data.message);
+        await api.delete(url);
+        SwalMessages.success('Cliente eliminado exitosamente.');
         await loadClients();
     } catch (error) {
         if (!(error instanceof ApiError)) throw error;

@@ -26,9 +26,7 @@ class DashboardTest extends TestCase
     {
         parent::setUp();
 
-
         $this->travelTo(Carbon::parse('2026-10-15 10:00:00'));
-
 
         $this->actingAs(User::factory()->create());
 
@@ -43,7 +41,6 @@ class DashboardTest extends TestCase
         $this->seedSubscriptions();
         $this->seedPayments();
     }
-
 
     private function seedSubscriptions(): void
     {
@@ -77,15 +74,15 @@ class DashboardTest extends TestCase
     {
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertViewHas('clientesActivos', 6)
-            ->assertViewHas('ingresosMes', 350.5)
-            ->assertViewHas('suscripcionesPorVencer', 4);
+            ->assertViewHas('activeClients', 6)
+            ->assertViewHas('monthlyRevenue', 350.5)
+            ->assertViewHas('expiringSubscriptions', 4);
     }
 
     public function test_active_client_is_counted_once_even_with_several_current_subscriptions(): void
     {
 
-        $this->get(route('dashboard'))->assertViewHas('clientesActivos', 6);
+        $this->get(route('dashboard'))->assertViewHas('activeClients', 6);
 
         $this->assertSame(
             7,
@@ -101,8 +98,7 @@ class DashboardTest extends TestCase
         $this->crearSuscripcion($cliente, 30, SubscriptionStatus::Cancelled);
         $this->crearSuscripcion($cliente, -1, SubscriptionStatus::Active);
 
-
-        $this->get(route('dashboard'))->assertViewHas('clientesActivos', 6);
+        $this->get(route('dashboard'))->assertViewHas('activeClients', 6);
     }
 
     public function test_monthly_revenue_is_displayed_in_bolivianos(): void
@@ -112,7 +108,6 @@ class DashboardTest extends TestCase
             ->assertSee('Bs 350,50')
             ->assertDontSee('$350');
     }
-
 
     private function suscripcion(
         string $nombre,
