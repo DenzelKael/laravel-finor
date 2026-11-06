@@ -17,19 +17,33 @@
             <div class="card-body">
                 @foreach ($permissions->groupBy(fn($p) => Str::before($p->name, '.')) as $module => $items)
 
-                    <h5 class="mt-3 text-capitalize">
-                        {{ $module }}
-                    </h5>
+                    <div class="d-flex align-items-center justify-content-between mt-3">
+                        <h5 class="text-capitalize mb-0">
+                            {{ $module }}
+                        </h5>
+
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input module-toggle" data-module="{{ $module }}"
+                                id="toggle-{{ $module }}">
+
+                            <label class="form-check-label" for="toggle-{{ $module }}">
+                                Marcar todos
+                            </label>
+                        </div>
+                    </div>
 
                     @foreach ($items as $permission)
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="permissions[]" value="{{ $permission->name }}"
+                            <input type="checkbox" class="form-check-input permission-checkbox" data-module="{{ $module }}"
+                                name="permissions[]" value="{{ $permission->name }}"
                                 @checked($role->hasPermissionTo($permission->name))>
+
                             <label class="form-check-label">
                                 {{ $permission->name }}
                             </label>
                         </div>
                     @endforeach
+
                 @endforeach
             </div>
         </div>

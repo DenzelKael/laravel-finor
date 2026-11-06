@@ -41,6 +41,53 @@ export default class SwalMessages {
         });
         return result.isConfirmed;
     }
+    static async confirmWithReason(
+    text,
+    title = 'Confirmar',
+    confirmText = 'Sí, continuar'
+) {
+    const result = await Swal.fire({
+        title,
+        text,
+        icon: 'warning',
+        input: 'textarea',
+        inputLabel: 'Motivo de anulación',
+        inputPlaceholder: 'Ingrese el motivo de anulación...',
+        inputAttributes: {
+            maxlength: 255,
+        },
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: confirmText,
+        cancelButtonText: 'Cancelar',
+        preConfirm: (value) => {
+            const reason = value?.trim();
+
+            if (!reason) {
+                Swal.showValidationMessage(
+                    'Debe ingresar el motivo de anulación.'
+                );
+
+                return false;
+            }
+
+            if (reason.length > 255) {
+                Swal.showValidationMessage(
+                    'El motivo no puede superar los 255 caracteres.'
+                );
+
+                return false;
+            }
+
+            return reason;
+        },
+    });
+
+    return result.isConfirmed
+        ? result.value
+        : null;
+}
 
     static async confirmDelete(entityName = 'este registro') {
         return this.confirm(

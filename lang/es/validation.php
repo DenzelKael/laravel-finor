@@ -210,12 +210,12 @@ return [
     |
     */
 
-   'attributes' => [
-    'nombre' => 'nombre',
-    'descripcion' => 'descripción',
-    'precio' => 'precio',
-    'duracion_dias' => 'duración en días',
-    'activo' => 'estado',
-],
+    'attributes' => [
+        'nombre' => 'nombre',
+        'descripcion' => 'descripción',
+        'precio' => 'precio',
+        'duracion_dias' => 'duración en días',
+        'activo' => 'estado',
+    ],
 
 ];

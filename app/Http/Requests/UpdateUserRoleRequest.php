@@ -12,7 +12,7 @@ class UpdateUserRoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('users.update') ?? false;
     }
 
     /**
@@ -38,6 +38,7 @@ class UpdateUserRoleRequest extends FormRequest
             ],
         ];
     }
+
     public function messages(): array
     {
         return [

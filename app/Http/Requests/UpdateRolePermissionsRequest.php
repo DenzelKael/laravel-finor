@@ -7,33 +7,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRolePermissionsRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('roles.update') ?? false;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'permissions' => [
-                'nullable',
-                'array',
-            ],
-
-            'permissions.*' => [
-                'exists:permissions,name',
-            ],
+            'permissions' => ['nullable', 'array'],
+            'permissions.*' => ['exists:permissions,name'],
         ];
-
     }
+
     public function messages(): array
     {
         return [

@@ -9,7 +9,9 @@ function showAlert(message, type = 'success') {
     }
 
     const alert = document.createElement('div');
-    alert.className = `alert alert-${type} alert-dismissible fade show m-3`;
+    alert.className =
+        `alert alert-${type} alert-dismissible fade show m-3`;
+
     alert.setAttribute('role', 'alert');
 
     const messageElement = document.createElement('span');
@@ -38,39 +40,56 @@ function showAlert(message, type = 'success') {
 }
 
 async function confirmCancelPayment(id, url) {
-    const confirmed = await SwalMessages.confirm(
-        'Esta acción cambiará el estado del pago a ANULADO y conservará el registro contable.',
+    const reason = await SwalMessages.confirmWithReason(
+        'El pago conservará su registro contable.',
         '¿Está seguro de anular este pago?',
         'Sí, anular pago'
     );
 
-    if (confirmed) {
-        cancelPayment(id, url);
+    if (!reason) {
+        return;
     }
+
+    await cancelPayment(id, url, reason);
 }
 
-async function cancelPayment(id, url) {
+async function cancelPayment(id, url, reason) {
     try {
-        const data = await api.patch(url);
-        showAlert(data.message || 'Pago anulado correctamente.', 'success');
+        const data = await api.patch(url, {
+            void_reason: reason,
+        });
 
-        // Actualizar visualmente la fila del pago
-        const badgeEl = document.getElementById(`payment-status-${id}`);
+        showAlert(
+            data.message || 'Pago anulado correctamente.',
+            'success'
+        );
+
+        const badgeEl = document.getElementById(
+            `payment-status-${id}`
+        );
+
         if (badgeEl) {
             badgeEl.className = 'badge badge-danger';
             badgeEl.textContent = 'Anulado';
         }
 
-        const actionBtn = document.getElementById(`payment-action-${id}`);
+        const actionBtn = document.getElementById(
+            `payment-action-${id}`
+        );
+
         if (actionBtn) {
             actionBtn.remove();
         }
     } catch (error) {
         if (error instanceof ApiError) {
             showAlert(error.message, 'danger');
-        } else {
-            showAlert('Ocurrió un error inesperado al anular el pago.', 'danger');
+            return;
         }
+
+        showAlert(
+            'Ocurrió un error inesperado al anular el pago.',
+            'danger'
+        );
     }
 }
 
@@ -90,12 +109,13 @@ document.addEventListener('click', function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    const flashMessage = sessionStorage.getItem('flash_message');
-    if (flashMessage) {
-        showAlert(flashMessage, 'success');
-        sessionStorage.removeItem('flash_message');
+    const flashMessage =
+        sessionStorage.getItem('flash_message');
+
+    if (!flashMessage) {
+        return;
     }
+
+    showAlert(flashMessage, 'success');
+    sessionStorage.removeItem('flash_message');
 });
-
-
-

@@ -1,16 +1,20 @@
 @props(['status'])
 
 @php
-    $badgeClass = match ($status?->value ?? (string) $status) {
-        \App\Enums\PaymentStatus::Registered->value, 'REGISTERED' => 'badge-success',
-        \App\Enums\PaymentStatus::Cancelled->value, 'CANCELLED' => 'badge-danger',
+    $statusValue = $status instanceof \App\Enums\PaymentStatus
+        ? $status->value
+        : (string) $status;
+
+    $badgeClass = match ($statusValue) {
+        \App\Enums\PaymentStatus::Registered->value => 'badge-success',
+        \App\Enums\PaymentStatus::Voided->value => 'badge-danger',
         default => 'badge-secondary',
     };
 
-    $label = match ($status?->value ?? (string) $status) {
-        \App\Enums\PaymentStatus::Registered->value, 'REGISTERED' => 'Registrado',
-        \App\Enums\PaymentStatus::Cancelled->value, 'CANCELLED' => 'Anulado',
-        default => (string) $status,
+    $label = match ($statusValue) {
+        \App\Enums\PaymentStatus::Registered->value => 'Registrado',
+        \App\Enums\PaymentStatus::Voided->value => 'Anulado',
+        default => 'Desconocido',
     };
 @endphp
 

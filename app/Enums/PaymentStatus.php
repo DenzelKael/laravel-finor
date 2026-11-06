@@ -5,13 +5,13 @@ namespace App\Enums;
 enum PaymentStatus: string
 {
     case Registered = 'REGISTERED';
-    case Cancelled = 'CANCELLED';
+    case Voided = 'VOIDED';
 
     public function label(): string
     {
         return match ($this) {
             self::Registered => 'Registrado',
-            self::Cancelled => 'Anulado',
+            self::Voided => 'Anulado',
         };
     }
 
@@ -19,7 +19,7 @@ enum PaymentStatus: string
     {
         return match ($this) {
             self::Registered => 'badge-success',
-            self::Cancelled => 'badge-danger',
+            self::Voided => 'badge-danger',
         };
     }
 }

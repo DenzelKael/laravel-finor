@@ -38,6 +38,6 @@ class PaymentPolicy
     public function cancel(User $user, Payment $payment): bool
     {
         return $user->can('payments.cancel')
-            && $payment->status !== PaymentStatus::Cancelled;
+            && $payment->status !== PaymentStatus::Voided;
     }
 }

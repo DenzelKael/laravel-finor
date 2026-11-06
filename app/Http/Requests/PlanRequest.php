@@ -18,7 +18,9 @@ class PlanRequest extends FormRequest
 
         return [
             'nombre' => [
-                'required', 'string', 'max:100',
+                'required',
+                'string',
+                'max:100',
                 Rule::unique('plans', 'nombre')->ignore($planId),
             ],
             'descripcion' => ['nullable', 'string', 'max:1000'],

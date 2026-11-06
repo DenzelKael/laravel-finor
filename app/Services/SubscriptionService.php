@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\SubscriptionStatus;
+use App\Models\Client;
 use App\Models\Plan;
 use App\Models\Subscription;
 use Carbon\Carbon;
@@ -41,7 +42,7 @@ class SubscriptionService
     /**
      * Método subscribe() según el requerimiento de la tarjeta escalable.
      */
-    public function subscribe(\App\Models\Client $client, Plan $plan, ?string $startDate = null): Subscription
+    public function subscribe(Client $client, Plan $plan, ?string $startDate = null): Subscription
     {
         return $this->createSubscription([
             'client_id' => $client->id,

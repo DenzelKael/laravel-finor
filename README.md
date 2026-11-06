@@ -182,6 +182,15 @@ El seeder principal coordina la carga de roles y permisos, clientes, planes y su
 
 La tabla refleja la organización funcional del proyecto; no implica que todos los módulos tengan el mismo grado de implementación.
 
+## Documentación del Proyecto
+
+En esta sección se encuentran los documentos técnicos y guías de uso de Laravel Finor:
+
+- **[Manual de Usuario](docs/manual-usuario.md):** Guía detallada de uso por rol (Administrador y Vendedor) para los módulos del sistema.
+- **[Diagrama Entidad-Relación (ER)](docs/diagrama-er.md):** Especificación técnica del modelo relacional de la base de datos.
+- **[Diagrama de Clases](docs/diagrama_clases.md):** Modelado de las clases del dominio y servicios del sistema.
+- **[Catálogo de Permisos](docs/permissions.md):** Matriz de permisos granulares organizados por módulo y acción.
+
 ## Roles y permisos
 
 El proyecto utiliza Spatie Laravel Permission para organizar la autorización.
