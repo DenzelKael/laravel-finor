@@ -79,28 +79,89 @@ Para mantener la uniformidad del frontend, se deben reutilizar los componentes d
 
 Antes de crear una funcionalidad similar, revisa si alguno de estos componentes ya resuelve esa necesidad.
 
-## 6. Convenciones para commits
+## 6. Convenciones para commits (Conventional Commits)
 
-Los mensajes de commit deben ser breves, claros y describir el propósito del cambio.
+Todos los integrantes deben utilizar el estándar **Conventional Commits** para escribir mensajes de commit claros, consistentes y fáciles de identificar.
 
-Se recomienda utilizar estos prefijos:
+### 6.1. Estructura del mensaje
 
-| Prefijo | Descripción |
-|---|---|
-| `feat:` | Nueva funcionalidad. |
-| `fix:` | Corrección de errores. |
-| `docs:` | Cambios en documentación. |
-| `refactor:` | Reestructuración del código. |
-| `test:` | Incorporación o modificación de pruebas. |
-| `style:` | Cambios de formato sin alterar la lógica. |
+Los mensajes deben seguir esta estructura:
+
+```text
+<tipo>(<alcance>): <descripción>
+```
+
+Donde:
+
+- **tipo:** identifica la naturaleza del cambio.
+- **alcance:** indica el módulo o parte del proyecto afectada. Es opcional.
+- **descripción:** resume brevemente el cambio realizado.
 
 Ejemplos:
 
-```bash
-git commit -m "feat: agregar modulo de suscripciones"
-git commit -m "fix: corregir validacion de clientes"
-git commit -m "docs: actualizar README y CONTRIBUTING"
+```text
+feat(suscripciones): agregar registro de suscripciones
+fix(clientes): corregir validación del correo electrónico
+docs: actualizar guía de instalación
+test(planes): agregar pruebas de creación de planes
 ```
+
+### 6.2. Tipos de commits permitidos
+
+Se utilizarán los siguientes tipos:
+
+| Tipo | Uso |
+|---|---|
+| `feat` | Incorporación de una nueva funcionalidad. |
+| `fix` | Corrección de un error. |
+| `docs` | Cambios en la documentación. |
+| `style` | Cambios de formato que no modifican la lógica. |
+| `refactor` | Modificación interna del código sin cambiar su comportamiento. |
+| `test` | Incorporación o modificación de pruebas. |
+| `build` | Cambios relacionados con dependencias o sistema de compilación. |
+| `ci` | Cambios en la integración y ejecución automatizada de pruebas. |
+| `perf` | Mejoras de rendimiento. |
+| `chore` | Tareas de mantenimiento que no corresponden a los tipos anteriores. |
+
+### 6.3. Reglas para escribir los mensajes
+
+- Utilizar minúsculas en el tipo y en la descripción.
+- Escribir una descripción breve y específica.
+- Utilizar el modo imperativo para describir el cambio.
+- No finalizar la descripción con un punto.
+- Evitar mensajes genéricos como `cambios`, `actualización` o `correcciones`.
+- Utilizar el alcance cuando ayude a identificar el módulo afectado.
+
+### 6.4. Cambios incompatibles (Breaking Changes)
+
+Cuando un commit introduzca un cambio que rompa la compatibilidad con funcionalidades existentes, se debe indicar utilizando `!` después del tipo o tipo y alcance.
+
+Ejemplo:
+
+```text
+feat(api)!: modificar estructura de respuesta
+```
+
+También se puede explicar el cambio incompatible en el cuerpo del mensaje utilizando el pie `BREAKING CHANGE:`.
+
+```text
+feat(api): modificar estructura de respuesta
+
+BREAKING CHANGE: los consumidores deben actualizar
+la forma en que interpretan la respuesta de la API.
+```
+
+### 6.5. Ejemplos de commits para Laravel Finor
+
+```bash
+git commit -m "feat(suscripciones): agregar registro de suscripciones"
+git commit -m "fix(clientes): corregir validación de correo"
+git commit -m "docs: actualizar CONTRIBUTING"
+git commit -m "test(planes): agregar pruebas de planes"
+git commit -m "refactor(usuarios): simplificar controlador"
+```
+
+Todos los integrantes deben respetar esta convención para mantener un historial de cambios organizado y facilitar la revisión del proyecto.
 
 ## 7. Flujo de trabajo con Git
 
