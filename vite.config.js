@@ -27,6 +27,7 @@ export default defineConfig({
                 'resources/js/roles/create.js',
                 'resources/js/roles/edit.js',
                 'resources/js/roles/index.js',
+                'resources/js/dashboard/main.js',
             ],
             refresh: true,
             fonts: [

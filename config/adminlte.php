@@ -217,7 +217,7 @@ return [
     'menu' => [
         [
             'text' => 'Dashboard',
-            'url' => 'admin',
+            'route' => 'dashboard',
             'icon' => 'bi bi-speedometer',
         ],
 
@@ -251,6 +251,15 @@ return [
             'can' => 'payments.view',
         ],
 
+        ['header' => 'REPORTES'],
+        [
+            'text' => 'Suscripciones por vencer',
+            'route' => 'reports.subscriptions.expiring',
+            'icon' => 'bi bi-calendar-event',
+            'active' => ['reports/expiring-subscriptions*'],
+            'can' => 'subscriptions.view',
+        ],
+
         ['header' => 'SISTEMA'],
         [
             'text' => 'Configuración',
@@ -273,6 +282,12 @@ return [
                     'url' => 'admin/permissions',
                     'icon' => 'bi bi-key-fill',
                     'can' => 'permissions.view',
+                ],
+                [
+                    'text' => 'Auditoría',
+                    'url' => 'admin/activity',
+                    'icon' => 'bi bi-clipboard-data',
+                    'can' => 'audit.view',
                 ],
             ],
         ],
