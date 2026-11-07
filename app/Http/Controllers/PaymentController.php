@@ -16,7 +16,7 @@ use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
-    public function index(): View
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Payment::class);
 
@@ -27,6 +27,10 @@ class PaymentController extends Controller
             ->latest('payment_date')
             ->latest('id')
             ->paginate(15);
+
+        if ($request->expectsJson()) {
+            return PaymentResource::collection($payments);
+        }
 
         return view('payments.index', compact('payments'));
     }
@@ -56,7 +60,7 @@ class PaymentController extends Controller
         ], 201);
     }
 
-    public function show(Payment $payment): View
+    public function show(Request $request, Payment $payment)
     {
         $this->authorize('view', $payment);
 
@@ -64,6 +68,10 @@ class PaymentController extends Controller
             'subscription.client',
             'subscription.plan',
         ]);
+
+        if ($request->expectsJson()) {
+            return new PaymentResource($payment);
+        }
 
         return view('payments.show', compact('payment'));
     }
