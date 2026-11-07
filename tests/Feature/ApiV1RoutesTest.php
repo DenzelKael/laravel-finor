@@ -31,7 +31,7 @@ class ApiV1RoutesTest extends TestCase
 
     public function test_guest_cannot_access_api_v1(): void
     {
-        $this->getJson(route('api.v1.clients.index'))
+        $this->getJson(route('api.clients.index'))
             ->assertUnauthorized();
     }
 
@@ -40,7 +40,7 @@ class ApiV1RoutesTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->getJson(route('api.v1.clients.index'))
+            ->getJson(route('api.clients.index'))
             ->assertForbidden();
     }
 
@@ -53,7 +53,7 @@ class ApiV1RoutesTest extends TestCase
         Client::factory()->count(2)->create();
 
         $this->actingAs($user)
-            ->getJson(route('api.v1.clients.index'))
+            ->getJson(route('api.clients.index'))
             ->assertOk()
             ->assertJsonStructure([
                 'data',
@@ -69,7 +69,7 @@ class ApiV1RoutesTest extends TestCase
         Plan::factory()->count(2)->create();
 
         $this->actingAs($user)
-            ->getJson(route('api.v1.plans.index'))
+            ->getJson(route('api.plans.index'))
             ->assertOk()
             ->assertJsonStructure([
                 'data',
@@ -83,7 +83,7 @@ class ApiV1RoutesTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->getJson(route('api.v1.payments.index'))
+            ->getJson(route('api.payments.index'))
             ->assertOk()
             ->assertJsonStructure([
                 'data',
@@ -111,7 +111,7 @@ class ApiV1RoutesTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson(
-                route('api.v1.clients.store'),
+                route('api.clients.store'),
                 $client->toArray()
             );
 
@@ -133,7 +133,7 @@ class ApiV1RoutesTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson(
-                route('api.v1.clients.destroy', $client)
+                route('api.clients.destroy', $client)
             )
             ->assertNoContent();
 
@@ -152,7 +152,7 @@ class ApiV1RoutesTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson(
-                route('api.v1.plans.store'),
+                route('api.plans.store'),
                 $plan->toArray()
             );
 
@@ -174,7 +174,7 @@ class ApiV1RoutesTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson(
-                route('api.v1.plans.destroy', $plan)
+                route('api.plans.destroy', $plan)
             )
             ->assertNoContent();
 
@@ -191,7 +191,7 @@ class ApiV1RoutesTest extends TestCase
 
         $this->actingAs($user)
             ->postJson(
-                route('api.v1.clients.store'),
+                route('api.clients.store'),
                 []
             )
             ->assertUnprocessable()

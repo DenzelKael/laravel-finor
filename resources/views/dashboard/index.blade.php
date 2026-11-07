@@ -50,11 +50,7 @@
                 <h3 class="card-title">Resumen de Actividad</h3>
             </div>
             <div class="card-body">
-                <div
-                    id="mainChart"
-                    data-url="{{ route('dashboard.chart') }}"
-                    style="min-height: 250px;">
-                </div>
+                <div id="mainChart" data-url="{{ route('dashboard.chart') }}" style="min-height: 250px;"></div>
             </div>
         </div>
     </div>

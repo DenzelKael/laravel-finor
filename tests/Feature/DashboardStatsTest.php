@@ -11,6 +11,7 @@ use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class DashboardStatsTest extends TestCase
@@ -51,9 +52,16 @@ class DashboardStatsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->getJson(route('dashboard.chart'));
+        $permission = Permission::findOrCreate('payments.view');
+        $user->givePermissionTo($permission);
+
+        $response = $this->actingAs($user)
+            ->getJson(route('dashboard.chart'));
 
         $response->assertOk();
-        $response->assertJsonStructure(['labels', 'data']);
+        $response->assertJsonStructure([
+            'labels',
+            'data',
+        ]);
     }
 }

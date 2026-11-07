@@ -11,17 +11,19 @@ Route::get('/ping', fn () => response()->json([
     'status' => 'ok',
 ]))->name('api.ping');
 
+Route::controller(ApiPlanController::class)
+    ->prefix('plans')
+    ->name('api.plans.')
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{plan}', 'show')->name('show');
+    });
+
 Route::middleware(['web', 'auth'])->group(function () {
-    /*
-     * Dashboard
-     */
     Route::get('/chart-data', [DashboardController::class, 'chartData'])
         ->middleware('permission:payments.view')
         ->name('dashboard.chart');
 
-    /*
-     * Clients API
-     */
     Route::controller(ClientController::class)
         ->prefix('clients')
         ->name('api.clients.')
@@ -47,22 +49,6 @@ Route::middleware(['web', 'auth'])->group(function () {
                 ->name('destroy');
         });
 
-    /*
-     * Plans API
-     */
-    Route::controller(ApiPlanController::class)
-        ->prefix('plans')
-        ->name('api.plans.')
-        ->group(function () {
-            Route::get('/', 'index')
-                ->middleware('permission:plans.view')
-                ->name('index');
-
-            Route::get('/{plan}', 'show')
-                ->middleware('permission:plans.view')
-                ->name('show');
-        });
-
     Route::controller(PlanController::class)
         ->prefix('plans')
         ->name('api.plans.')
@@ -80,9 +66,6 @@ Route::middleware(['web', 'auth'])->group(function () {
                 ->name('destroy');
         });
 
-    /*
-     * Payments API
-     */
     Route::controller(PaymentController::class)
         ->prefix('payments')
         ->name('api.payments.')

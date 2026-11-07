@@ -289,20 +289,14 @@ Route::middleware('auth')->group(function () {
     );
 
     // Dashboard
-    Route::get(
-        '/',
-        [DashboardController::class, 'index']
-    )->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-    Route::get(
-        '/dashboard',
-        [DashboardController::class, 'index']
-    )->name('dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard.index');
 
-    Route::post(
-        'logout',
-        [LoginController::class, 'logout']
-    )->name('logout');
+    Route::post('logout', [LoginController::class, 'logout'])
+        ->name('logout');
 
     // Rutas explícitas de Suscripciones (Equipo D)
     Route::controller(SubscriptionController::class)
@@ -333,7 +327,7 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permission:subscriptions.update')
                 ->name('renew');
 
-            // La cancelación de suscripción se mapea a subscriptions.delete
+            // La cancelación de suscripción se mapea a 'subscriptions.delete'
             // siguiendo el esquema estándar CRUD de permisos.
             Route::patch('/{subscription}/cancel', 'cancel')
                 ->middleware('permission:subscriptions.delete')
@@ -354,15 +348,14 @@ Route::middleware('auth')->group(function () {
         });
 });
 
-// AdminLTE audit log routes
 Route::middleware(['web', 'auth'])
     ->prefix('admin')
     ->name('adminlte.')
     ->group(function () {
-        Route::get(
-            'activity',
-            [ActivityController::class, 'index']
-        )
+        Route::get('activity', [
+            ActivityController::class,
+            'index',
+        ])
             ->middleware('permission:audit.view')
             ->name('activity.index');
     });
