@@ -65,6 +65,9 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'subscriptions.update']);
         Permission::firstOrCreate(['name' => 'subscriptions.delete']);
 
+        // Auditoría
+        Permission::firstOrCreate(['name' => 'audit.view']);
+
         $admin->syncPermissions(Permission::all());
 
         $vendedor->syncPermissions([

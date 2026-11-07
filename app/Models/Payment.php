@@ -88,8 +88,8 @@ class Payment extends Model
                 PaymentStatus::Registered->value
             )
             ->whereBetween('payment_date', [
-                now()->startOfMonth()->toDateString(),
-                now()->endOfMonth()->toDateString(),
+                now()->startOfMonth(),
+                now()->endOfMonth(),
             ]);
     }
 }

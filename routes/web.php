@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLte\ActivityController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -331,4 +333,27 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permission:subscriptions.delete')
                 ->name('cancel');
         });
+
+    // Reportes (Equipo G)
+    Route::controller(SubscriptionReportController::class)
+        ->prefix('reports')
+        ->name('reports.')
+        ->group(function () {
+            Route::get('/expiring-subscriptions', 'expiringSubscriptions')
+                ->middleware('permission:subscriptions.view')
+                ->name('subscriptions.expiring');
+        });
 });
+
+// AdminLTE audit log routes
+Route::middleware(['web', 'auth'])
+    ->prefix('admin')
+    ->name('adminlte.')
+    ->group(function () {
+        Route::get('activity', [
+            ActivityController::class,
+            'index',
+        ])
+            ->middleware('permission:audit.view')
+            ->name('activity.index');
+    });
