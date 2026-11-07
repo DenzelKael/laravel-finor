@@ -55,7 +55,7 @@ class FullFlowTest extends TestCase
             ->toArray();
 
         $clientResponse = $this->postJson(
-            route('api.v1.clients.store'),
+            route('api.clients.store'),
             $clientPayload
         );
 
@@ -92,7 +92,7 @@ class FullFlowTest extends TestCase
             ->toArray();
 
         $planResponse = $this->postJson(
-            route('api.v1.plans.store'),
+            route('api.plans.store'),
             $planPayload
         );
 
@@ -172,7 +172,7 @@ class FullFlowTest extends TestCase
         $paymentMethod = PaymentMethod::cases()[0]->value;
 
         $paymentResponse = $this->postJson(
-            route('api.v1.payments.store'),
+            route('api.payments.store'),
             [
                 'subscription_id' => $subscriptionId,
                 'amount' => 40.00,
@@ -238,19 +238,19 @@ class FullFlowTest extends TestCase
 
         $this->assertSame(
             1,
-            (int) $dashboardResponse->viewData('clientesActivos'),
+            (int) $dashboardResponse->viewData('activeClients'),
             '[DASHBOARD] El indicador de clientes activos es incorrecto.'
         );
 
         $this->assertEquals(
             40.00,
-            (float) $dashboardResponse->viewData('ingresosMes'),
+            (float) $dashboardResponse->viewData('monthlyRevenue'),
             '[DASHBOARD] El indicador de ingresos del mes es incorrecto.'
         );
 
         $this->assertSame(
             1,
-            (int) $dashboardResponse->viewData('suscripcionesPorVencer'),
+            (int) $dashboardResponse->viewData('expiringSubscriptions'),
             '[DASHBOARD] El indicador de suscripciones por vencer es incorrecto.'
         );
     }

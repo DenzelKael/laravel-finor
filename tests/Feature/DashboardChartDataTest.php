@@ -26,7 +26,7 @@ class DashboardChartDataTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->getJson(route('api.chart-data.index'));
+            ->getJson(route('dashboard.chart'));
 
         $response
             ->assertOk()
@@ -39,7 +39,7 @@ class DashboardChartDataTest extends TestCase
     public function test_guest_cannot_retrieve_chart_data(): void
     {
         $response = $this->getJson(
-            route('api.chart-data.index')
+            route('dashboard.chart')
         );
 
         $response->assertUnauthorized();
@@ -51,7 +51,7 @@ class DashboardChartDataTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->getJson(route('api.chart-data.index'));
+            ->getJson(route('dashboard.chart'));
 
         $response->assertForbidden();
     }
