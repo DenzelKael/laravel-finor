@@ -10,7 +10,9 @@ use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class DashboardStatsTest extends TestCase
@@ -31,7 +33,7 @@ class DashboardStatsTest extends TestCase
             'expiration_date' => now()->addDays(10),
         ]);
 
-        Payment::forceCreate([
+        Payment::factory()->create([
             'subscription_id' => $subscription->id,
             'amount' => 100,
             'payment_date' => now(),
@@ -47,13 +49,69 @@ class DashboardStatsTest extends TestCase
         $response->assertViewHas('expiringSubscriptions', 1);
     }
 
-    public function test_chart_data_returns_json_with_labels_and_data(): void
+    public function test_chart_data_returns_aggregated_payment_data(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->getJson(route('dashboard.chart'));
+        $permission = Permission::findOrCreate('payments.view');
+        $user->givePermissionTo($permission);
 
-        $response->assertOk();
-        $response->assertJsonStructure(['labels', 'data']);
+        $client = Client::factory()->create();
+        $plan = Plan::factory()->create(['precio' => 500]);
+
+        $subscription = Subscription::factory()->create([
+            'client_id' => $client->id,
+            'plan_id' => $plan->id,
+            'status' => SubscriptionStatus::Active->value,
+            'expiration_date' => now()->addMonth(),
+        ]);
+
+        $firstWeekDate = now()
+            ->copy()
+            ->startOfYear()
+            ->next(Carbon::MONDAY);
+
+        $secondWeekDate = $firstWeekDate->copy()->addWeek();
+
+        Payment::factory()->create([
+            'subscription_id' => $subscription->id,
+            'amount' => 100,
+            'payment_date' => $firstWeekDate->toDateString(),
+            'status' => PaymentStatus::Registered->value,
+            'payment_method' => PaymentMethod::Cash->value,
+        ]);
+
+        Payment::factory()->create([
+            'subscription_id' => $subscription->id,
+            'amount' => 50,
+            'payment_date' => $firstWeekDate->copy()->addDay()->toDateString(),
+            'status' => PaymentStatus::Registered->value,
+            'payment_method' => PaymentMethod::Cash->value,
+        ]);
+
+        Payment::factory()->create([
+            'subscription_id' => $subscription->id,
+            'amount' => 200,
+            'payment_date' => $secondWeekDate->toDateString(),
+            'status' => PaymentStatus::Registered->value,
+            'payment_method' => PaymentMethod::Cash->value,
+        ]);
+
+        $firstWeek = $firstWeekDate->weekOfYear;
+        $secondWeek = $secondWeekDate->weekOfYear;
+
+        $this->actingAs($user)
+            ->getJson(route('dashboard.chart'))
+            ->assertOk()
+            ->assertExactJson([
+                'labels' => [
+                    'Semana '.$firstWeek,
+                    'Semana '.$secondWeek,
+                ],
+                'data' => [
+                    150.0,
+                    200.0,
+                ],
+            ]);
     }
 }
