@@ -7,13 +7,15 @@ use App\Enums\SubscriptionStatus;
 use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Subscription;
-use Carbon\Carbon;
 
 class DashboardStats
 {
     public function getActiveClients(): int
     {
-        return Client::whereHas('subscriptions', fn ($query) => $query->active())->count();
+        return Client::whereHas(
+            'subscriptions',
+            fn ($query) => $query->active()
+        )->count();
     }
 
     public function getMonthlyRevenue(): float
@@ -27,21 +29,36 @@ class DashboardStats
     {
         return Subscription::query()
             ->where('status', SubscriptionStatus::Active->value)
-            ->whereBetween('expiration_date', [today(), today()->addDays($days)])
+            ->whereBetween('expiration_date', [
+                today(),
+                today()->addDays($days),
+            ])
             ->count();
     }
 
     public function getChartData(): array
     {
+        $startOfYear = now()->copy()->startOfYear();
+        $endOfYear = now()->copy()->endOfYear();
+
         $payments = Payment::query()
+            ->select([
+                'payment_date',
+                'amount',
+            ])
             ->where('status', PaymentStatus::Registered->value)
-            ->whereYear('payment_date', now()->year)
+            ->whereBetween('payment_date', [
+                $startOfYear->toDateString(),
+                $endOfYear->toDateString(),
+            ])
             ->orderBy('payment_date')
             ->get();
 
-        $grouped = $payments->groupBy(function ($payment) {
-            return Carbon::parse($payment->payment_date)->weekOfYear;
-        })->sortKeys();
+        $grouped = $payments
+            ->groupBy(
+                fn (Payment $payment) => $payment->payment_date->weekOfYear
+            )
+            ->sortKeys();
 
         $labels = [];
         $data = [];
