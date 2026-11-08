@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Subscription;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardStats
 {
@@ -33,15 +34,27 @@ class DashboardStats
 
     public function getChartData(): array
     {
-        $payments = Payment::query()
+        $startOfYear = now()->copy()->startOfYear();
+        $endOfYear = now()->copy()->endOfYear();
+
+        $payments = DB::table('payments')
+            ->select([
+                'payment_date',
+                'amount',
+            ])
             ->where('status', PaymentStatus::Registered->value)
-            ->whereYear('payment_date', now()->year)
+            ->whereBetween('payment_date', [
+                $startOfYear->toDateString(),
+                $endOfYear->toDateString(),
+            ])
             ->orderBy('payment_date')
             ->get();
 
-        $grouped = $payments->groupBy(function ($payment) {
-            return Carbon::parse($payment->payment_date)->weekOfYear;
-        })->sortKeys();
+        $grouped = $payments
+            ->groupBy(function ($payment) {
+                return Carbon::parse($payment->payment_date)->weekOfYear;
+            })
+            ->sortKeys();
 
         $labels = [];
         $data = [];
