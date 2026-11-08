@@ -33,7 +33,7 @@ class DashboardStatsTest extends TestCase
             'expiration_date' => now()->addDays(10),
         ]);
 
-        Payment::forceCreate([
+        Payment::factory()->create([
             'subscription_id' => $subscription->id,
             'amount' => 100,
             'payment_date' => now(),
@@ -73,7 +73,7 @@ class DashboardStatsTest extends TestCase
 
         $secondWeekDate = $firstWeekDate->copy()->addWeek();
 
-        Payment::forceCreate([
+        Payment::factory()->create([
             'subscription_id' => $subscription->id,
             'amount' => 100,
             'payment_date' => $firstWeekDate->toDateString(),
@@ -81,7 +81,7 @@ class DashboardStatsTest extends TestCase
             'payment_method' => PaymentMethod::Cash->value,
         ]);
 
-        Payment::forceCreate([
+        Payment::factory()->create([
             'subscription_id' => $subscription->id,
             'amount' => 50,
             'payment_date' => $firstWeekDate->copy()->addDay()->toDateString(),
@@ -89,7 +89,7 @@ class DashboardStatsTest extends TestCase
             'payment_method' => PaymentMethod::Cash->value,
         ]);
 
-        Payment::forceCreate([
+        Payment::factory()->create([
             'subscription_id' => $subscription->id,
             'amount' => 200,
             'payment_date' => $secondWeekDate->toDateString(),
