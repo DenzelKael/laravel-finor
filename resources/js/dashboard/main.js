@@ -13,7 +13,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         new ApexCharts(el, {
             chart: { type: 'area', height: 250, toolbar: { show: false } },
-            series: [{ name: 'Ingresos (Bs)', data: data.data ?? [] }],
+            series: [
+    {
+        name: el.dataset.seriesLabel ?? '',
+        data: data.data ?? [],
+    },
+],
             xaxis: { categories: data.labels ?? [] },
             colors: ['#3c8dbc'],
             stroke: { curve: 'smooth', width: 2 },

@@ -7,14 +7,15 @@ use App\Enums\SubscriptionStatus;
 use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Subscription;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class DashboardStats
 {
     public function getActiveClients(): int
     {
-        return Client::whereHas('subscriptions', fn ($query) => $query->active())->count();
+        return Client::whereHas(
+            'subscriptions',
+            fn ($query) => $query->active()
+        )->count();
     }
 
     public function getMonthlyRevenue(): float
@@ -28,7 +29,10 @@ class DashboardStats
     {
         return Subscription::query()
             ->where('status', SubscriptionStatus::Active->value)
-            ->whereBetween('expiration_date', [today(), today()->addDays($days)])
+            ->whereBetween('expiration_date', [
+                today(),
+                today()->addDays($days),
+            ])
             ->count();
     }
 
@@ -37,7 +41,7 @@ class DashboardStats
         $startOfYear = now()->copy()->startOfYear();
         $endOfYear = now()->copy()->endOfYear();
 
-        $payments = DB::table('payments')
+        $payments = Payment::query()
             ->select([
                 'payment_date',
                 'amount',
@@ -51,9 +55,9 @@ class DashboardStats
             ->get();
 
         $grouped = $payments
-            ->groupBy(function ($payment) {
-                return Carbon::parse($payment->payment_date)->weekOfYear;
-            })
+            ->groupBy(
+                fn (Payment $payment) => $payment->payment_date->weekOfYear
+            )
             ->sortKeys();
 
         $labels = [];
