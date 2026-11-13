@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PaymentStatus;
 use App\Enums\SubscriptionStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -105,6 +106,17 @@ class Subscription extends Model
                 '>=',
                 today()
             );
+    }
+
+    /**
+     * Suscripciones activas que vencen entre hoy y dentro de N días (ambos inclusive).
+     */
+    public function scopeExpiringWithin(Builder $query, int $days): Builder
+    {
+        return $query
+            ->where('status', SubscriptionStatus::Active->value)
+            ->whereDate('expiration_date', '>=', today())
+            ->whereDate('expiration_date', '<=', today()->addDays($days));
     }
 
     /**
