@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\SubscriptionStatus;
 use App\Http\Requests\SubscriptionRequest;
 use App\Models\Client;
 use App\Models\Plan;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
@@ -100,6 +102,27 @@ class SubscriptionRequestTest extends TestCase
             'El plan seleccionado no existe o no está activo.',
             $validator->errors()->first('plan_id')
         );
+    }
+
+    public function test_request_does_not_check_active_subscription_rule(): void
+    {
+        // La regla "una sola activa por cliente" vive solo en SubscriptionService.
+        $client = $this->client();
+        $plan = $this->plan(true);
+
+        Subscription::create([
+            'client_id' => $client->id,
+            'plan_id' => $plan->id,
+            'start_date' => today()->toDateString(),
+            'expiration_date' => today()->addDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Active,
+        ]);
+
+        $data = ['client_id' => $client->id, 'plan_id' => $plan->id];
+        $request = $this->requestFor(null, $data);
+
+        $this->assertFalse(method_exists($request, 'withValidator'));
+        $this->assertTrue($this->validate($data)->passes());
     }
 
     public function test_rules_reject_nonexistent_plan(): void

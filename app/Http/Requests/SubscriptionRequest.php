@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Subscription;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -40,24 +39,5 @@ class SubscriptionRequest extends FormRequest
             'plan_id.exists' => 'El plan seleccionado no existe o no está activo.',
             'start_date.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
         ];
-    }
-
-    /**
-     * Configurar validaciones adicionales posteriores (no duplicar suscripción activa).
-     */
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            $clientId = $this->input('client_id');
-            if ($clientId) {
-                $hasActive = Subscription::where('client_id', $clientId)
-                    ->active()
-                    ->exists();
-
-                if ($hasActive) {
-                    $validator->errors()->add('client_id', 'El cliente ya cuenta con una suscripción activa.');
-                }
-            }
-        });
     }
 }

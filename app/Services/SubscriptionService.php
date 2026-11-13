@@ -9,34 +9,46 @@ use App\Models\Client;
 use App\Models\Plan;
 use App\Models\Subscription;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class SubscriptionService
 {
     /**
      * Crear una nueva suscripción calculando la fecha de expiración basada en el plan.
+     *
+     * Única fuente de la regla "una sola suscripción activa por cliente".
+     * Se ejecuta en una transacción bloqueando la fila del cliente y sus
+     * suscripciones, para que dos altas simultáneas no pasen ambas la comprobación.
+     *
+     * @throws SubscriptionAlreadyActiveException
      */
     public function createSubscription(array $data): Subscription
     {
-        $hasActive = Subscription::where('client_id', $data['client_id'])
-            ->active()
-            ->exists();
-
-        if ($hasActive) {
-            throw new SubscriptionAlreadyActiveException;
-        }
-
         $plan = Plan::findOrFail($data['plan_id']);
 
         $startDate = isset($data['start_date']) ? Carbon::parse($data['start_date'])->toDateString() : today()->toDateString();
         $expirationDate = Carbon::parse($startDate)->addDays($plan->duracion_dias)->toDateString();
 
-        $subscription = Subscription::create([
-            'client_id' => $data['client_id'],
-            'plan_id' => $plan->id,
-            'start_date' => $startDate,
-            'expiration_date' => $expirationDate,
-            'status' => SubscriptionStatus::Active,
-        ]);
+        $subscription = DB::transaction(function () use ($data, $plan, $startDate, $expirationDate) {
+            // Bloquear el cliente serializa las altas aunque aún no tenga suscripciones.
+            $client = Client::query()->lockForUpdate()->findOrFail($data['client_id']);
+
+            $hasActive = $client->subscriptions()
+                ->active()
+                ->lockForUpdate()
+                ->exists();
+
+            if ($hasActive) {
+                throw new SubscriptionAlreadyActiveException;
+            }
+
+            return $client->subscriptions()->create([
+                'plan_id' => $plan->id,
+                'start_date' => $startDate,
+                'expiration_date' => $expirationDate,
+                'status' => SubscriptionStatus::Active,
+            ]);
+        });
 
         return $subscription->load(['client', 'plan']);
     }

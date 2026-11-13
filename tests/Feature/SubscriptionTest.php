@@ -336,6 +336,62 @@ class SubscriptionTest extends TestCase
     }
 
     /**
+     * El servicio rechaza el duplicado sin insertar nada y con el mensaje de dominio.
+     */
+    public function test_duplicate_active_subscription_is_rejected_by_service_without_inserting(): void
+    {
+        $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+            ])
+            ->assertStatus(201);
+
+        $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'client_id' => 'El cliente ya cuenta con una suscripción activa.',
+            ]);
+
+        $this->assertDatabaseCount('subscriptions', 1);
+    }
+
+    /**
+     * Un cliente cuya suscripción anterior está cancelada o vencida puede suscribirse de nuevo.
+     */
+    public function test_client_with_cancelled_or_expired_subscription_can_subscribe_again(): void
+    {
+        Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->subDays(60)->toDateString(),
+            'expiration_date' => today()->subDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Expired,
+        ]);
+
+        Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->toDateString(),
+            'expiration_date' => today()->addDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Cancelled,
+        ]);
+
+        $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+            ])
+            ->assertStatus(201);
+
+        $this->assertDatabaseCount('subscriptions', 3);
+    }
+
+    /**
      * Test 10: El comando subscriptions:expire marca como vencidas las suscripciones pasadas.
      */
     public function test_expire_subscriptions_command_marks_past_subscriptions_as_expired(): void
