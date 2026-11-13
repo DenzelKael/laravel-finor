@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('subscriptions:expire')->daily();
+Schedule::command('subscriptions:notify-expiring --days=3')->dailyAt('08:00');
