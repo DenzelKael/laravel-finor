@@ -113,6 +113,52 @@ class SubscriptionTest extends TestCase
     }
 
     /**
+     * Rechaza el alta con start_date en el pasado: evita guardar suscripciones
+     * con status ACTIVE cuya expiration_date ya pasó.
+     */
+    public function test_cannot_create_subscription_with_start_date_in_the_past(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+                'start_date' => today()->subDays(60)->toDateString(),
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'start_date' => 'La fecha de inicio no puede ser anterior a hoy.',
+            ]);
+
+        $this->assertDatabaseCount('subscriptions', 0);
+    }
+
+    /**
+     * Acepta start_date de hoy o futura, y también omitirla (usa hoy).
+     */
+    public function test_can_create_subscription_with_start_date_today_future_or_omitted(): void
+    {
+        foreach ([today()->toDateString(), today()->addDays(5)->toDateString(), null] as $i => $startDate) {
+            $client = Client::create([
+                'name' => "Cliente {$i}",
+                'email' => "cliente{$i}@example.com",
+                'phone' => '70000000',
+                'address' => 'Av. Test',
+            ]);
+
+            $this->actingAs($this->user)
+                ->postJson('/subscriptions', array_filter([
+                    'client_id' => $client->id,
+                    'plan_id' => $this->activePlan->id,
+                    'start_date' => $startDate,
+                ]))
+                ->assertStatus(201);
+        }
+
+        $this->assertDatabaseCount('subscriptions', 3);
+    }
+
+    /**
      * Test 3: Renovación de suscripción activa o vencida actualiza expiration_date.
      */
     public function test_can_renew_active_or_expired_subscription(): void
@@ -287,6 +333,62 @@ class SubscriptionTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['client_id']);
+    }
+
+    /**
+     * El servicio rechaza el duplicado sin insertar nada y con el mensaje de dominio.
+     */
+    public function test_duplicate_active_subscription_is_rejected_by_service_without_inserting(): void
+    {
+        $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+            ])
+            ->assertStatus(201);
+
+        $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'client_id' => 'El cliente ya cuenta con una suscripción activa.',
+            ]);
+
+        $this->assertDatabaseCount('subscriptions', 1);
+    }
+
+    /**
+     * Un cliente cuya suscripción anterior está cancelada o vencida puede suscribirse de nuevo.
+     */
+    public function test_client_with_cancelled_or_expired_subscription_can_subscribe_again(): void
+    {
+        Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->subDays(60)->toDateString(),
+            'expiration_date' => today()->subDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Expired,
+        ]);
+
+        Subscription::create([
+            'client_id' => $this->client->id,
+            'plan_id' => $this->activePlan->id,
+            'start_date' => today()->toDateString(),
+            'expiration_date' => today()->addDays(30)->toDateString(),
+            'status' => SubscriptionStatus::Cancelled,
+        ]);
+
+        $this->actingAs($this->user)
+            ->postJson('/subscriptions', [
+                'client_id' => $this->client->id,
+                'plan_id' => $this->activePlan->id,
+            ])
+            ->assertStatus(201);
+
+        $this->assertDatabaseCount('subscriptions', 3);
     }
 
     /**
