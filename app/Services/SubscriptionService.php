@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\SubscriptionStatus;
+use App\Exceptions\SubscriptionAlreadyActiveException;
+use App\Exceptions\SubscriptionCancelledException;
 use App\Models\Client;
 use App\Models\Plan;
 use App\Models\Subscription;
@@ -20,7 +22,7 @@ class SubscriptionService
             ->exists();
 
         if ($hasActive) {
-            abort(422, 'El cliente ya cuenta con una suscripción activa.');
+            throw new SubscriptionAlreadyActiveException;
         }
 
         $plan = Plan::findOrFail($data['plan_id']);
@@ -57,14 +59,21 @@ class SubscriptionService
      */
     public function renew(Subscription $subscription): Subscription
     {
-        if ($subscription->status === SubscriptionStatus::Cancelled || $subscription->status === SubscriptionStatus::Cancelled->value) {
-            abort(422, 'No se puede renovar una suscripción cancelada.');
+        if ($subscription->status === SubscriptionStatus::Cancelled) {
+            throw new SubscriptionCancelledException(
+                'No se puede renovar una suscripción cancelada.'
+            );
         }
 
         $plan = $subscription->plan;
 
-        $baseDate = $subscription->isExpired() ? today() : Carbon::parse($subscription->expiration_date);
-        $newExpirationDate = $baseDate->copy()->addDays($plan->duracion_dias)->toDateString();
+        $baseDate = $subscription->isExpired()
+            ? today()
+            : Carbon::parse($subscription->expiration_date);
+
+        $newExpirationDate = $baseDate->copy()
+            ->addDays($plan->duracion_dias)
+            ->toDateString();
 
         $subscription->update([
             'expiration_date' => $newExpirationDate,
@@ -74,14 +83,12 @@ class SubscriptionService
         return $subscription->load(['client', 'plan']);
     }
 
-    /**
-     * Cancelar una suscripción.
-     * Aborta con HTTP 422 si ya se encuentra cancelada.
-     */
     public function cancel(Subscription $subscription): Subscription
     {
-        if ($subscription->status === SubscriptionStatus::Cancelled || $subscription->status === SubscriptionStatus::Cancelled->value) {
-            abort(422, 'La suscripción ya se encuentra cancelada.');
+        if ($subscription->status === SubscriptionStatus::Cancelled) {
+            throw new SubscriptionCancelledException(
+                'La suscripción ya se encuentra cancelada.'
+            );
         }
 
         $subscription->update([
