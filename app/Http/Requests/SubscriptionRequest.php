@@ -27,7 +27,7 @@ class SubscriptionRequest extends FormRequest
         return [
             'client_id' => ['required', 'exists:clients,id'],
             'plan_id' => ['required', Rule::exists('plans', 'id')->where('activo', true)],
-            'start_date' => ['nullable', 'date'],
+            'start_date' => ['nullable', 'date', 'after_or_equal:today'],
         ];
     }
 
@@ -38,6 +38,7 @@ class SubscriptionRequest extends FormRequest
     {
         return [
             'plan_id.exists' => 'El plan seleccionado no existe o no está activo.',
+            'start_date.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
         ];
     }
 

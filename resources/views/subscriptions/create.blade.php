@@ -63,7 +63,8 @@
                                name="start_date"
                                id="start_date"
                                class="form-control"
-                               value="{{ old('start_date', date('Y-m-d')) }}">
+                               min="{{ today()->toDateString() }}"
+                               value="{{ old('start_date', today()->toDateString()) }}">
                         <small class="form-text text-muted">Si no se especifica, se tomará la fecha actual.</small>
                         <div class="invalid-feedback"></div>
                     </div>
