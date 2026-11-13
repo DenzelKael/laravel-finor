@@ -14,7 +14,7 @@ class SubscriptionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('subscriptions.create') ?? false;
     }
 
     /**
@@ -28,6 +28,16 @@ class SubscriptionRequest extends FormRequest
             'client_id' => ['required', 'exists:clients,id'],
             'plan_id' => ['required', Rule::exists('plans', 'id')->where('activo', true)],
             'start_date' => ['nullable', 'date'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'plan_id.exists' => 'El plan seleccionado no existe o no está activo.',
         ];
     }
 
