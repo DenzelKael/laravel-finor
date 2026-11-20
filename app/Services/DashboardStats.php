@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\PaymentStatus;
-use App\Enums\SubscriptionStatus;
 use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Subscription;
@@ -25,10 +24,7 @@ class DashboardStats
 
     public function getExpiringSubscriptions(int $days = 15): int
     {
-        return Subscription::query()
-            ->where('status', SubscriptionStatus::Active->value)
-            ->whereBetween('expiration_date', [today(), today()->addDays($days)])
-            ->count();
+        return Subscription::expiringWithin($days)->count();
     }
 
     public function getChartData(): array
